@@ -58,13 +58,13 @@
 - [x] Tests RBAC: 7/7 (guest→login, acceso por rol, 403, password pendiente)
 
 ## Fase 4 — Módulo Noticias
-- [ ] CRUD por rol (Docente solo propias; Admin/Super todas)
-- [ ] Imágenes (máx 10, portada, drag&drop, WebP)
-- [ ] Adjuntos validados (MIME real)
-- [ ] Estados publicado/borrador (Docente publica directo)
-- [ ] Autor + cargo + `updated_by` (badge "modificado por")
-- [ ] Papelera propia/general + restaurar + purga 7 días
-- [ ] Registro en Historial
+- [x] CRUD por rol (Docente solo propias; Admin/Super todas)
+- [x] Imágenes (máx 10, portada, drag&drop, WebP)
+- [x] Adjuntos validados (MIME real)
+- [x] Estados publicado/borrador (Docente publica directo)
+- [x] Autor + cargo + `updated_by` (badge "modificado por")
+- [x] Papelera jerárquica por autoría (Docente solo propias; Admin propias + de docentes; Super todas) + restaurar + purga 7 días (lazy + `noticias:purgar-papelera` programado)
+- [x] Registro en Historial
 
 ## Fase 5 — Módulo Docentes (Admin/Super)
 - [ ] CRUD + foto con cropper + WebP

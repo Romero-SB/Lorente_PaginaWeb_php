@@ -71,6 +71,11 @@ class Noticia extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
     public function imagenes()
     {
         return $this->hasMany(NoticiaImagen::class)->orderBy('orden');

@@ -8,6 +8,18 @@ return [
         'docente' => 'Docente',
     ],
 
+    'categorias_noticias' => [
+        'Logros' => '🏆 Logros',
+        'Concurso' => '🥇 Concurso',
+        'Resultados' => '📋 Resultados',
+        'Cultura' => '🎭 Cultura',
+        'Educacion' => '📚 Educación',
+        'Evento' => '🥳 Evento',
+        'Comunicado' => '📢 Comunicado',
+    ],
+
+    'dias_purga_papelera' => 7,
+
     'secciones' => [
         'resumen' => [
             'etiqueta' => 'Resumen',

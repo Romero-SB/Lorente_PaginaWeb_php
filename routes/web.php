@@ -41,6 +41,15 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
 
     Route::middleware('debe.cambiar.password')->group(function () {
         Route::get('/noticias', [NoticiasController::class, 'index'])->name('panel.noticias.index');
+        Route::post('/noticias', [NoticiasController::class, 'store'])->name('panel.noticias.store');
+        Route::post('/noticias/{noticia}', [NoticiasController::class, 'update'])->name('panel.noticias.update');
+        Route::post('/noticias/{noticia}/eliminar', [NoticiasController::class, 'destroy'])->name('panel.noticias.destroy');
+        Route::post('/noticias/{noticia}/restaurar', [NoticiasController::class, 'restaurar'])
+            ->withTrashed()
+            ->name('panel.noticias.restaurar');
+        Route::post('/noticias/{noticia}/permanente', [NoticiasController::class, 'permanente'])
+            ->withTrashed()
+            ->name('panel.noticias.permanente');
         Route::get('/docentes', [DocentesController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.docentes.index');
