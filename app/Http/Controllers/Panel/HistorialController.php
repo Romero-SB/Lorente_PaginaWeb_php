@@ -19,6 +19,8 @@ class HistorialController extends Controller
         'App\Models\Noticia' => 'Noticia',
         'App\Models\Docente' => 'Docente',
         'App\Models\Documento' => 'Documento',
+        'App\Models\Config' => 'Configuración',
+        'App\Models\User' => 'Cuenta',
     ];
 
     public function index(Request $request): Response

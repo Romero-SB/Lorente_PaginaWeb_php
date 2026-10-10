@@ -49,7 +49,7 @@ class PanelSeccionesTest extends TestCase
         }
     }
 
-    public function test_administrador_accede_a_sus_secciones_pero_no_a_cuentas(): void
+    public function test_administrador_accede_a_sus_secciones_pero_no_a_historial(): void
     {
         $admin = $this->usuario(User::ROLE_ADMIN);
 
@@ -59,7 +59,8 @@ class PanelSeccionesTest extends TestCase
         $this->actingAs($admin)->get('/lorente-panel/documentos')->assertOk();
         $this->actingAs($admin)->get('/lorente-panel/mensajes')->assertOk();
         $this->actingAs($admin)->get('/lorente-panel/configuracion')->assertOk();
-        $this->actingAs($admin)->get('/lorente-panel/cuentas')->assertForbidden();
+        $this->actingAs($admin)->get('/lorente-panel/cuentas')->assertOk();
+        $this->actingAs($admin)->get('/lorente-panel/historial')->assertForbidden();
     }
 
     public function test_super_usuario_accede_a_todas_las_secciones(): void
@@ -73,6 +74,7 @@ class PanelSeccionesTest extends TestCase
             '/lorente-panel/documentos',
             '/lorente-panel/mensajes',
             '/lorente-panel/cuentas',
+            '/lorente-panel/historial',
             '/lorente-panel/configuracion',
             '/lorente-panel/perfil',
         ];

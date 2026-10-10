@@ -86,11 +86,11 @@
 - [x] Purga a los 7 días con aviso de días restantes
 
 ## Fase 8 — Configuración + cuentas
-- [ ] Datos institucionales (Admin/Super)
-- [ ] Datos de contacto (teléfono/correo/dirección)
-- [ ] Perfil personal
-- [ ] Cambio de contraseña
-- [ ] Gestión de cuentas: Super (admin+docente, reset pass), Admin (solo docente)
+- [x] Datos institucionales (Admin/Super)
+- [x] Datos de contacto (teléfono/correo/dirección)
+- [x] Perfil personal
+- [x] Cambio de contraseña
+- [x] Gestión de cuentas: Super (admin+docente, reset pass), Admin (solo docente)
 
 ## Fase 9 — Sitio público
 - [ ] Portar Hero/Nosotros/Noticias/Documentos/Contacto/Sidebar 3D/WhatsApp/Footer (CSS original)

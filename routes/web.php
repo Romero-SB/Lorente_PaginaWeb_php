@@ -95,14 +95,28 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.mensajes.index');
         Route::get('/cuentas', [CuentasController::class, 'index'])
-            ->middleware('rol:super-usuario')
+            ->middleware('rol:super-usuario,administrador')
             ->name('panel.cuentas.index');
+        Route::post('/cuentas', [CuentasController::class, 'store'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.cuentas.store');
+        Route::post('/cuentas/{cuenta}/password', [CuentasController::class, 'resetPassword'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.cuentas.password');
+        Route::post('/cuentas/{cuenta}/eliminar', [CuentasController::class, 'destroy'])
+            ->middleware('rol:super-usuario')
+            ->name('panel.cuentas.destroy');
         Route::get('/historial', [HistorialController::class, 'index'])
             ->middleware('rol:super-usuario')
             ->name('panel.historial.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.index');
+        Route::post('/configuracion', [ConfiguracionController::class, 'update'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.update');
         Route::get('/perfil', [PerfilController::class, 'index'])->name('panel.perfil.index');
+        Route::post('/perfil', [PerfilController::class, 'update'])->name('panel.perfil.update');
+        Route::post('/perfil/password', [PerfilController::class, 'updatePassword'])->name('panel.perfil.password');
     });
 });

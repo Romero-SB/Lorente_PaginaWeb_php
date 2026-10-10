@@ -67,7 +67,7 @@ return [
             'etiqueta' => 'Cuentas',
             'icono' => 'cuentas',
             'ruta' => '/lorente-panel/cuentas',
-            'roles' => ['super-usuario'],
+            'roles' => ['super-usuario', 'administrador'],
         ],
         'configuracion' => [
             'etiqueta' => 'Configuración',
