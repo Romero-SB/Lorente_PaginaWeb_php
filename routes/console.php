@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('noticias:purgar-papelera')->dailyAt('03:00');
 Schedule::command('docentes:purgar-papelera')->dailyAt('03:15');
+Schedule::command('documentos:purgar-papelera')->dailyAt('03:30');

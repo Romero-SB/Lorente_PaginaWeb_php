@@ -65,6 +65,16 @@ class Almacenamiento
      */
     public static function guardarAdjunto(UploadedFile $archivo, string $carpeta = 'noticias/adjuntos'): ?array
     {
+        return self::guardarAdjuntoEn($archivo, self::disco(), $carpeta);
+    }
+
+    /**
+     * Guarda un adjunto en un disco concreto validando su MIME real.
+     *
+     * @return array{ruta: string, mime: string, peso: int}|null
+     */
+    public static function guardarAdjuntoEn(UploadedFile $archivo, string $disco, string $carpeta = 'documentos'): ?array
+    {
         $mime = $archivo->getMimeType();
         $extension = self::adjuntosPermitidos()[$mime] ?? null;
 
@@ -73,7 +83,7 @@ class Almacenamiento
         }
 
         $nombre = $carpeta.'/'.date('Ymd_His').'_'.uniqid().'.'.$extension;
-        $ruta = $archivo->storeAs(dirname($nombre), basename($nombre), self::disco());
+        $ruta = $archivo->storeAs(dirname($nombre), basename($nombre), $disco);
 
         return [
             'ruta' => $ruta,
@@ -84,8 +94,13 @@ class Almacenamiento
 
     public static function eliminar(?string $ruta): void
     {
-        if ($ruta !== null && Storage::disk(self::disco())->exists($ruta)) {
-            Storage::disk(self::disco())->delete($ruta);
+        self::eliminarDe(self::disco(), $ruta);
+    }
+
+    public static function eliminarDe(string $disco, ?string $ruta): void
+    {
+        if ($ruta !== null && Storage::disk($disco)->exists($ruta)) {
+            Storage::disk($disco)->delete($ruta);
         }
     }
 }

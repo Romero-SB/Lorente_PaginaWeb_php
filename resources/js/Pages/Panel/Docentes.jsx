@@ -1,7 +1,8 @@
 import { router, useForm, usePage } from '@inertiajs/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
+import GestorCategorias from '../../Components/Panel/GestorCategorias';
 import Recortador from '../../Components/Panel/Recortador';
 import PanelLayout from '../../Layouts/PanelLayout';
 import { toast } from '../../lib/toast';
@@ -180,15 +181,6 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
         }, { preserveScroll: true });
     }
 
-    function soltarCategoria(desde, hasta) {
-        if (desde === hasta) return;
-        const copia = reordenarLista(cats, desde, hasta);
-        setCats(copia);
-        router.post('/lorente-panel/docente-categorias/reordenar', {
-            categorias: copia.map((c) => c.nombre),
-        }, { preserveScroll: true });
-    }
-
     const filtrados = useMemo(() => {
         const q = busqueda.trim().toLowerCase();
         if (!q) return locales;
@@ -260,7 +252,13 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
             )}
 
             {gestorAbierto && (
-                <GestorCategorias categorias={cats} onClose={() => setGestorAbierto(false)} onReordenar={soltarCategoria} />
+                <GestorCategorias
+                    categorias={cats}
+                    baseUrl="/lorente-panel/docente-categorias"
+                    bloqueoKey="docentes"
+                    bloqueoEtiqueta="docentes"
+                    onClose={() => setGestorAbierto(false)}
+                />
             )}
 
             {cropSrc && (
@@ -544,168 +542,6 @@ function Papelera({ papelera, esAdmin, onRestaurar, onEliminarPermanente }) {
                     ))}
                 </div>
             )}
-        </div>
-    );
-}
-
-function GestorCategorias({ categorias, onClose, onReordenar }) {
-    const [nuevo, setNuevo] = useState('');
-    const [creando, setCreando] = useState(false);
-    const [renombrando, setRenombrando] = useState(null);
-    const [valorRenombre, setValorRenombre] = useState('');
-    const [bloqueada, setBloqueada] = useState(null);
-    const [origen, setOrigen] = useState(null);
-
-    const lista = useRef(categorias);
-    lista.current = categorias;
-
-    function crear() {
-        const nombre = nuevo.trim();
-        if (!nombre) return;
-        setCreando(true);
-        router.post('/lorente-panel/docente-categorias', { nombre }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setNuevo('');
-                toast('Categoría creada', 'ok');
-            },
-            onError: (errors) => toast(errors.nombre || 'No se pudo crear la categoría', 'error'),
-            onFinish: () => setCreando(false),
-        });
-    }
-
-    function confirmarRenombre(actual) {
-        const nombre = valorRenombre.trim();
-        if (!nombre || nombre === actual) {
-            setRenombrando(null);
-            return;
-        }
-        router.post(`/lorente-panel/docente-categorias/${actual.id}`, { nombre }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setRenombrando(null);
-                toast('Categoría renombrada', 'ok');
-            },
-            onError: (errors) => toast(errors.nombre || 'No se pudo renombrar', 'error'),
-        });
-    }
-
-    function eliminar(cat) {
-        setBloqueada(null);
-        router.post(`/lorente-panel/docente-categorias/${cat.id}/eliminar`, {}, {
-            preserveScroll: true,
-            onSuccess: () => toast('Categoría eliminada', 'ok'),
-            onError: (errors) => {
-                if (errors.categoria) {
-                    setBloqueada({ nombre: cat.nombre, docentes: errors.docentes || [] });
-                }
-                toast(errors.categoria || 'No se pudo eliminar la categoría', 'error');
-            },
-        });
-    }
-
-    return (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/70 p-4" onClick={onClose}>
-            <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                    <h3 className="text-sm font-bold text-slate-800">Administrar categorías</h3>
-                    <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
-                        <Icono nombre="cerrar" className="h-4 w-4" />
-                    </button>
-                </div>
-
-                <div className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                        <input
-                            value={nuevo}
-                            onChange={(e) => setNuevo(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && crear()}
-                            placeholder="Nueva categoría (ej. 1er Grado A)"
-                            className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                        />
-                        <button
-                            type="button"
-                            onClick={crear}
-                            disabled={creando || !nuevo.trim()}
-                            className="rounded-lg bg-blue-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
-                        >
-                            Crear
-                        </button>
-                    </div>
-
-                    {bloqueada && (
-                        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                            <p className="font-semibold">No se puede eliminar “{bloqueada.nombre}” porque tiene docentes asociados.</p>
-                            {bloqueada.docentes.length > 0 && (
-                                <ul className="mt-1 list-disc pl-4">
-                                    {bloqueada.docentes.map((n) => (
-                                        <li key={n}>{n}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="mt-3 space-y-2">
-                        {categorias.length === 0 && <p className="py-6 text-center text-xs text-slate-400">No hay categorías guardadas.</p>}
-                        {categorias.map((cat, idx) => (
-                            <div
-                                key={cat.id}
-                                draggable={renombrando !== cat.id}
-                                onDragStart={() => setOrigen(idx)}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={() => {
-                                    onReordenar(origen, idx);
-                                    setOrigen(null);
-                                }}
-                                className="flex items-center gap-2 rounded-lg border border-slate-200 px-2 py-1.5"
-                            >
-                                <button type="button" className="cursor-grab text-slate-300 active:cursor-grabbing" title="Arrastrar para reordenar">
-                                    <Icono nombre="grip" className="h-4 w-4" />
-                                </button>
-                                {renombrando === cat.id ? (
-                                    <>
-                                        <input
-                                            autoFocus
-                                            value={valorRenombre}
-                                            onChange={(e) => setValorRenombre(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') confirmarRenombre(cat);
-                                                if (e.key === 'Escape') setRenombrando(null);
-                                            }}
-                                            className="min-w-0 flex-1 rounded-md border border-slate-200 px-2 py-1 text-sm outline-none focus:border-blue-400"
-                                        />
-                                        <button type="button" onClick={() => confirmarRenombre(cat)} className="text-emerald-600 transition hover:text-emerald-700" title="Confirmar">
-                                            <Icono nombre="check" className="h-4 w-4" />
-                                        </button>
-                                        <button type="button" onClick={() => setRenombrando(null)} className="text-slate-400 transition hover:text-slate-600" title="Cancelar">
-                                            <Icono nombre="cerrar" className="h-4 w-4" />
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{cat.nombre}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setRenombrando(cat.id);
-                                                setValorRenombre(cat.nombre);
-                                            }}
-                                            className="text-slate-400 transition hover:text-blue-700"
-                                            title="Renombrar"
-                                        >
-                                            <Icono nombre="editar" className="h-4 w-4" />
-                                        </button>
-                                        <button type="button" onClick={() => eliminar(cat)} className="text-slate-400 transition hover:text-red-600" title="Eliminar">
-                                            <Icono nombre="basura" className="h-4 w-4" />
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }

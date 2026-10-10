@@ -801,3 +801,45 @@
 #81 D:/Lorente_PaginaWeb_php/vendor/phpunit/phpunit/phpunit(104): PHPUnit/TextUI/Application->run(Array)
 #82 {main}
 "} 
+[2026-10-10 03:05:19] local.ERROR: Command "migrate:db" is not defined.
+
+Did you mean one of these?
+    migrate
+    migrate:fresh
+    migrate:install
+    migrate:refresh
+    migrate:reset
+    migrate:rollback
+    migrate:status {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"migrate:db\" is not defined.
+
+Did you mean one of these?
+    migrate
+    migrate:fresh
+    migrate:install
+    migrate:refresh
+    migrate:reset
+    migrate:rollback
+    migrate:status at D:/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php:759)
+[stacktrace]
+#0 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(298): Symfony/Component/Console/Application->find('migrate:db')
+#1 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#2 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#3 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1243): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#4 D:/Lorente_PaginaWeb_php/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#5 {main}
+"} 
+[2026-10-10 03:05:32] local.ERROR: No arguments expected for "migrate" command, got "db:refresh". {"exception":"[object] (Symfony\\Component\\Console\\Exception\\RuntimeException(code: 0): No arguments expected for \"migrate\" command, got \"db:refresh\". at D:/Lorente_PaginaWeb_php/vendor/symfony/console/Input/ArgvInput.php:199)
+[stacktrace]
+#0 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Input/ArgvInput.php(92): Symfony/Component/Console/Input/ArgvInput->parseArgument('db:refresh')
+#1 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Input/ArgvInput.php(77): Symfony/Component/Console/Input/ArgvInput->parseToken('db:refresh', true)
+#2 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Input/Input.php(53): Symfony/Component/Console/Input/ArgvInput->parse()
+#3 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Command/Command.php(295): Symfony/Component/Console/Input/Input->bind(Object(Symfony/Component/Console/Input/InputDefinition))
+#4 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Console/Command.php(261): Symfony/Component/Console/Command/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Illuminate/Console/OutputStyle))
+#5 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#6 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand(Object(Illuminate/Database/Console/Migrations/MigrateCommand), Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#7 D:/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#8 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#9 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1243): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
+#10 D:/Lorente_PaginaWeb_php/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
+#11 {main}
+"} 

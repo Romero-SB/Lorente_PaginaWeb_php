@@ -7,6 +7,7 @@ use App\Http\Controllers\Panel\ConfiguracionController;
 use App\Http\Controllers\Panel\CuentasController;
 use App\Http\Controllers\Panel\DocenteCategoriasController;
 use App\Http\Controllers\Panel\DocentesController;
+use App\Http\Controllers\Panel\DocumentoCategoriasController;
 use App\Http\Controllers\Panel\DocumentosController;
 use App\Http\Controllers\Panel\MensajesController;
 use App\Http\Controllers\Panel\NoticiasController;
@@ -71,6 +72,24 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         });
 
         Route::get('/documentos', [DocumentosController::class, 'index'])->name('panel.documentos.index');
+        Route::post('/documentos', [DocumentosController::class, 'store'])->name('panel.documentos.store');
+        Route::get('/documentos/{documento}/descargar', [DocumentosController::class, 'descargar'])->name('panel.documentos.descargar');
+        Route::post('/documentos/{documento}', [DocumentosController::class, 'update'])->name('panel.documentos.update');
+        Route::post('/documentos/{documento}/eliminar', [DocumentosController::class, 'destroy'])->name('panel.documentos.destroy');
+        Route::post('/documentos/{documento}/restaurar', [DocumentosController::class, 'restaurar'])
+            ->withTrashed()
+            ->name('panel.documentos.restaurar');
+        Route::post('/documentos/{documento}/permanente', [DocumentosController::class, 'permanente'])
+            ->withTrashed()
+            ->name('panel.documentos.permanente');
+
+        Route::middleware('rol:super-usuario,administrador')->group(function () {
+            Route::post('/documento-categorias', [DocumentoCategoriasController::class, 'store'])->name('panel.documento-categorias.store');
+            Route::post('/documento-categorias/reordenar', [DocumentoCategoriasController::class, 'reordenar'])->name('panel.documento-categorias.reordenar');
+            Route::post('/documento-categorias/{categoria}', [DocumentoCategoriasController::class, 'update'])->name('panel.documento-categorias.update');
+            Route::post('/documento-categorias/{categoria}/eliminar', [DocumentoCategoriasController::class, 'destroy'])->name('panel.documento-categorias.destroy');
+        });
+
         Route::get('/mensajes', [MensajesController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.mensajes.index');

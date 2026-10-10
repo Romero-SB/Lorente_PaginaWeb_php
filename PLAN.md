@@ -73,11 +73,11 @@
 - [x] Papelera jerárquica (Admin solo propias; Super todas) + restaurar + permanente (solo Super) + purga 7 días (lazy + `docentes:purgar-papelera`) + Historial
 
 ## Fase 6 — Módulo Documentos
-- [ ] CRUD (todos crean; Admin/Super gestionan todas)
-- [ ] Validación de cabeceras (`file` + `mimes:pdf,doc,docx,xls,xlsx,ppt,pptx` + `isValid`)
-- [ ] Público/Privado (disco privado + ruta con `auth`)
-- [ ] Categorías con reorden/renombre/guarda
-- [ ] Papelera + Historial
+- [x] CRUD (todos crean; Admin/Super gestionan todas)
+- [x] Validación de cabeceras (`file` + `mimes:pdf,doc,docx,xls,xlsx,ppt,pptx` + `isValid`)
+- [x] Público/Privado (disco privado + ruta con `auth`)
+- [x] Categorías con reorden/renombre/guarda
+- [x] Papelera + Historial
 
 ## Fase 7 — Papelera + Historial
 - [ ] Vistas de papelera por rol (propia vs general)

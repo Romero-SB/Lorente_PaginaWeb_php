@@ -20,6 +20,11 @@ return [
 
     'dias_purga_papelera' => 7,
 
+    'visibilidades_documentos' => [
+        'publico' => 'Público',
+        'privado' => 'Privado',
+    ],
+
     'secciones' => [
         'resumen' => [
             'etiqueta' => 'Resumen',
