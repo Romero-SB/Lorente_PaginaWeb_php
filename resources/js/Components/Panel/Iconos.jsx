@@ -153,6 +153,13 @@ const PATH = {
         </>
     ),
     check: <path d="M20 6 9 17l-5-5" />,
+    historial: (
+        <>
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 7v5l4 2" />
+        </>
+    ),
 };
 
 export function Icono({ nombre, className = 'h-5 w-5', strokeWidth = 2 }) {

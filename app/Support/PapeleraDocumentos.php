@@ -17,7 +17,8 @@ class PapeleraDocumentos
      * Consulta de documentos en la papelera visibles para el usuario.
      *
      * - Docente: solo los de su autoría.
-     * - Administrador y Super Usuario: todos (gestionan el módulo completo).
+     * - Administrador: los suyos y los de autoría docente.
+     * - Super Usuario: todos.
      *
      * @return Builder<Documento>
      */
@@ -25,16 +26,25 @@ class PapeleraDocumentos
     {
         return Documento::onlyTrashed()
             ->with(['author:id,name,cargo,role', 'deletedBy:id,name'])
-            ->when($usuario->isDocente(), fn (Builder $q) => $q->where('author_id', $usuario->id));
+            ->when($usuario->isDocente(), fn (Builder $q) => $q->where('author_id', $usuario->id))
+            ->when($usuario->isAdministrador(), fn (Builder $q) => $q->where(function (Builder $sub) use ($usuario) {
+                $sub->where('author_id', $usuario->id)
+                    ->orWhereHas('author', fn (Builder $a) => $a->where('role', User::ROLE_DOCENTE));
+            }));
     }
 
     public static function puedeGestionarEliminada(User $usuario, Documento $documento): bool
     {
-        if ($usuario->isSuperUsuario() || $usuario->isAdministrador()) {
+        if ($usuario->isSuperUsuario()) {
             return true;
         }
 
-        return $usuario->isDocente() && $documento->author_id === $usuario->id;
+        if ($usuario->isDocente()) {
+            return $documento->author_id === $usuario->id;
+        }
+
+        return $documento->author_id === $usuario->id
+            || $documento->author?->role === User::ROLE_DOCENTE;
     }
 
     public static function diasRestantes(Documento $documento): int

@@ -212,6 +212,20 @@ class NoticiasPanelTest extends TestCase
         $this->assertSame($docente->id, $noticia->updated_by);
     }
 
+    public function test_la_vista_incluye_quien_modifico_la_noticia(): void
+    {
+        $admin = $this->usuario(User::ROLE_ADMIN);
+        $docente = $this->usuario(User::ROLE_DOCENTE);
+        $noticia = $this->noticia('Con historial de cambios', $docente);
+        $noticia->update(['updated_by' => $admin->id]);
+
+        $this->actingAs($admin)
+            ->get('/lorente-panel/noticias')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('noticias.0.modificado_por.name', $admin->name));
+    }
+
     public function test_docente_mueve_a_papelera_restaura_y_elimina_permanentemente(): void
     {
         Storage::fake('public');

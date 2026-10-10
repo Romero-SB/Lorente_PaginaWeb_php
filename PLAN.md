@@ -80,10 +80,10 @@
 - [x] Papelera + Historial
 
 ## Fase 7 — Papelera + Historial
-- [ ] Vistas de papelera por rol (propia vs general)
-- [ ] Historial (solo Super) con filtros
-- [ ] "Modificado por" en noticias
-- [ ] Purga a los 7 días con aviso de días restantes
+- [x] Vistas de papelera por rol (propia vs general)
+- [x] Historial (solo Super) con filtros
+- [x] "Modificado por" en noticias
+- [x] Purga a los 7 días con aviso de días restantes
 
 ## Fase 8 — Configuración + cuentas
 - [ ] Datos institucionales (Admin/Super)

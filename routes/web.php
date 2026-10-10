@@ -9,6 +9,7 @@ use App\Http\Controllers\Panel\DocenteCategoriasController;
 use App\Http\Controllers\Panel\DocentesController;
 use App\Http\Controllers\Panel\DocumentoCategoriasController;
 use App\Http\Controllers\Panel\DocumentosController;
+use App\Http\Controllers\Panel\HistorialController;
 use App\Http\Controllers\Panel\MensajesController;
 use App\Http\Controllers\Panel\NoticiasController;
 use App\Http\Controllers\Panel\PerfilController;
@@ -96,6 +97,9 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::get('/cuentas', [CuentasController::class, 'index'])
             ->middleware('rol:super-usuario')
             ->name('panel.cuentas.index');
+        Route::get('/historial', [HistorialController::class, 'index'])
+            ->middleware('rol:super-usuario')
+            ->name('panel.historial.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.index');

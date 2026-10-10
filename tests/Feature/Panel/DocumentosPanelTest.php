@@ -309,7 +309,7 @@ class DocumentosPanelTest extends TestCase
         $this->assertSoftDeleted('documentos', ['id' => $documento->id]);
     }
 
-    public function test_papelera_es_propia_para_docente_y_general_para_admin_y_super(): void
+    public function test_papelera_es_propia_para_docente_y_de_docentes_para_admin_y_total_para_super(): void
     {
         $super = $this->usuario(User::ROLE_SUPER);
         $admin = $this->usuario(User::ROLE_ADMIN);
@@ -326,10 +326,35 @@ class DocumentosPanelTest extends TestCase
         $this->assertEqualsCanonicalizing([$deDocente->id], $idsDocente->all());
 
         $idsAdmin = collect($this->papeleraDe($admin)->inertiaProps('papelera'))->pluck('id');
-        $this->assertEqualsCanonicalizing([$deDocente->id, $deAdmin->id, $deSuper->id], $idsAdmin->all());
+        $this->assertEqualsCanonicalizing([$deDocente->id, $deAdmin->id], $idsAdmin->all());
 
         $idsSuper = collect($this->papeleraDe($super)->inertiaProps('papelera'))->pluck('id');
         $this->assertEqualsCanonicalizing([$deDocente->id, $deAdmin->id, $deSuper->id], $idsSuper->all());
+    }
+
+    public function test_administrador_gestiona_papelera_de_docente_pero_no_de_otros_roles(): void
+    {
+        $super = $this->usuario(User::ROLE_SUPER);
+        $admin = $this->usuario(User::ROLE_ADMIN);
+        $docente = $this->usuario(User::ROLE_DOCENTE);
+
+        $deDocente = $this->documento('De docente', $docente);
+        $this->aPapelera($deDocente, $docente);
+        $deSuper = $this->documento('De super', $super);
+        $this->aPapelera($deSuper, $super);
+
+        $this->actingAs($admin)
+            ->post("/lorente-panel/documentos/{$deDocente->id}/restaurar")
+            ->assertRedirect();
+        $this->assertNull($deDocente->fresh()->deleted_at);
+
+        $this->actingAs($admin)
+            ->post("/lorente-panel/documentos/{$deSuper->id}/restaurar")
+            ->assertForbidden();
+        $this->actingAs($admin)
+            ->post("/lorente-panel/documentos/{$deSuper->id}/permanente")
+            ->assertForbidden();
+        $this->assertSoftDeleted('documentos', ['id' => $deSuper->id]);
     }
 
     public function test_docente_restaura_su_documento_pero_no_el_de_otro(): void

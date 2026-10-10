@@ -57,6 +57,12 @@ return [
             'ruta' => '/lorente-panel/mensajes',
             'roles' => ['super-usuario', 'administrador'],
         ],
+        'historial' => [
+            'etiqueta' => 'Historial',
+            'icono' => 'historial',
+            'ruta' => '/lorente-panel/historial',
+            'roles' => ['super-usuario'],
+        ],
         'cuentas' => [
             'etiqueta' => 'Cuentas',
             'icono' => 'cuentas',
