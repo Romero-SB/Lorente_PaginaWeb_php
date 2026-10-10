@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
+use App\Support\Correo;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -60,6 +62,20 @@ class User extends Authenticatable
     public static function roles(): array
     {
         return [self::ROLE_SUPER, self::ROLE_ADMIN, self::ROLE_DOCENTE];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            if ($user->email !== null) {
+                $user->email = Correo::normalizar($user->email);
+            }
+        });
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token, $this->email));
     }
 
     public function noticias()

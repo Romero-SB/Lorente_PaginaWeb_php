@@ -41,11 +41,13 @@
 - [x] (opcional) `DemoUsuariosSeeder` creado (no se auto-ejecuta): `php artisan db:seed --class=DemoUsuariosSeeder`
 
 ## Fase 2 — Autenticación
-- [ ] Rutas `/lorente-panel` (login/logout/forgot/reset)
-- [ ] Login por email, remember me, rate limiting (3 fallos → 1h), Turnstile
-- [ ] Reset por Gmail SMTP + notificación + expiración 60 min
-- [ ] Cambio de contraseña obligatorio en cuentas nuevas (si aplica)
-- [ ] Vistas Inertia de auth con estética institucional
+- [x] Rutas `/lorente-panel` (login/logout/recuperar/restablecer)
+- [x] Login por email normalizado (mayúsculas → minúsculas), remember me, rate limiting (3 fallos → bloqueo 1h), Turnstile condicional (`TURNSTILE_ENABLED` + site key)
+- [x] Reset por Gmail SMTP (config comentada en `.env`, pendiente credenciales) + `ResetPasswordNotification` + expiración 60 min
+- [x] Cambio de contraseña obligatorio en cuentas nuevas (`must_change_password`)
+- [x] Vistas Inertia de auth con estética institucional (`AuthLayout` + componente `Turnstile`)
+- [x] Panel placeholder (`/lorente-panel`) para que login/redirect funcionen hasta la Fase 3
+- [x] Tests de flujo: 20/20 (login, rate limit, reset, cambio obligatorio, Turnstile)
 
 ## Fase 3 — RBAC + panel flotante
 - [ ] Middleware `rol:`
