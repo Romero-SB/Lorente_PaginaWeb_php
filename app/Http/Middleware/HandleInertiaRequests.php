@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PanelSecciones;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -49,6 +50,16 @@ class HandleInertiaRequests extends Middleware
             'turnstile_site_key' => config('services.turnstile.enabled')
                 ? config('services.turnstile.site_key')
                 : null,
+            'flash' => [
+                'ok' => $request->session()->pull('ok'),
+                'error' => $request->session()->pull('error'),
+                'expired_draft' => $request->session()->pull('expired_draft'),
+            ],
+            'panel' => fn () => $request->user() ? [
+                'rol' => $request->user()->role,
+                'rol_etiqueta' => PanelSecciones::etiquetaRol($request->user()->role),
+                'secciones' => PanelSecciones::paraRol($request->user()->role),
+            ] : null,
         ];
     }
 }

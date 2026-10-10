@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\DebeCambiarPassword;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,11 +16,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
+            HandleInertiaRequests::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('panel.login.show'));
         $middleware->redirectUsersTo(fn () => route('panel.index'));
+
+        $middleware->alias([
+            'rol' => CheckRole::class,
+            'debe.cambiar.password' => DebeCambiarPassword::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

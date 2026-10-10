@@ -50,10 +50,12 @@
 - [x] Tests de flujo: 20/20 (login, rate limit, reset, cambio obligatorio, Turnstile)
 
 ## Fase 3 — RBAC + panel flotante
-- [ ] Middleware `rol:`
-- [ ] Layout ventana flotante (drag/resize/min/max + restore borrador)
-- [ ] Sidebar interno con secciones por rol
-- [ ] Refetch AJAX tras cada acción + toasts
+- [x] Middleware `rol:` (+ `debe.cambiar.password` en el panel)
+- [x] Layout ventana flotante (drag/resize/min/max + posición persistente en localStorage + pill al minimizar)
+- [x] Sidebar interno por rol (`config/panel.php` + props compartidas `panel.*`)
+- [x] Refetch AJAX + toasts (tienda `lib/toast` + flash; `lib/draft` para restore del borrador)
+- [x] Secciones: Resumen (con contadores por rol) + placeholders Noticias/Docentes/Documentos/Mensajes/Cuentas/Configuración/Perfil
+- [x] Tests RBAC: 7/7 (guest→login, acceso por rol, 403, password pendiente)
 
 ## Fase 4 — Módulo Noticias
 - [ ] CRUD por rol (Docente solo propias; Admin/Super todas)
