@@ -35,10 +35,10 @@
 - [x] Verificado: migraciones base, build Vite, primera página Inertia (HTTP 200)
 
 ## Fase 1 — Modelo de datos
-- [ ] Migraciones: users(mod), config, noticias, noticia_imagenes, adjuntos, docente_categorias, docentes, documento_categorias, documentos, actividad, contacto_mensajes
-- [ ] Modelos + relaciones + casts
-- [ ] Seeders: superusuario + config institucional
-- [ ] (opcional) seed demo admin/docente
+- [x] Migraciones: users(mod role/cargo/must_change_password), config, noticias, noticia_imagenes, adjuntos, docente_categorias, docentes, documento_categorias, documentos(visibilidad), actividad, contacto_mensajes
+- [x] Modelos + relaciones + casts (Noticia con `slug` autogenerado y borrado en cascada de imágenes/adjuntos)
+- [x] Seeders: superusuario (`admin@lorente.edu.pe` / `lorente2026`, cambio obligatorio) + config institucional
+- [x] (opcional) `DemoUsuariosSeeder` creado (no se auto-ejecuta): `php artisan db:seed --class=DemoUsuariosSeeder`
 
 ## Fase 2 — Autenticación
 - [ ] Rutas `/lorente-panel` (login/logout/forgot/reset)

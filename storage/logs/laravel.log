@@ -1,0 +1,30 @@
+[2026-10-09 23:14:26] local.ERROR: SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: noticias.slug (Connection: sqlite, Database: D:\Lorente_PaginaWeb_php\database\database.sqlite, SQL: insert into "noticias" ("titulo", "updated_at", "created_at") values (Prueba, 2026-10-09 23:14:26, 2026-10-09 23:14:26)) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: noticias.slug (Connection: sqlite, Database: D:\\Lorente_PaginaWeb_php\\database\\database.sqlite, SQL: insert into \"noticias\" (\"titulo\", \"updated_at\", \"created_at\") values (Prueba, 2026-10-09 23:14:26, 2026-10-09 23:14:26)) at D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857)
+[stacktrace]
+#0 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(813): Illuminate/Database/Connection->runQueryCallback('insert into \"no...', Array, Object(Closure))
+#1 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(590): Illuminate/Database/Connection->run('insert into \"no...', Array, Object(Closure))
+#2 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(554): Illuminate/Database/Connection->statement('insert into \"no...', Array)
+#3 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php(32): Illuminate/Database/Connection->insert('insert into \"no...', Array)
+#4 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4324): Illuminate/Database/Query/Processors/Processor->processInsertGetId(Object(Illuminate/Database/Query/Builder), 'insert into \"no...', Array, 'id')
+#5 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2350): Illuminate/Database/Query/Builder->insertGetId(Array, 'id')
+#6 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1714): Illuminate/Database/Eloquent/Builder->__call('insertGetId', Array)
+#7 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1626): Illuminate/Database/Eloquent/Model->insertAndSetId(Object(Illuminate/Database/Eloquent/Builder), Array)
+#8 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1428): Illuminate/Database/Eloquent/Model->performInsert(Object(Illuminate/Database/Eloquent/Builder))
+#9 C:/Users/STEVEN/AppData/Local/Temp/opencode/check.php(18): Illuminate/Database/Eloquent/Model->save()
+#10 {main}
+
+[previous exception] [object] (PDOException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: noticias.slug at D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php:601)
+[stacktrace]
+#0 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(601): PDOStatement->execute()
+#1 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(846): Illuminate/Database/Connection->Illuminate/Database/{closure}('insert into \"no...', Array)
+#2 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(813): Illuminate/Database/Connection->runQueryCallback('insert into \"no...', Array, Object(Closure))
+#3 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(590): Illuminate/Database/Connection->run('insert into \"no...', Array, Object(Closure))
+#4 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(554): Illuminate/Database/Connection->statement('insert into \"no...', Array)
+#5 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php(32): Illuminate/Database/Connection->insert('insert into \"no...', Array)
+#6 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(4324): Illuminate/Database/Query/Processors/Processor->processInsertGetId(Object(Illuminate/Database/Query/Builder), 'insert into \"no...', Array, 'id')
+#7 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(2350): Illuminate/Database/Query/Builder->insertGetId(Array, 'id')
+#8 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1714): Illuminate/Database/Eloquent/Builder->__call('insertGetId', Array)
+#9 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1626): Illuminate/Database/Eloquent/Model->insertAndSetId(Object(Illuminate/Database/Eloquent/Builder), Array)
+#10 D:/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1428): Illuminate/Database/Eloquent/Model->performInsert(Object(Illuminate/Database/Eloquent/Builder))
+#11 C:/Users/STEVEN/AppData/Local/Temp/opencode/check.php(18): Illuminate/Database/Eloquent/Model->save()
+#12 {main}
+"} 
