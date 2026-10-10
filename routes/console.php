@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('noticias:purgar-papelera')->dailyAt('03:00');
+Schedule::command('docentes:purgar-papelera')->dailyAt('03:15');

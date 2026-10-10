@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Panel\ConfiguracionController;
 use App\Http\Controllers\Panel\CuentasController;
+use App\Http\Controllers\Panel\DocenteCategoriasController;
 use App\Http\Controllers\Panel\DocentesController;
 use App\Http\Controllers\Panel\DocumentosController;
 use App\Http\Controllers\Panel\MensajesController;
@@ -50,9 +51,25 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::post('/noticias/{noticia}/permanente', [NoticiasController::class, 'permanente'])
             ->withTrashed()
             ->name('panel.noticias.permanente');
-        Route::get('/docentes', [DocentesController::class, 'index'])
-            ->middleware('rol:super-usuario,administrador')
-            ->name('panel.docentes.index');
+        Route::middleware('rol:super-usuario,administrador')->group(function () {
+            Route::get('/docentes', [DocentesController::class, 'index'])->name('panel.docentes.index');
+            Route::post('/docentes', [DocentesController::class, 'store'])->name('panel.docentes.store');
+            Route::post('/docentes/reordenar', [DocentesController::class, 'reordenar'])->name('panel.docentes.reordenar');
+            Route::post('/docentes/{docente}', [DocentesController::class, 'update'])->name('panel.docentes.update');
+            Route::post('/docentes/{docente}/eliminar', [DocentesController::class, 'destroy'])->name('panel.docentes.destroy');
+            Route::post('/docentes/{docente}/restaurar', [DocentesController::class, 'restaurar'])
+                ->withTrashed()
+                ->name('panel.docentes.restaurar');
+            Route::post('/docentes/{docente}/permanente', [DocentesController::class, 'permanente'])
+                ->withTrashed()
+                ->name('panel.docentes.permanente');
+
+            Route::post('/docente-categorias', [DocenteCategoriasController::class, 'store'])->name('panel.docente-categorias.store');
+            Route::post('/docente-categorias/reordenar', [DocenteCategoriasController::class, 'reordenar'])->name('panel.docente-categorias.reordenar');
+            Route::post('/docente-categorias/{categoria}', [DocenteCategoriasController::class, 'update'])->name('panel.docente-categorias.update');
+            Route::post('/docente-categorias/{categoria}/eliminar', [DocenteCategoriasController::class, 'destroy'])->name('panel.docente-categorias.destroy');
+        });
+
         Route::get('/documentos', [DocumentosController::class, 'index'])->name('panel.documentos.index');
         Route::get('/mensajes', [MensajesController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')

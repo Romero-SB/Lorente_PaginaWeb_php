@@ -142,6 +142,17 @@ const PATH = {
             <path d="m21 21-4.3-4.3" />
         </>
     ),
+    grip: (
+        <>
+            <circle cx="9" cy="6" r="1" />
+            <circle cx="9" cy="12" r="1" />
+            <circle cx="9" cy="18" r="1" />
+            <circle cx="15" cy="6" r="1" />
+            <circle cx="15" cy="12" r="1" />
+            <circle cx="15" cy="18" r="1" />
+        </>
+    ),
+    check: <path d="M20 6 9 17l-5-5" />,
 };
 
 export function Icono({ nombre, className = 'h-5 w-5', strokeWidth = 2 }) {

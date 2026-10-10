@@ -67,10 +67,10 @@
 - [x] Registro en Historial
 
 ## Fase 5 — Módulo Docentes (Admin/Super)
-- [ ] CRUD + foto con cropper + WebP
-- [ ] Categorías (crear/renombrar/eliminar + guarda de bloqueo)
-- [ ] Reorden drag&drop (`orden *10`)
-- [ ] Papelera + Historial
+- [x] CRUD + foto con cropper (`react-easy-crop`, 4:5) + WebP (400px)
+- [x] Categorías (crear/renombrar/eliminar + guarda de bloqueo)
+- [x] Reorden drag&drop (`orden *10`, docentes y categorías)
+- [x] Papelera jerárquica (Admin solo propias; Super todas) + restaurar + permanente (solo Super) + purga 7 días (lazy + `docentes:purgar-papelera`) + Historial
 
 ## Fase 6 — Módulo Documentos
 - [ ] CRUD (todos crean; Admin/Super gestionan todas)

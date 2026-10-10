@@ -35,6 +35,32 @@ function cargarImagen(url) {
     });
 }
 
+export async function recortarImagenWebp(imageSrc, areaPixels, anchoSalida = 400, calidad = 0.85) {
+    const imagen = await cargarImagen(imageSrc);
+    const altoSalida = Math.max(1, Math.round(anchoSalida * (areaPixels.height / areaPixels.width)));
+
+    const lienzo = document.createElement('canvas');
+    lienzo.width = anchoSalida;
+    lienzo.height = altoSalida;
+    const ctx = lienzo.getContext('2d');
+    ctx.drawImage(
+        imagen,
+        areaPixels.x,
+        areaPixels.y,
+        areaPixels.width,
+        areaPixels.height,
+        0,
+        0,
+        anchoSalida,
+        altoSalida,
+    );
+
+    const blob = await new Promise((res) => lienzo.toBlob(res, 'image/webp', calidad));
+    if (!blob) throw new Error('No se pudo procesar la imagen');
+
+    return new File([blob], 'docente.webp', { type: 'image/webp' });
+}
+
 export function formatoPeso(bytes) {
     if (!bytes) return '0 KB';
     if (bytes < 1024) return `${bytes} B`;
