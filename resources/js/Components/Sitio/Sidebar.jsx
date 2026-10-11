@@ -1,22 +1,55 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { router, usePage } from '@inertiajs/react';
-
 import { irASeccion } from '../../lib/sitio';
 
 const MENU = [
-    { id: 'inicio', icon: 'fa-solid fa-house', label: 'Inicio', tipo: 'seccion' },
-    { id: 'nosotros', icon: 'fa-solid fa-building-columns', label: 'Nosotros', tipo: 'seccion' },
-    { id: 'noticias', icon: 'fa-solid fa-newspaper', label: 'Noticias', tipo: 'seccion' },
-    { id: 'documentos', icon: 'fa-solid fa-folder-open', label: 'Documentos', tipo: 'seccion' },
-    { id: 'contacto', icon: 'fa-solid fa-envelope', label: 'Contacto', tipo: 'seccion' },
+    { id: 'inicio', label: 'Inicio', tipo: 'seccion' },
+    { id: 'nosotros', label: 'Nosotros', tipo: 'seccion' },
+    { id: 'noticias', label: 'Noticias', tipo: 'seccion' },
+    { id: 'documentos', label: 'Documentos', tipo: 'seccion' },
+    { id: 'contacto', label: 'Contacto', tipo: 'seccion' },
 ];
 
 const SECCIONES = ['inicio', 'nosotros', 'noticias', 'documentos', 'contacto'];
 
+const ICONOS = {
+    inicio: (
+        <>
+            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+            <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        </>
+    ),
+    nosotros: (
+        <>
+            <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+            <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+            <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+            <path d="M10 6h4" />
+            <path d="M10 10h4" />
+            <path d="M10 14h4" />
+            <path d="M10 18h4" />
+        </>
+    ),
+    noticias: (
+        <>
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+            <path d="M18 14h-8" />
+            <path d="M15 18h-5" />
+            <path d="M10 6h8v4h-8Z" />
+        </>
+    ),
+    documentos: (
+        <path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" />
+    ),
+    contacto: (
+        <>
+            <rect width="20" height="16" x="2" y="4" rx="2" />
+            <path d="m22 7-8.97 5.89a2 2 0 0 1-2.06 0L2 7" />
+        </>
+    ),
+};
+
 export default function Sidebar() {
-    const { auth } = usePage().props;
-    const usuario = auth?.user;
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [activa, setActiva] = useState('inicio');
     const [mvListo, setMvListo] = useState(false);
@@ -224,26 +257,23 @@ export default function Sidebar() {
                                 className={`menu-item ${activa === item.id ? 'active' : ''}`}
                                 onClick={() => navegar(item)}
                             >
-                                <i className={item.icon}></i> {item.label}
+                                <span className="menu-item-icono" aria-hidden="true">
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        {ICONOS[item.id]}
+                                    </svg>
+                                </span>
+                                <span className="menu-item-texto">{item.label}</span>
                             </button>
                         </li>
                     ))}
                 </ul>
-
-                <div className="sidebar-footer">
-                    {usuario && (
-                        <button
-                            type="button"
-                            className="menu-item"
-                            onClick={() => {
-                                setShowMobileMenu(false);
-                                router.visit('/lorente-panel');
-                            }}
-                        >
-                            <i className="fa-solid fa-gauge-high"></i> Abrir panel
-                        </button>
-                    )}
-                </div>
             </aside>
 
             <button

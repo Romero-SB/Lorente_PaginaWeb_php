@@ -222,21 +222,28 @@
     display: flex;
     flex-grow: 1;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     margin-top: 24px;
     list-style: none;
 }
 
+.sitio-root .sidebar-menu > li {
+    width: 100%;
+}
+
 .sitio-root .menu-item {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 11px 14px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.65);
-    letter-spacing: 0.01em;
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px 11px 16px;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.015em;
     text-align: left;
     background: none;
     border: none;
@@ -245,12 +252,26 @@
     transition: all 0.25s var(--trans-suave);
 }
 
-.sitio-root .menu-item i {
+.sitio-root .menu-item-icono {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
     width: 20px;
-    font-size: 0.95rem;
+    height: 20px;
     color: rgba(255, 255, 255, 0.4);
-    text-align: center;
     transition: color 0.25s var(--trans-suave);
+}
+
+.sitio-root .menu-item-icono svg {
+    width: 100%;
+    height: 100%;
+}
+
+.sitio-root .menu-item-texto {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .sitio-root .menu-item:hover {
@@ -258,29 +279,18 @@
     background: rgba(255, 255, 255, 0.06);
 }
 
-.sitio-root .menu-item:hover i {
+.sitio-root .menu-item:hover .menu-item-icono {
     color: var(--do);
 }
 
 .sitio-root .menu-item.active {
     color: var(--az);
-    background: var(--do);
-    box-shadow: 0 4px 15px rgba(214, 168, 32, 0.2);
+    background: linear-gradient(90deg, var(--do2), var(--do));
+    box-shadow: 0 4px 15px rgba(214, 168, 32, 0.28);
 }
 
-.sitio-root .menu-item.active i {
+.sitio-root .menu-item.active .menu-item-icono {
     color: var(--az);
-}
-
-.sitio-root .sidebar-footer {
-    flex-shrink: 0;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sitio-root .sidebar-footer .menu-item {
-    width: 100%;
 }
 
 .sitio-root .mobile-menu-btn,
@@ -1790,6 +1800,72 @@
 .sitio-root .wa svg {
     width: 30px;
     height: 30px;
+}
+
+/* ===== Botón Recorrido 3D ===== */
+.sitio-root .recorrido-3d-wrap {
+    position: fixed;
+    right: 26px;
+    bottom: 96px;
+    z-index: 250;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sitio-root .recorrido-3d {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--az900);
+    white-space: nowrap;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--do2), var(--do));
+    border: none;
+    border-radius: 9999px;
+    box-shadow: 0 10px 26px rgba(194, 154, 43, 0.4);
+    transition: all 0.3s var(--trans-suave);
+    animation: rec3dPulse 2.6s ease-in-out infinite;
+}
+
+.sitio-root .recorrido-3d svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sitio-root .recorrido-3d:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(194, 154, 43, 0.55);
+    animation: none;
+}
+
+.sitio-root .recorrido-3d-aviso {
+    max-width: 190px;
+    padding: 8px 12px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #fff;
+    pointer-events: none;
+    background: #1e293b;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.sitio-root .recorrido-3d-aviso.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@keyframes rec3dPulse {
+    0%, 100% { box-shadow: 0 10px 26px rgba(194, 154, 43, 0.4); }
+    50% { box-shadow: 0 10px 26px rgba(194, 154, 43, 0.4), 0 0 0 6px rgba(194, 154, 43, 0.12); }
 }
 
 /* ===== Toast ===== */
