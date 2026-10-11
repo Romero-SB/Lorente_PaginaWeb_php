@@ -11,12 +11,14 @@ function formatearFecha(valor) {
     }).format(new Date(valor));
 }
 
-export default function Mensajes({ mensajes = [], filtros = {}, stats = {} }) {
+export default function Mensajes({ mensajes = { data: [], links: [], meta: {} }, filtros = {}, stats = {} }) {
+    const items = mensajes?.data ?? [];
+    const meta = mensajes?.meta ?? {};
     const [filtro, setFiltro] = useState(filtros.filtro ?? 'todos');
     const [q, setQ] = useState(filtros.q ?? '');
-    const [seleccion, setSeleccion] = useState(mensajes[0]?.id ?? null);
+    const [seleccion, setSeleccion] = useState(items[0]?.id ?? null);
 
-    const actual = mensajes.find((m) => m.id === seleccion) ?? null;
+    const actual = items.find((m) => m.id === seleccion) ?? null;
 
     function buscar(e) {
         e.preventDefault();
@@ -107,39 +109,75 @@ export default function Mensajes({ mensajes = [], filtros = {}, stats = {} }) {
             </div>
 
             <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr]">
-                <div className="max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    {mensajes.length === 0 ? (
-                        <p className="px-4 py-10 text-center text-sm text-slate-500">
-                            No hay mensajes que coincidan.
-                        </p>
-                    ) : (
-                        <ul className="divide-y divide-slate-100">
-                            {mensajes.map((m) => (
-                                <li key={m.id}>
-                                    <button
-                                        onClick={() => setSeleccion(m.id)}
-                                        className={`w-full px-4 py-3 text-left transition ${
-                                            seleccion === m.id ? 'bg-blue-50' : 'hover:bg-slate-50'
-                                        }`}
-                                    >
-                                        <div className="flex items-center justify-between gap-2">
-                                            <span className={`truncate text-sm ${m.leido ? 'font-medium text-slate-700' : 'font-bold text-slate-900'}`}>
-                                                {m.nombre}
-                                            </span>
-                                            {!m.leido && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>}
-                                            {m.respondido && (
-                                                <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                                                    respondido
+                <div className="flex max-h-[70vh] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex-1 overflow-y-auto">
+                        {items.length === 0 ? (
+                            <p className="px-4 py-10 text-center text-sm text-slate-500">
+                                No hay mensajes que coincidan.
+                            </p>
+                        ) : (
+                            <ul className="divide-y divide-slate-100">
+                                {items.map((m) => (
+                                    <li key={m.id}>
+                                        <button
+                                            onClick={() => setSeleccion(m.id)}
+                                            className={`w-full px-4 py-3 text-left transition ${
+                                                seleccion === m.id ? 'bg-blue-50' : 'hover:bg-slate-50'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between gap-2">
+                                                <span className={`truncate text-sm ${m.leido ? 'font-medium text-slate-700' : 'font-bold text-slate-900'}`}>
+                                                    {m.nombre}
                                                 </span>
-                                            )}
-                                        </div>
-                                        <div className="mt-0.5 truncate text-xs font-medium text-slate-500">{m.asunto}</div>
-                                        <div className="mt-0.5 max-h-8 overflow-hidden text-xs text-slate-400">{m.mensaje}</div>
-                                        <div className="mt-1 text-[11px] text-slate-400">{formatearFecha(m.fecha)}</div>
-                                    </button>
-                                </li>
+                                                {!m.leido && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>}
+                                                {m.respondido && (
+                                                    <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                                                        respondido
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="mt-0.5 truncate text-xs font-medium text-slate-500">{m.asunto}</div>
+                                            <div className="mt-0.5 max-h-8 overflow-hidden text-xs text-slate-400">{m.mensaje}</div>
+                                            <div className="mt-1 text-[11px] text-slate-400">{formatearFecha(m.fecha)}</div>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+
+                    {mensajes?.links?.length > 3 && (
+                        <div className="flex flex-wrap items-center justify-center gap-1 border-t border-slate-100 p-2">
+                            {mensajes.links.map((link, i) => (
+                                <button
+                                    key={i}
+                                    disabled={!link.url}
+                                    onClick={() =>
+                                        link.url &&
+                                        router.visit(link.url, {
+                                            preserveScroll: true,
+                                            preserveState: true,
+                                            onSuccess: () => setSeleccion(null),
+                                        })
+                                    }
+                                    className={`min-w-8 rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                                        link.active
+                                            ? 'bg-blue-950 text-white'
+                                            : link.url
+                                              ? 'border border-slate-300 text-slate-600 hover:bg-slate-50'
+                                              : 'cursor-not-allowed border border-slate-200 text-slate-300'
+                                    }`}
+                                >
+                                    {link.label}
+                                </button>
                             ))}
-                        </ul>
+                        </div>
+                    )}
+
+                    {meta.total > 0 && (
+                        <p className="border-t border-slate-100 px-3 py-1.5 text-center text-[11px] text-slate-400">
+                            Mostrando {meta.desde}-{meta.hasta} de {meta.total}
+                        </p>
                     )}
                 </div>
 
