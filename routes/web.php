@@ -14,12 +14,21 @@ use App\Http\Controllers\Panel\MensajesController;
 use App\Http\Controllers\Panel\NoticiasController;
 use App\Http\Controllers\Panel\PerfilController;
 use App\Http\Controllers\Panel\ResumenController;
+use App\Http\Controllers\Sitio\ContactoController;
+use App\Http\Controllers\Sitio\DocumentoController;
+use App\Http\Controllers\Sitio\InicioController;
+use App\Http\Controllers\Sitio\NoticiaController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Home');
-})->name('home');
+Route::get('/', [InicioController::class, 'index'])->name('home');
+Route::get('/noticias', [NoticiaController::class, 'index'])->name('sitio.noticias.index');
+Route::get('/noticias/{noticia:slug}', [NoticiaController::class, 'show'])->name('sitio.noticias.show');
+Route::post('/contacto', [ContactoController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('sitio.contacto.store');
+Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'descargar'])
+    ->middleware('auth')
+    ->name('sitio.documentos.descargar');
 
 Route::middleware('guest')->prefix('lorente-panel')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('panel.login.show');
@@ -94,6 +103,15 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::get('/mensajes', [MensajesController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.mensajes.index');
+        Route::post('/mensajes/{mensaje}/leido', [MensajesController::class, 'marcarLeido'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.mensajes.leido');
+        Route::post('/mensajes/{mensaje}/respondido', [MensajesController::class, 'marcarRespondido'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.mensajes.respondido');
+        Route::post('/mensajes/{mensaje}/eliminar', [MensajesController::class, 'destroy'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.mensajes.destroy');
         Route::get('/cuentas', [CuentasController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.cuentas.index');

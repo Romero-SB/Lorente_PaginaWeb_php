@@ -1,92 +1,146 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 import Turnstile from '../../Components/Auth/Turnstile';
-import AuthLayout from '../../Layouts/AuthLayout';
+import SitioHome from '../../Components/Sitio/SitioHome';
+import SitioLayout from '../../Layouts/SitioLayout';
 
 export default function Login() {
+    const { sitio } = usePage().props;
+    const [verClave, setVerClave] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: false,
     });
 
+    function salir() {
+        router.visit('/');
+    }
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key === 'Escape') salir();
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
+
     function submit(e) {
         e.preventDefault();
         post('/lorente-panel/login', { preserveScroll: true });
     }
 
+    const modal = (
+        <div className="login-capa" onClick={(e) => e.target === e.currentTarget && salir()}>
+            <div className="login-modal" role="dialog" aria-modal="true" aria-label="Acceso al panel">
+                <div className="login-modal-cab">
+                    <button
+                        type="button"
+                        className="login-cerrar"
+                        onClick={salir}
+                        aria-label="Cerrar y volver al sitio"
+                        title="Cerrar (Esc)"
+                    >
+                        <i className="fa-solid fa-xmark" aria-hidden="true" />
+                    </button>
+                    <span className="login-badge">
+                        <img src="/logo_lorente.webp" alt="Logo I.E. N.º 31501 Sebastián Lorente" />
+                    </span>
+                    <h1 className="login-modal-titulo">Panel de gestión</h1>
+                    <p className="login-modal-sub">I.E. N.º 31501 «Sebastián Lorente»</p>
+                </div>
+
+                <div className="login-modal-cuerpo">
+                    <form onSubmit={submit} className="space-y-4" noValidate>
+                        <div>
+                            <label htmlFor="email" className="login-label">
+                                Correo electrónico
+                            </label>
+                            <div className="login-campo">
+                                <i className="fa-regular fa-envelope" aria-hidden="true" />
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    placeholder="usuario@lorente.edu.pe"
+                                    autoComplete="email"
+                                    autoFocus
+                                    className="login-input"
+                                />
+                            </div>
+                            {errors.email && <p className="login-error">{errors.email}</p>}
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="login-label">
+                                Contraseña
+                            </label>
+                            <div className="login-campo">
+                                <i className="fa-solid fa-lock" aria-hidden="true" />
+                                <input
+                                    id="password"
+                                    type={verClave ? 'text' : 'password'}
+                                    name="password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    placeholder="••••••••"
+                                    autoComplete="current-password"
+                                    className="login-input login-input--pass"
+                                />
+                                <button
+                                    type="button"
+                                    className="login-toggle"
+                                    onClick={() => setVerClave((v) => !v)}
+                                    title={verClave ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                                    aria-label={verClave ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                                >
+                                    <i className={verClave ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'} aria-hidden="true" />
+                                </button>
+                            </div>
+                            {errors.password && <p className="login-error">{errors.password}</p>}
+                        </div>
+
+                        <div className="login-fila">
+                            <label className="login-check">
+                                <input
+                                    type="checkbox"
+                                    name="remember"
+                                    checked={data.remember}
+                                    onChange={(e) => setData('remember', e.target.checked)}
+                                />
+                                <span>Mantener la sesión</span>
+                            </label>
+                            <Link href="/lorente-panel/recuperar" className="login-enlace">
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        </div>
+
+                        <Turnstile />
+                        {errors['cf-turnstile-response'] && (
+                            <p className="login-error">{errors['cf-turnstile-response']}</p>
+                        )}
+
+                        <button type="submit" disabled={processing} className="login-btn">
+                            {processing ? 'Ingresando…' : 'Iniciar sesión'}
+                        </button>
+                    </form>
+
+                    <p className="login-pie">
+                        <Link href="/" className="login-enlace">
+                            ← Volver al sitio
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
-        <AuthLayout title="Iniciar sesión">
-            <h2 className="text-lg font-bold text-gray-900">Iniciar sesión</h2>
-            <p className="mt-1 text-sm text-gray-500">Panel de administración institucional.</p>
-
-            <form onSubmit={submit} className="mt-6 space-y-4" noValidate>
-                <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                        Correo electrónico
-                    </label>
-                    <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        autoComplete="email"
-                        autoFocus
-                        className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    />
-                    {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
-                </div>
-
-                <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                        Contraseña
-                    </label>
-                    <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        autoComplete="current-password"
-                        className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    />
-                    {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <label className="flex items-center text-sm text-gray-600">
-                        <input
-                            type="checkbox"
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) => setData('remember', e.target.checked)}
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span className="ml-2">Mantener la sesión</span>
-                    </label>
-                </div>
-
-                <Turnstile />
-                {errors['cf-turnstile-response'] && (
-                    <p className="text-xs text-red-600">{errors['cf-turnstile-response']}</p>
-                )}
-
-                <button
-                    type="submit"
-                    disabled={processing}
-                    className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
-                >
-                    {processing ? 'Ingresando…' : 'Iniciar sesión'}
-                </button>
-            </form>
-
-            <p className="mt-5 text-center text-sm text-gray-500">
-                ¿Olvidaste tu contraseña?{' '}
-                <Link href="/lorente-panel/recuperar" className="font-medium text-indigo-600 hover:underline">
-                    Recupérala aquí
-                </Link>
-            </p>
-        </AuthLayout>
+        <SitioLayout overlay={modal} toastSitio={false}>
+            {sitio ? <SitioHome {...sitio} /> : null}
+        </SitioLayout>
     );
 }

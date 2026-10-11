@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\ContenidoSitio;
 use App\Support\PanelSecciones;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -60,6 +61,9 @@ class HandleInertiaRequests extends Middleware
                 'rol_etiqueta' => PanelSecciones::etiquetaRol($request->user()->role),
                 'secciones' => PanelSecciones::paraRol($request->user()->role),
             ] : null,
+            'sitio' => fn () => $request->routeIs('panel.*')
+                ? ContenidoSitio::para($request->user())
+                : null,
         ];
     }
 }

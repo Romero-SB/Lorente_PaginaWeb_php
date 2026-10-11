@@ -16,7 +16,7 @@
 - Login del panel en `/lorente-panel`.
 - Roles: `super-usuario`, `administrador`, `docente`.
 - Un Docente publica noticias directamente (autor visible con su `cargo`).
-- Panel = ventana flotante arrastrable/redimensionable + sidebar interno por rol; refetch AJAX tras cada acción.
+- Panel = ventana flotante arrastrable/redimensionable + sidebar interno por rol; refetch AJAX tras cada acción. Superpuesta al sitio público (el home queda de fondo).
 - Noticias del sitio público con rutas reales `/noticias/{slug}`.
 - Contacto: guarda en BD + email + bandeja (admin/super) + captcha.
 - Documentos publico/privado; privados accesibles con sesión (cualquier rol).
@@ -31,7 +31,7 @@
 - [x] Configurar discos `public` y `local`/privado (default Laravel 13 = `storage/app/private`)
 - [x] Copiar assets desde `PHP_Lorente` (LOGASO.glb, referencial.jpg, lorentefrontis.jpg, logo)
 - [x] Optimizar `LOGASO.glb` (Draco+Meshopt+textures 512 → **19.8 MB → 1.5 MB**) y logo (PNG 5.8 MB → WebP 94 KB); favicon.png generado (el original estaba vacío)
-- [~] Poster de LOGASO + carga diferida (se integra al portar el Sidebar 3D en Fase 9)
+- [x] Poster de LOGASO + carga diferida (se integra al portar el Sidebar 3D en Fase 9)
 - [x] Verificado: migraciones base, build Vite, primera página Inertia (HTTP 200)
 
 ## Fase 1 — Modelo de datos
@@ -93,19 +93,23 @@
 - [x] Gestión de cuentas: Super (admin+docente, reset pass), Admin (solo docente)
 
 ## Fase 9 — Sitio público
-- [ ] Portar Hero/Nosotros/Noticias/Documentos/Contacto/Sidebar 3D/WhatsApp/Footer (CSS original)
-- [ ] Rutas reales `/noticias`, `/noticias/{slug}` + SEO meta/OG por ruta
-- [ ] Contacto real + bandeja (Admin/Super)
-- [ ] Acceso a documentos privados con sesión
-- [ ] Animaciones, skeletons y reveal
+- [x] Portar Hero/Nosotros/Noticias/Documentos/Contacto/Sidebar 3D/WhatsApp/Footer (CSS original)
+- [x] Rutas reales `/noticias`, `/noticias/{slug}` + SEO meta/OG por ruta
+- [x] Contacto real + bandeja (Admin/Super)
+- [x] Acceso a documentos privados con sesión
+- [x] Animaciones, skeletons y reveal
+
+## Fase 9.1 — Login y panel superpuestos al sitio
+- [x] Login como modal sobre el home público (`/lorente-panel/login` renderiza el sitio + modal)
+- [x] Panel como ventana flotante sobre el home (datos públicos compartidos vía `ContenidoSitio`)
+- [x] Reestilo institucional (navy + oro + crema, Playfair/Inter) del panel y del login
+- [x] Disparador de acceso al panel en el sidebar público
+- [x] Reflejo en vivo de acciones sin perder la posición de scroll (layout persistente + `preserveScroll` + `<Link prefetch>`, nav con `except: ['sitio']`)
 
 ## Fase 10 — Pulido y despliegue
 - [ ] SEO (sitemap, robots, meta), favicon
 - [ ] Accesibilidad + responsive
 - [ ] Optimización (GLB, imágenes, cache)
-- [ ] Export SQLite → `.sql` MySQL
-- [ ] Guía cPanel (symlink storage, APP_KEY, `.env`, import `.sql`)
-- [ ] Checklist de go-live
 
 ## Pendientes del usuario
 - [ ] `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`

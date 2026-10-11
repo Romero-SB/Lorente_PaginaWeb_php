@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 const CLAVE = 'lorente_panel_ventana';
 
-const MIN_ANCHO = 380;
-const MIN_ALTO = 400;
+const MIN_ANCHO = 420;
+const MIN_ALTO = 440;
 
 function acotar(v, min, max) {
     return Math.min(Math.max(v, min), max);
@@ -12,7 +12,7 @@ function acotar(v, min, max) {
 function ajustarAlViewport(b) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const w = acotar(b.width, MIN_ANCHO, Math.min(vw * 0.9, 960));
+    const w = acotar(b.width, MIN_ANCHO, Math.min(vw * 0.94, 1280));
     const h = acotar(b.height, MIN_ALTO, vh * 0.9);
     return {
         left: acotar(b.left, 8, Math.max(8, vw - 100)),
@@ -40,8 +40,8 @@ function inicial() {
     } catch {}
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const width = Math.min(980, Math.round(vw * 0.92));
-    const height = Math.min(680, Math.round(vh * 0.88));
+    const width = Math.min(1120, Math.round(vw * 0.92));
+    const height = Math.min(780, Math.round(vh * 0.9));
     return {
         left: Math.max(8, Math.round((vw - width) / 2)),
         top: Math.max(6, Math.round((vh - height) / 2)),
@@ -138,7 +138,7 @@ export function usePanelWindow() {
                 const dx = cx - d.startX;
                 const dy = cy - d.startY;
                 const s = d.startRect;
-                const maxW = Math.min(window.innerWidth * 0.9, 960);
+                const maxW = Math.min(window.innerWidth * 0.94, 1280);
                 const maxH = window.innerHeight * 0.9;
                 let w = s.width;
                 let h = s.height;

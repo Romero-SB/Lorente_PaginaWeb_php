@@ -25,10 +25,14 @@ export default function Resumen({ stats }) {
 
     return (
         <div>
-            <h1 className="text-xl font-bold text-slate-900">Resumen</h1>
-            <p className="mt-1 text-sm text-slate-500">
-                Hola, {auth.user?.name}. Desde aquí puedes gestionar el contenido de la institución.
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h1 className="text-xl font-bold text-slate-900">Resumen</h1>
+                    <p className="mt-1 text-sm text-slate-500">
+                        Hola, {auth.user?.name}. Desde aquí puedes gestionar el contenido de la institución.
+                    </p>
+                </div>
+            </div>
 
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {tarjetas.map((t) => {
