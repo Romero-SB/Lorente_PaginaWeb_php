@@ -62,6 +62,7 @@ class ContenidoSitio
             ->unique();
 
         return DocenteCategoria::query()
+            ->select(['id', 'nombre', 'orden', 'estilo'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
@@ -95,6 +96,7 @@ class ContenidoSitio
     private static function documentos(bool $autenticado): array
     {
         return Documento::query()
+            ->select(['id', 'titulo', 'categoria', 'descripcion', 'instrucciones', 'visibilidad', 'archivo_url', 'archivo_nombre'])
             ->when(! $autenticado, fn ($q) => $q->where('visibilidad', Documento::VISIBILIDAD_PUBLICO))
             ->orderByDesc('id')
             ->get()

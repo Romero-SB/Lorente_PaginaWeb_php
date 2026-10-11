@@ -22,6 +22,7 @@ class DocentesController extends Controller
         PapeleraDocentes::purgarVencidasSiCorresponde();
 
         $docentes = Docente::query()
+            ->select(['id', 'nombre', 'cargo', 'categoria', 'orden', 'activo', 'foto'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
@@ -33,6 +34,7 @@ class DocentesController extends Controller
             ->pluck('total', 'categoria');
 
         $categorias = DocenteCategoria::query()
+            ->select(['id', 'nombre', 'orden', 'estilo'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()

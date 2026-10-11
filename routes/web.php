@@ -46,7 +46,7 @@ Route::get('/sitemap.xml', function () {
         ['loc' => url('/noticias'), 'changefreq' => 'daily', 'priority' => '0.8'],
     ];
 
-    foreach (Noticia::query()->where('est', Noticia::EST_PUBLICADO)->orderByDesc('fiso')->get() as $noticia) {
+    foreach (Noticia::query()->where('est', Noticia::EST_PUBLICADO)->select(['id', 'slug', 'updated_at'])->orderByDesc('fiso')->get() as $noticia) {
         $urls[] = [
             'loc' => route('sitio.noticias.show', $noticia),
             'lastmod' => $noticia->updated_at?->toAtomString(),

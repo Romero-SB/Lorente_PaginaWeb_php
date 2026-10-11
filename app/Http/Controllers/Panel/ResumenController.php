@@ -14,11 +14,13 @@ use Inertia\Response;
 
 class ResumenController extends Controller
 {
+    public const CLAVE_ESTADISTICAS = 'panel.stats';
+
     public function index(Request $request): Response
     {
         $usuario = $request->user();
 
-        $conteos = Cache::remember('panel.stats', now()->addMinutes(5), fn () => [
+        $conteos = Cache::remember(self::CLAVE_ESTADISTICAS, now()->addMinutes(5), fn () => [
             'noticias' => Noticia::count(),
             'documentos' => Documento::count(),
             'docentes' => Docente::count(),

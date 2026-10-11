@@ -26,6 +26,7 @@ class DocumentosController extends Controller
         PapeleraDocumentos::purgarVencidasSiCorresponde();
 
         $documentos = Documento::query()
+            ->select(['id', 'titulo', 'categoria', 'visibilidad', 'descripcion', 'instrucciones', 'archivo_url', 'archivo_nombre', 'author_id'])
             ->with(['author:id,name,cargo'])
             ->when($usuario->isDocente(), fn ($q) => $q->where('author_id', $usuario->id))
             ->orderByDesc('id')
@@ -38,6 +39,7 @@ class DocumentosController extends Controller
             ->pluck('total', 'categoria');
 
         $categorias = DocumentoCategoria::query()
+            ->select(['id', 'nombre', 'orden'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
