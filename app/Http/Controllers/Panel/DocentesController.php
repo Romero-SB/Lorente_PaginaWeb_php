@@ -19,7 +19,7 @@ class DocentesController extends Controller
     public function index(Request $request): Response
     {
         $usuario = $request->user();
-        PapeleraDocentes::purgarVencidas();
+        PapeleraDocentes::purgarVencidasSiCorresponde();
 
         $docentes = Docente::query()
             ->orderBy('orden')
@@ -182,7 +182,7 @@ class DocentesController extends Controller
     /** @return array<int, array<string, mixed>> */
     private function papelera(User $usuario): array
     {
-        PapeleraDocentes::purgarVencidas();
+        PapeleraDocentes::purgarVencidasSiCorresponde();
 
         return PapeleraDocentes::consultaVisible($usuario)
             ->orderByDesc('deleted_at')

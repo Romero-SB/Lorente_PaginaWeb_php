@@ -12,7 +12,7 @@ export default function NoticiaCard({ noticia }) {
         >
             <div className="nt-img">
                 {img ? (
-                    <img src={img} alt="" />
+                    <img src={img} alt="" loading="lazy" decoding="async" />
                 ) : (
                     <i className="fas fa-newspaper" style={{ fontSize: '2.5rem', color: 'rgba(255,255,255,0.3)' }}></i>
                 )}

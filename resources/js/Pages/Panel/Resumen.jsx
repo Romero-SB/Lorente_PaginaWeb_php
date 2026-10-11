@@ -1,7 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 
 function visit(ruta) {
     router.visit(ruta, { preserveScroll: true });
@@ -68,5 +67,3 @@ export default function Resumen({ stats }) {
         </div>
     );
 }
-
-Resumen.layout = (page) => <PanelLayout children={page} />;

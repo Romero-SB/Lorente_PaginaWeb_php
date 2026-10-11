@@ -107,9 +107,9 @@
 - [x] Reflejo en vivo de acciones sin perder la posición de scroll (layout persistente + `preserveScroll` + `<Link prefetch>`, nav con `except: ['sitio']`)
 
 ## Fase 10 — Pulido y despliegue
-- [ ] SEO (sitemap, robots, meta), favicon
-- [ ] Accesibilidad + responsive
-- [ ] Optimización (GLB, imágenes, cache)
+- [~] SEO (sitemap, robots, meta), favicon
+- [~] Accesibilidad + responsive
+- [~] Optimización (GLB, imágenes, cache)
 
 ## Pendientes del usuario
 - [ ] `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`

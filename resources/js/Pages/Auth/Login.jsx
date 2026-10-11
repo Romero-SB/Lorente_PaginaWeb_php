@@ -1,12 +1,9 @@
-import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 import Turnstile from '../../Components/Auth/Turnstile';
-import SitioHome from '../../Components/Sitio/SitioHome';
-import SitioLayout from '../../Layouts/SitioLayout';
 
 export default function Login() {
-    const { sitio } = usePage().props;
     const [verClave, setVerClave] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
         email: '',
@@ -69,9 +66,15 @@ export default function Login() {
                                     autoComplete="email"
                                     autoFocus
                                     className="login-input"
+                                    aria-invalid={errors.email ? true : undefined}
+                                    aria-describedby={errors.email ? 'email-error' : undefined}
                                 />
                             </div>
-                            {errors.email && <p className="login-error">{errors.email}</p>}
+                            {errors.email && (
+                                <p className="login-error" id="email-error" role="alert">
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -89,6 +92,8 @@ export default function Login() {
                                     placeholder="••••••••"
                                     autoComplete="current-password"
                                     className="login-input login-input--pass"
+                                    aria-invalid={errors.password ? true : undefined}
+                                    aria-describedby={errors.password ? 'password-error' : undefined}
                                 />
                                 <button
                                     type="button"
@@ -100,7 +105,11 @@ export default function Login() {
                                     <i className={verClave ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'} aria-hidden="true" />
                                 </button>
                             </div>
-                            {errors.password && <p className="login-error">{errors.password}</p>}
+                            {errors.password && (
+                                <p className="login-error" id="password-error" role="alert">
+                                    {errors.password}
+                                </p>
+                            )}
                         </div>
 
                         <div className="login-fila">
@@ -138,9 +147,5 @@ export default function Login() {
         </div>
     );
 
-    return (
-        <SitioLayout overlay={modal} toastSitio={false}>
-            {sitio ? <SitioHome {...sitio} /> : null}
-        </SitioLayout>
-    );
+    return modal;
 }

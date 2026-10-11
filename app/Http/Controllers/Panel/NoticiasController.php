@@ -21,7 +21,7 @@ class NoticiasController extends Controller
     public function index(Request $request): Response
     {
         $usuario = $request->user();
-        PapeleraNoticias::purgarVencidas();
+        PapeleraNoticias::purgarVencidasSiCorresponde();
 
         $noticias = Noticia::query()
             ->with(['author:id,name,cargo', 'updatedBy:id,name', 'imagenes', 'adjuntos'])
@@ -281,7 +281,7 @@ class NoticiasController extends Controller
     /** @return array<int, array<string, mixed>> */
     private function papelera(User $usuario): array
     {
-        PapeleraNoticias::purgarVencidas();
+        PapeleraNoticias::purgarVencidasSiCorresponde();
 
         return PapeleraNoticias::consultaVisible($usuario)
             ->orderByDesc('deleted_at')

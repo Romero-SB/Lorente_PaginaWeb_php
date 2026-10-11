@@ -4,7 +4,6 @@ import NoticiaCard from '../../Components/Sitio/NoticiaCard';
 import NoticiaDetalle from '../../Components/Sitio/NoticiaDetalle';
 import Reveal from '../../Components/Sitio/Reveal';
 import SectionHeader from '../../Components/Sitio/SectionHeader';
-import SitioLayout from '../../Layouts/SitioLayout';
 
 export default function Noticia({ noticia, relacionadas = [] }) {
     const descripcion = (noticia.res || noticia.con || '').substring(0, 160);
@@ -54,4 +53,3 @@ export default function Noticia({ noticia, relacionadas = [] }) {
     );
 }
 
-Noticia.layout = (page) => <SitioLayout>{page}</SitioLayout>;

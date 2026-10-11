@@ -2,7 +2,6 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 
 const ETIQUETAS_ROL = {
     'super-usuario': 'Super Usuario',
@@ -268,4 +267,3 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
     );
 }
 
-Historial.layout = (page) => <PanelLayout children={page} />;

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Icono } from '../../Components/Panel/Iconos';
 import GestorCategorias from '../../Components/Panel/GestorCategorias';
 import Recortador from '../../Components/Panel/Recortador';
-import PanelLayout from '../../Layouts/PanelLayout';
 import { toast } from '../../lib/toast';
 
 const PESO_FOTO = 3 * 1024 * 1024;
@@ -546,4 +545,3 @@ function Papelera({ papelera, esAdmin, onRestaurar, onEliminarPermanente }) {
     );
 }
 
-Docentes.layout = (page) => <PanelLayout children={page} />;

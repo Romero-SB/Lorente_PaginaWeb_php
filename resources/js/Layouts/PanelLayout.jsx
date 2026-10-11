@@ -3,16 +3,14 @@ import { useEffect } from 'react';
 
 import { Icono } from '../Components/Panel/Iconos';
 import { Toasts } from '../Components/Panel/Toasts';
-import SitioHome from '../Components/Sitio/SitioHome';
 import { usePanelWindow } from '../hooks/usePanelWindow';
 import { guardarBorrador, limpiarBorrador, restaurarBorrador } from '../lib/draft';
 import { toast } from '../lib/toast';
-import SitioLayout from './SitioLayout';
 
 const DIRECCIONES_RESIZE = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
 
 export default function PanelLayout({ children }) {
-    const { auth, panel, flash, sitio } = usePage().props;
+    const { auth, panel, flash } = usePage().props;
     const ventana = usePanelWindow();
 
     const secciones = panel?.secciones ?? [];
@@ -46,6 +44,26 @@ export default function PanelLayout({ children }) {
         };
     }, []);
 
+    useEffect(() => {
+        ventana.panelRef.current?.focus?.({ preventScroll: true });
+    }, []);
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key !== 'Escape') return;
+
+            const t = e.target;
+            if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) {
+                return;
+            }
+
+            if (ventana.view !== 'minimizado') ventana.setView('minimizado');
+        };
+
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [ventana.view]);
+
     function cerrarSesion() {
         router.post('/lorente-panel/logout');
     }
@@ -77,7 +95,15 @@ export default function PanelLayout({ children }) {
                 </button>
             )}
 
-            <div ref={ventana.panelRef} className={ventana.claseVentana} style={ventana.estiloVentana}>
+            <div
+                ref={ventana.panelRef}
+                className={ventana.claseVentana}
+                style={ventana.estiloVentana}
+                role="dialog"
+                aria-label="Panel administrativo"
+                aria-modal={ventana.view === 'maximizado' ? true : undefined}
+                tabIndex={-1}
+            >
                 {ventana.view === 'normal' &&
                     !ventana.isMobile &&
                     DIRECCIONES_RESIZE.map((dir) => (
@@ -191,9 +217,5 @@ export default function PanelLayout({ children }) {
         </div>
     );
 
-    return (
-        <SitioLayout overlay={overlay} toastSitio={false}>
-            {sitio ? <SitioHome {...sitio} /> : null}
-        </SitioLayout>
-    );
+    return overlay;
 }

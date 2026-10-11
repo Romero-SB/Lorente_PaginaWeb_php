@@ -8,6 +8,7 @@ use App\Models\Docente;
 use App\Models\Documento;
 use App\Models\Noticia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,11 +18,18 @@ class ResumenController extends Controller
     {
         $usuario = $request->user();
 
-        $stats = [
+        $conteos = Cache::remember('panel.stats', now()->addMinutes(5), fn () => [
             'noticias' => Noticia::count(),
             'documentos' => Documento::count(),
-            'docentes' => $usuario->isDocente() ? null : Docente::count(),
-            'mensajes' => $usuario->isDocente() ? null : ContactoMensaje::count(),
+            'docentes' => Docente::count(),
+            'mensajes' => ContactoMensaje::count(),
+        ]);
+
+        $stats = [
+            'noticias' => $conteos['noticias'],
+            'documentos' => $conteos['documentos'],
+            'docentes' => $usuario->isDocente() ? null : $conteos['docentes'],
+            'mensajes' => $usuario->isDocente() ? null : $conteos['mensajes'],
         ];
 
         return Inertia::render('Panel/Resumen', [

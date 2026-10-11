@@ -3,7 +3,6 @@ import { Head, Link } from '@inertiajs/react';
 import NoticiaCard from '../../Components/Sitio/NoticiaCard';
 import Reveal from '../../Components/Sitio/Reveal';
 import SectionHeader from '../../Components/Sitio/SectionHeader';
-import SitioLayout from '../../Layouts/SitioLayout';
 
 function Paginacion({ paginador }) {
     const links = paginador?.links ?? [];
@@ -83,4 +82,3 @@ export default function Noticias({ noticias }) {
     );
 }
 
-Noticias.layout = (page) => <SitioLayout>{page}</SitioLayout>;

@@ -23,3 +23,31 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Compresión de respuestas de texto
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+    AddOutputFilterByType DEFLATE application/javascript application/json application/xml
+    AddOutputFilterByType DEFLATE image/svg+xml font/woff2
+</IfModule>
+
+# Caché de imágenes y modelos del sitio
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/avif "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType model/gltf-binary "access plus 30 days"
+</IfModule>
+
+# Los assets con hash de Vite pueden cachearse para siempre
+<IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/build/" ASSET_VERSIONADO=1
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|woff2?|webp|png|jpe?g|svg|avif)$">
+        Header set Cache-Control "public, max-age=31536000, immutable" env=ASSET_VERSIONADO
+    </FilesMatch>
+</IfModule>

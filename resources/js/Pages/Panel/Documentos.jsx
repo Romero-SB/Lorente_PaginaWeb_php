@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 
 import GestorCategorias from '../../Components/Panel/GestorCategorias';
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 import { toast } from '../../lib/toast';
 
 const PESO_ARCHIVO = 20 * 1024 * 1024;
@@ -515,4 +514,3 @@ function Papelera({ papelera, onRestaurar, onEliminarPermanente }) {
     );
 }
 
-Documentos.layout = (page) => <PanelLayout children={page} />;

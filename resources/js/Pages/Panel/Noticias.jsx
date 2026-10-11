@@ -2,7 +2,6 @@ import { router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 import { registerDraftSaver, restaurarBorrador, limpiarBorrador } from '../../lib/draft';
 import { comprimirAWebp, formatoPeso } from '../../lib/image';
 import { toast } from '../../lib/toast';
@@ -668,5 +667,3 @@ function Formulario({
         </form>
     );
 }
-
-Noticias.layout = (page) => <PanelLayout children={page} />;

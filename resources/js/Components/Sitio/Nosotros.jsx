@@ -42,7 +42,7 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
             <div className="nosg">
                 <Reveal>
                     <div className="nosv">
-                        <img src="/referencial.jpg" alt="Instalaciones de la IE Sebastián Lorente" />
+                        <img src="/referencial.jpg" alt="Instalaciones de la IE Sebastián Lorente" loading="lazy" decoding="async" />
                     </div>
                 </Reveal>
                 <Reveal delay={120}>
@@ -133,7 +133,7 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
                                             <div className="pdc">
                                                 <div className="pdc-img">
                                                     {d.foto ? (
-                                                        <img src={d.foto} alt={d.nombre} />
+                                                        <img src={d.foto} alt={d.nombre} loading="lazy" decoding="async" />
                                                     ) : (
                                                         <i
                                                             className="fas fa-user"

@@ -1,7 +1,6 @@
 import { useForm, usePage } from '@inertiajs/react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 
 function Campo({ etiqueta, children, error, ayuda }) {
     return (
@@ -169,4 +168,3 @@ export default function Configuracion({ config = {} }) {
     );
 }
 
-Configuracion.layout = (page) => <PanelLayout children={page} />;

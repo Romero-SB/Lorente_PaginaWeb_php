@@ -18,6 +18,7 @@ use App\Http\Controllers\Sitio\ContactoController;
 use App\Http\Controllers\Sitio\DocumentoController;
 use App\Http\Controllers\Sitio\InicioController;
 use App\Http\Controllers\Sitio\NoticiaController;
+use App\Models\Noticia;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('home');
@@ -29,6 +30,35 @@ Route::post('/contacto', [ContactoController::class, 'store'])
 Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'descargar'])
     ->middleware('auth')
     ->name('sitio.documentos.descargar');
+
+Route::get('/robots.txt', function () {
+    $contenido = "User-agent: *\n"
+        ."Disallow: /lorente-panel/\n"
+        ."\n"
+        .'Sitemap: '.url('/sitemap.xml')."\n";
+
+    return response($contenido, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+})->name('robots');
+
+Route::get('/sitemap.xml', function () {
+    $urls = [
+        ['loc' => url('/'), 'changefreq' => 'weekly', 'priority' => '1.0'],
+        ['loc' => url('/noticias'), 'changefreq' => 'daily', 'priority' => '0.8'],
+    ];
+
+    foreach (Noticia::query()->where('est', Noticia::EST_PUBLICADO)->orderByDesc('fiso')->get() as $noticia) {
+        $urls[] = [
+            'loc' => route('sitio.noticias.show', $noticia),
+            'lastmod' => $noticia->updated_at?->toAtomString(),
+            'changefreq' => 'monthly',
+            'priority' => '0.6',
+        ];
+    }
+
+    return response()
+        ->view('sitemap', ['urls' => $urls])
+        ->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('sitemap');
 
 Route::middleware('guest')->prefix('lorente-panel')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('panel.login.show');

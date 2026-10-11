@@ -2,7 +2,6 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 
 function formatearFecha(valor) {
     if (!valor) return '—';
@@ -214,4 +213,3 @@ export default function Mensajes({ mensajes = [], filtros = {}, stats = {} }) {
     );
 }
 
-Mensajes.layout = (page) => <PanelLayout children={page} />;

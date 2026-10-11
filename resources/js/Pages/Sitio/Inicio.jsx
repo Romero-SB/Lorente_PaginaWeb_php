@@ -1,7 +1,6 @@
 import { Head } from '@inertiajs/react';
 
 import SitioHome from '../../Components/Sitio/SitioHome';
-import SitioLayout from '../../Layouts/SitioLayout';
 
 export default function Inicio(props) {
     const descripcion =
@@ -23,4 +22,3 @@ export default function Inicio(props) {
     );
 }
 
-Inicio.layout = (page) => <SitioLayout>{page}</SitioLayout>;

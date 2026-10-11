@@ -23,7 +23,7 @@ class DocumentosController extends Controller
     public function index(Request $request): Response
     {
         $usuario = $request->user();
-        PapeleraDocumentos::purgarVencidas();
+        PapeleraDocumentos::purgarVencidasSiCorresponde();
 
         $documentos = Documento::query()
             ->with(['author:id,name,cargo'])
@@ -222,7 +222,7 @@ class DocumentosController extends Controller
     /** @return array<int, array<string, mixed>> */
     private function papelera(User $usuario): array
     {
-        PapeleraDocumentos::purgarVencidas();
+        PapeleraDocumentos::purgarVencidasSiCorresponde();
 
         return PapeleraDocumentos::consultaVisible($usuario)
             ->orderByDesc('deleted_at')

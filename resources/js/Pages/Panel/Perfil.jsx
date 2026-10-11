@@ -1,7 +1,6 @@
 import { useForm } from '@inertiajs/react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
 
 const claseInput =
     'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100';
@@ -155,4 +154,3 @@ export default function Perfil({ perfil = {} }) {
     );
 }
 
-Perfil.layout = (page) => <PanelLayout children={page} />;

@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Docente;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 
 class PapeleraDocentes
 {
@@ -72,5 +73,18 @@ class PapeleraDocentes
         }
 
         return $vencidas->count();
+    }
+
+    /**
+     * Ejecuta la purga como máximo una vez cada 6 horas para no recorrer la
+     * papelera en cada petición al panel.
+     */
+    public static function purgarVencidasSiCorresponde(): int
+    {
+        if (! Cache::add('papelera.docentes.purga', now()->timestamp, now()->addHours(6))) {
+            return 0;
+        }
+
+        return self::purgarVencidas();
     }
 }
