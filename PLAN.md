@@ -37,8 +37,7 @@
 ## Fase 1 — Modelo de datos
 - [x] Migraciones: users(mod role/cargo/must_change_password), config, noticias, noticia_imagenes, adjuntos, docente_categorias, docentes, documento_categorias, documentos(visibilidad), actividad, contacto_mensajes
 - [x] Modelos + relaciones + casts (Noticia con `slug` autogenerado y borrado en cascada de imágenes/adjuntos)
-- [x] Seeders: superusuario (`admin@lorente.edu.pe` / `lorente2026`, cambio obligatorio) + config institucional
-- [x] (opcional) `DemoUsuariosSeeder` creado (no se auto-ejecuta): `php artisan db:seed --class=DemoUsuariosSeeder`
+- [x] Seeders: superusuario, administrador y docente (clave `lorente2026`) + config institucional
 
 ## Fase 2 — Autenticación
 - [x] Rutas `/lorente-panel` (login/logout/recuperar/restablecer)
@@ -115,4 +114,3 @@
 - [ ] `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
 - [ ] Cuenta Gmail + App Password (reset y contacto)
 - [ ] Dominio final
-- [ ] (opcional) cuentas demo admin/docente

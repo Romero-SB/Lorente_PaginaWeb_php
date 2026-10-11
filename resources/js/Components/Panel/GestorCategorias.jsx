@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 import { toast } from '../../lib/toast';
+import EditorEstiloCategoria from './EditorEstiloCategoria';
 import { Icono } from './Iconos';
 
 function reordenarLista(lista, desde, hasta) {
@@ -19,6 +20,8 @@ export default function GestorCategorias({
     reorderKey = 'categorias',
     bloqueoKey = 'docentes',
     bloqueoEtiqueta = 'docentes',
+    permitirEstilo = false,
+    docentesMuestra = {},
     onClose,
 }) {
     const [lista, setLista] = useState(categorias);
@@ -28,6 +31,7 @@ export default function GestorCategorias({
     const [valorRenombre, setValorRenombre] = useState('');
     const [bloqueada, setBloqueada] = useState(null);
     const [origen, setOrigen] = useState(null);
+    const [estiloCategoria, setEstiloCategoria] = useState(null);
 
     useEffect(() => {
         setLista(categorias);
@@ -86,8 +90,9 @@ export default function GestorCategorias({
     }
 
     return (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/70 p-4" onClick={onClose}>
-            <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <>
+            <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/70 p-4" onClick={onClose}>
+                <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
                     <h3 className="text-sm font-bold text-slate-800">{titulo}</h3>
                     <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
@@ -168,6 +173,16 @@ export default function GestorCategorias({
                                 ) : (
                                     <>
                                         <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{cat.nombre}</span>
+                                        {permitirEstilo && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setEstiloCategoria(cat)}
+                                                className={`transition ${cat.estilo ? 'text-blue-700 hover:text-blue-900' : 'text-slate-400 hover:text-blue-700'}`}
+                                                title="Estilo de la categoría"
+                                            >
+                                                <Icono nombre="paleta" className="h-4 w-4" />
+                                            </button>
+                                        )}
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -189,6 +204,16 @@ export default function GestorCategorias({
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
+
+            {estiloCategoria && (
+                <EditorEstiloCategoria
+                    categoria={estiloCategoria}
+                    baseUrl={baseUrl}
+                    docenteMuestra={docentesMuestra[estiloCategoria.nombre]}
+                    onClose={() => setEstiloCategoria(null)}
+                />
+            )}
+        </>
     );
 }

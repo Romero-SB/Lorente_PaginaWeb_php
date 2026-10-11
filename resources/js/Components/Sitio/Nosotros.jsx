@@ -1,5 +1,7 @@
 import Reveal from './Reveal';
 import SectionHeader from './SectionHeader';
+import Imagen from './Imagen';
+import { estiloCategoria } from '../../lib/fuentes';
 
 const HISTORIA = [
     {
@@ -42,7 +44,7 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
             <div className="nosg">
                 <Reveal>
                     <div className="nosv">
-                        <img src="/referencial.jpg" alt="Instalaciones de la IE Sebastián Lorente" loading="lazy" decoding="async" />
+                        <Imagen src="/referencial.jpg" alt="Instalaciones de la IE Sebastián Lorente" loading="lazy" decoding="async" />
                     </div>
                 </Reveal>
                 <Reveal delay={120}>
@@ -127,19 +129,23 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
                                         <SectionHeader numeral="03" label="Nuestro equipo" title={cat.nombre} align="center" />
                                     </div>
                                 </Reveal>
-                                <div className="pdg pdg-dynamic">
+                                <div className="pdg pdg-dynamic" style={estiloCategoria(cat.estilo)}>
                                     {catDocs.map((d) => (
                                         <Reveal key={d.id} className="rev-fill">
                                             <div className="pdc">
                                                 <div className="pdc-img">
-                                                    {d.foto ? (
-                                                        <img src={d.foto} alt={d.nombre} loading="lazy" decoding="async" />
-                                                    ) : (
-                                                        <i
-                                                            className="fas fa-user"
-                                                            style={{ fontSize: '2.5rem', color: 'rgba(255,255,255,0.4)' }}
-                                                        ></i>
-                                                    )}
+                                                    <Imagen
+                                                        src={d.foto}
+                                                        alt={d.nombre}
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        fallback={
+                                                            <i
+                                                                className="fas fa-user"
+                                                                style={{ fontSize: '2.5rem', color: 'rgba(255,255,255,0.4)' }}
+                                                            ></i>
+                                                        }
+                                                    />
                                                 </div>
                                                 <div className="pdc-txt">
                                                     <h3>{d.nombre}</h3>

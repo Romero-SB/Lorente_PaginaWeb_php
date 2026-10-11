@@ -108,6 +108,7 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
             Route::post('/docente-categorias', [DocenteCategoriasController::class, 'store'])->name('panel.docente-categorias.store');
             Route::post('/docente-categorias/reordenar', [DocenteCategoriasController::class, 'reordenar'])->name('panel.docente-categorias.reordenar');
             Route::post('/docente-categorias/{categoria}', [DocenteCategoriasController::class, 'update'])->name('panel.docente-categorias.update');
+            Route::post('/docente-categorias/{categoria}/estilo', [DocenteCategoriasController::class, 'estilo'])->name('panel.docente-categorias.estilo');
             Route::post('/docente-categorias/{categoria}/eliminar', [DocenteCategoriasController::class, 'destroy'])->name('panel.docente-categorias.destroy');
         });
 

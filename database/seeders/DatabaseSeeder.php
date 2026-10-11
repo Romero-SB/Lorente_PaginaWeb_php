@@ -7,9 +7,8 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Siembra la cuenta Super Usuario y la configuración institucional.
-     *
-     * Para cuentas demo de prueba: `php artisan db:seed --class=DemoUsuariosSeeder`.
+     * Siembra las cuentas base (Super Usuario, Administrador y Docente)
+     * y la configuración institucional.
      */
     public function run(): void
     {

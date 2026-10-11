@@ -71,4 +71,27 @@ class DocenteCategoriasController extends Controller
 
         return back();
     }
+
+    public function estilo(Request $request, DocenteCategoria $categoria)
+    {
+        $datos = $request->validate([
+            'titulo_font' => ['nullable', Rule::in(DocenteCategoria::FUENTES_PERMITIDAS)],
+            'titulo_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'titulo_align' => ['nullable', Rule::in(['left', 'center', 'right'])],
+            'cargo_font' => ['nullable', Rule::in(DocenteCategoria::FUENTES_PERMITIDAS)],
+            'cargo_color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'cargo_align' => ['nullable', Rule::in(['left', 'center', 'right'])],
+            'fondo' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+        ]);
+
+        $estilo = collect($datos)
+            ->map(fn ($valor) => is_string($valor) ? trim($valor) : $valor)
+            ->filter(fn ($valor) => $valor !== null && $valor !== '')
+            ->map(fn ($valor) => str_starts_with($valor, '#') ? strtolower($valor) : $valor)
+            ->all();
+
+        $categoria->update(['estilo' => $estilo === [] ? null : $estilo]);
+
+        return back()->with('ok', "Estilo de \"{$categoria->nombre}\" actualizado.");
+    }
 }

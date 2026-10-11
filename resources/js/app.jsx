@@ -14,7 +14,12 @@ createInertiaApp({
     title: (title) => (title ? `${title} · ${appName}` : appName),
     resolve: (name) => pages[`./Pages/${name}.jsx`]().then((modulo) => modulo.default),
     layout: (name) =>
-        name.startsWith('Panel/') || name.startsWith('Sitio/') || name === 'Auth/Login' ? SitioLayout : undefined,
+        name.startsWith('Panel/') ||
+        name.startsWith('Sitio/') ||
+        name === 'Auth/Login' ||
+        name === 'Auth/FirstPasswordChange'
+            ? SitioLayout
+            : undefined,
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },

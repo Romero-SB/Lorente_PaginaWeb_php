@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+import Imagen from './Imagen';
+import Skeleton from './Skeleton';
 import Tooltip from './Tooltip';
 
 function extension(nombre) {
@@ -34,16 +36,21 @@ function iconoFa(nombre) {
     return mapa[e] || 'fa-file';
 }
 
-export default function NoticiaDetalle({ noticia }) {
+export default function NoticiaDetalle({ noticia, variante = 'pagina' }) {
     const imagenes = noticia.imagenes || [];
     const files = noticia.files || [];
     const [index, setIndex] = useState(0);
     const [fading, setFading] = useState(false);
+    const [cargandoInicial, setCargandoInicial] = useState(true);
     const intervalRef = useRef(null);
 
     const hasCarousel = imagenes.length > 1;
     const current = imagenes[index] || null;
     const next = hasCarousel ? imagenes[(index + 1) % imagenes.length] : null;
+
+    useEffect(() => {
+        setCargandoInicial(true);
+    }, [noticia.id]);
 
     useEffect(() => {
         if (!hasCarousel) return undefined;
@@ -55,7 +62,7 @@ export default function NoticiaDetalle({ noticia }) {
                 setIndex((prev) => (prev + 1) % imagenes.length);
                 setFading(false);
             }, 500);
-        }, 2500);
+        }, 2000);
 
         return () => clearInterval(intervalRef.current);
     }, [noticia.id, hasCarousel, imagenes.length]);
@@ -71,41 +78,49 @@ export default function NoticiaDetalle({ noticia }) {
                     setIndex((prev) => (prev + 1) % imagenes.length);
                     setFading(false);
                 }, 500);
-            }, 2500);
+            }, 2000);
         }
     };
 
-    return (
-        <article className="nd-card">
-            {current && (
-                <>
-                    <div className="nd-carousel-wrap">
-                        {hasCarousel && fading && next && <img src={next} alt="" className="nd-carousel-img nd-img-in" />}
+    const galeria = current ? (
+        <>
+            <div className="nd-carousel-wrap">
+                {hasCarousel && cargandoInicial && (
+                    <Skeleton className="img-sk" width="100%" height="100%" borderRadius={0} />
+                )}
+                {hasCarousel ? (
+                    <>
+                        {fading && next && <img src={next} alt="" className="nd-carousel-img nd-img-in" />}
                         <img
                             src={current}
                             alt=""
-                            className={`${hasCarousel ? 'nd-carousel-img' : 'nd-single-img'} ${
-                                hasCarousel && fading ? 'nd-img-out' : 'nd-img-in'
-                            }`}
+                            className={`nd-carousel-img ${fading ? 'nd-img-out' : 'nd-img-in'}`}
+                            onLoad={() => setCargandoInicial(false)}
                         />
-                    </div>
-                    {hasCarousel && (
-                        <div className="nd-dots">
-                            {imagenes.map((_, i) => (
-                                <Tooltip key={i} text={`Ver imagen ${i + 1}`}>
-                                    <button
-                                        type="button"
-                                        aria-label={`Ir a la imagen ${i + 1}`}
-                                        className={`nd-dot ${i === index ? 'active' : ''}`}
-                                        onClick={() => goTo(i)}
-                                    ></button>
-                                </Tooltip>
-                            ))}
-                        </div>
-                    )}
-                </>
+                    </>
+                ) : (
+                    <Imagen src={current} alt="" className="nd-single-img" />
+                )}
+            </div>
+            {hasCarousel && (
+                <div className="nd-dots">
+                    {imagenes.map((_, i) => (
+                        <Tooltip key={i} text={`Ver imagen ${i + 1}`}>
+                            <button
+                                type="button"
+                                aria-label={`Ir a la imagen ${i + 1}`}
+                                className={`nd-dot ${i === index ? 'active' : ''}`}
+                                onClick={() => goTo(i)}
+                            ></button>
+                        </Tooltip>
+                    ))}
+                </div>
             )}
+        </>
+    ) : null;
 
+    const cuerpo = (
+        <>
             {noticia.cat && <span className="n-cat-badge">{noticia.cat}</span>}
             <h1 className="n-title-detail">{noticia.titulo}</h1>
             <p className="n-meta-detail">
@@ -143,6 +158,22 @@ export default function NoticiaDetalle({ noticia }) {
                     <p className="n-att-empty">Sin documentos adjuntos.</p>
                 )}
             </div>
+        </>
+    );
+
+    if (variante === 'modal') {
+        return (
+            <article className={`nd-card nd-card--modal ${current ? '' : 'nd-card--solo'}`}>
+                {galeria && <div className="nd-media">{galeria}</div>}
+                <div className="nd-body">{cuerpo}</div>
+            </article>
+        );
+    }
+
+    return (
+        <article className="nd-card">
+            {galeria}
+            {cuerpo}
         </article>
     );
 }

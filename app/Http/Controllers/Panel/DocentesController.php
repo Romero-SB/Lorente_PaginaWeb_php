@@ -41,6 +41,7 @@ class DocentesController extends Controller
                 'nombre' => $c->nombre,
                 'orden' => $c->orden,
                 'total' => (int) ($conteos[$c->nombre] ?? 0),
+                'estilo' => $c->estilo,
             ]);
 
         return Inertia::render('Panel/Docentes', [

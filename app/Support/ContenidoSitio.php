@@ -70,6 +70,7 @@ class ContenidoSitio
                 'id' => $c->id,
                 'nombre' => $c->nombre,
                 'orden' => $c->orden,
+                'estilo' => $c->estilo,
             ])
             ->values()
             ->all();

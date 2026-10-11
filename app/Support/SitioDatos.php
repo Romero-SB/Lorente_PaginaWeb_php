@@ -41,7 +41,7 @@ class SitioDatos
                 'id' => $d->id,
                 'nombre' => $d->nombre,
                 'cargo' => $d->cargo,
-                'foto' => $d->foto,
+                'foto' => $d->foto ? Almacenamiento::url($d->foto) : null,
                 'categoria' => $d->categoria,
             ])
             ->values()

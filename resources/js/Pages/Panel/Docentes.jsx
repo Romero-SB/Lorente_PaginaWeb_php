@@ -47,6 +47,16 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
 
     const esAdmin = auth.user?.role === 'administrador';
 
+    const docentesMuestra = useMemo(() => {
+        const mapa = {};
+        for (const d of locales) {
+            if (d.categoria && !mapa[d.categoria]) {
+                mapa[d.categoria] = { nombre: d.nombre, cargo: d.cargo, foto: d.foto };
+            }
+        }
+        return mapa;
+    }, [locales]);
+
     function limpiarFoto() {
         setFotoFile(null);
         setFotoPreview(null);
@@ -89,9 +99,7 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
         router.reload({ only: ['papelera'] });
     }
 
-    function alSeleccionarFoto(e) {
-        const archivo = e.target.files?.[0];
-        e.target.value = '';
+    function procesarArchivoFoto(archivo) {
         if (!archivo) return;
         if (!archivo.type.startsWith('image/')) {
             toast('El archivo no es una imagen', 'error');
@@ -103,6 +111,12 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
         }
         if (cropSrc) URL.revokeObjectURL(cropSrc);
         setCropSrc(URL.createObjectURL(archivo));
+    }
+
+    function alSeleccionarFoto(e) {
+        const archivo = e.target.files?.[0];
+        e.target.value = '';
+        procesarArchivoFoto(archivo);
     }
 
     function alConfirmarRecorte(archivo) {
@@ -244,6 +258,7 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
                     categorias={cats}
                     fotoPreview={fotoPreview}
                     alSeleccionarFoto={alSeleccionarFoto}
+                    alSoltarFoto={procesarArchivoFoto}
                     quitarFoto={quitarFoto}
                     onSubmit={enviar}
                     onCancelar={abrirLista}
@@ -256,6 +271,8 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
                     baseUrl="/lorente-panel/docente-categorias"
                     bloqueoKey="docentes"
                     bloqueoEtiqueta="docentes"
+                    permitirEstilo
+                    docentesMuestra={docentesMuestra}
                     onClose={() => setGestorAbierto(false)}
                 />
             )}
@@ -382,7 +399,8 @@ function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onElimin
     );
 }
 
-function Formulario({ form, editingId, categorias, fotoPreview, alSeleccionarFoto, quitarFoto, onSubmit, onCancelar }) {
+function Formulario({ form, editingId, categorias, fotoPreview, alSeleccionarFoto, alSoltarFoto, quitarFoto, onSubmit, onCancelar }) {
+    const [arrastrando, setArrastrando] = useState(false);
     const error = (campo) => form.errors[campo];
 
     return (
@@ -446,9 +464,29 @@ function Formulario({ form, editingId, categorias, fotoPreview, alSeleccionarFot
                                 </button>
                             </div>
                         ) : (
-                            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-blue-300 hover:bg-blue-50/40">
+                            <label
+                                onDragOver={(ev) => {
+                                    ev.preventDefault();
+                                    if (!arrastrando) setArrastrando(true);
+                                }}
+                                onDragLeave={(ev) => {
+                                    if (ev.currentTarget.contains(ev.relatedTarget)) return;
+                                    setArrastrando(false);
+                                }}
+                                onDrop={(ev) => {
+                                    ev.preventDefault();
+                                    setArrastrando(false);
+                                    const archivo = ev.dataTransfer.files?.[0];
+                                    if (archivo) alSoltarFoto(archivo);
+                                }}
+                                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition ${
+                                    arrastrando ? 'border-blue-400 bg-blue-50' : 'border-slate-300 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40'
+                                }`}
+                            >
                                 <Icono nombre="imagen" className="h-7 w-7 text-slate-400" />
-                                <span className="text-xs font-semibold text-slate-600">Subir foto del docente</span>
+                                <span className="text-xs font-semibold text-slate-600">
+                                    {arrastrando ? 'Suelta la imagen aquí' : 'Subir foto del docente'}
+                                </span>
                                 <span className="text-[11px] text-slate-400">JPG, PNG o WebP (máx. 3 MB). Se recorta a 4:5.</span>
                                 <input type="file" accept="image/*" className="hidden" onChange={alSeleccionarFoto} />
                             </label>

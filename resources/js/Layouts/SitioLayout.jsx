@@ -13,8 +13,8 @@ export default function SitioLayout({ children }) {
     const { component, props } = usePage();
     const sitio = props.sitio;
     const esPanel = typeof component === 'string' && component.startsWith('Panel/');
-    const esLogin = component === 'Auth/Login';
-    const esOverlay = esPanel || esLogin;
+    const esAuth = component === 'Auth/Login' || component === 'Auth/FirstPasswordChange';
+    const esOverlay = esPanel || esAuth;
 
     return (
         <div className="sitio-root">
@@ -29,7 +29,7 @@ export default function SitioLayout({ children }) {
                 <Footer />
             </main>
 
-            {esLogin && createPortal(children, document.body)}
+            {esAuth && createPortal(children, document.body)}
             {esPanel && createPortal(<PanelLayout>{children}</PanelLayout>, document.body)}
 
             <Recorrido3dButton />
