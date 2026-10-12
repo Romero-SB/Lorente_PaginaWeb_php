@@ -46,7 +46,7 @@ class MensajesPanelTest extends TestCase
                 ->assertOk()
                 ->assertInertia(fn ($page) => $page
                     ->component('Panel/Mensajes')
-                    ->has('mensajes', 1)
+                    ->has('mensajes.data', 1)
                     ->has('filtros')
                     ->where('stats.total', 1)
                     ->where('stats.no_leidos', 1));
@@ -64,22 +64,22 @@ class MensajesPanelTest extends TestCase
             ->get('/lorente-panel/mensajes?filtro=no-leidos')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->has('mensajes', 1)
-                ->where('mensajes.0.id', $noLeido->id));
+                ->has('mensajes.data', 1)
+                ->where('mensajes.data.0.id', $noLeido->id));
 
         $this->actingAs($admin)
             ->get('/lorente-panel/mensajes?filtro=leidos')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->has('mensajes', 1)
-                ->where('mensajes.0.id', $leido->id));
+                ->has('mensajes.data', 1)
+                ->where('mensajes.data.0.id', $leido->id));
 
         $this->actingAs($admin)
             ->get('/lorente-panel/mensajes?q=Carla')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->has('mensajes', 1)
-                ->where('mensajes.0.id', $leido->id));
+                ->has('mensajes.data', 1)
+                ->where('mensajes.data.0.id', $leido->id));
     }
 
     public function test_marca_un_mensaje_como_leido_y_no_leido(): void

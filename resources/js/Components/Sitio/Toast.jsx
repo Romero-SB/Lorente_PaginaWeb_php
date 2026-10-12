@@ -19,5 +19,9 @@ export default function Toast() {
         return () => clearTimeout(id);
     }, [msg]);
 
-    return <div className={`toast ${msg ? 'show' : ''} ${msg?.tipo || ''}`}>{msg?.texto}</div>;
+    return (
+        <div className={`toast ${msg ? 'show' : ''} ${msg?.tipo || ''}`} role="status" aria-live="polite">
+            {msg?.texto}
+        </div>
+    );
 }

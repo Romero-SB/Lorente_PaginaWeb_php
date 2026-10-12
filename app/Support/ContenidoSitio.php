@@ -7,23 +7,48 @@ use App\Models\DocenteCategoria;
 use App\Models\Documento;
 use App\Models\Noticia;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class ContenidoSitio
 {
+    public const CLAVE_INVITADO = 'sitio.contenido.invitado';
+
+    public const CLAVE_AUTENTICADO = 'sitio.contenido.autenticado';
+
     /**
      * Datos que alimentan la página pública. Se reutilizan tanto en la casa
      * como detrás del panel administrativo (superpuesto) y del login.
      *
+     * Se cachean durante una hora; cualquier cambio en las entidades del
+     * sitio los invalida de inmediato (ver AppServiceProvider).
+     *
      * @return array<string, mixed>
      */
     public static function para(?User $usuario = null): array
+    {
+        $clave = $usuario !== null ? self::CLAVE_AUTENTICADO : self::CLAVE_INVITADO;
+
+        return Cache::remember($clave, now()->addHour(), fn () => self::construir($usuario !== null));
+    }
+
+    /**
+     * Invalida el contenido cacheado del sitio.
+     */
+    public static function olvidar(): void
+    {
+        Cache::forget(self::CLAVE_INVITADO);
+        Cache::forget(self::CLAVE_AUTENTICADO);
+    }
+
+    /** @return array<string, mixed> */
+    private static function construir(bool $autenticado): array
     {
         return [
             'config' => SitioDatos::config(),
             'docentes' => SitioDatos::docentes(),
             'categorias_docentes' => self::categoriasDocentes(),
             'noticias' => self::ultimasNoticias(),
-            'documentos' => self::documentos($usuario !== null),
+            'documentos' => self::documentos($autenticado),
         ];
     }
 
@@ -37,6 +62,7 @@ class ContenidoSitio
             ->unique();
 
         return DocenteCategoria::query()
+            ->select(['id', 'nombre', 'orden', 'estilo'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
@@ -45,6 +71,7 @@ class ContenidoSitio
                 'id' => $c->id,
                 'nombre' => $c->nombre,
                 'orden' => $c->orden,
+                'estilo' => $c->estilo,
             ])
             ->values()
             ->all();
@@ -69,6 +96,7 @@ class ContenidoSitio
     private static function documentos(bool $autenticado): array
     {
         return Documento::query()
+            ->select(['id', 'titulo', 'categoria', 'descripcion', 'instrucciones', 'visibilidad', 'archivo_url', 'archivo_nombre'])
             ->when(! $autenticado, fn ($q) => $q->where('visibilidad', Documento::VISIBILIDAD_PUBLICO))
             ->orderByDesc('id')
             ->get()

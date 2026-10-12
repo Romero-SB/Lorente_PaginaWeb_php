@@ -2,10 +2,11 @@ import { router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
-
-const claseInput =
-    'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100';
+import Boton from '../../Components/Shared/Boton';
+import Campo from '../../Components/Shared/Campo';
+import EmptyState from '../../Components/Shared/EmptyState';
+import PageHeader from '../../Components/Shared/PageHeader';
+import Paginacion from '../../Components/Shared/Paginacion';
 
 function colorRol(rol) {
     if (rol === 'super-usuario') return 'bg-purple-50 text-purple-700';
@@ -13,18 +14,9 @@ function colorRol(rol) {
     return 'bg-emerald-50 text-emerald-700';
 }
 
-function Campo({ etiqueta, children, error, ayuda }) {
-    return (
-        <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">{etiqueta}</label>
-            {children}
-            {ayuda && <p className="mt-1 text-[11px] text-slate-400">{ayuda}</p>}
-            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-        </div>
-    );
-}
-
-export default function Cuentas({ cuentas = [], roles_asignables = [], es_super = false }) {
+export default function Cuentas({ cuentas = { data: [], links: [], meta: {} }, roles_asignables = [], es_super = false }) {
+    const items = cuentas?.data ?? [];
+    const links = cuentas?.links ?? [];
     const [mostrarForm, setMostrarForm] = useState(false);
     const [resetId, setResetId] = useState(null);
 
@@ -82,56 +74,60 @@ export default function Cuentas({ cuentas = [], roles_asignables = [], es_super 
         router.post(`/lorente-panel/cuentas/${cuenta.id}/eliminar`, {}, { preserveScroll: true });
     }
 
+    function visitarPagina(url) {
+        router.visit(url, { preserveScroll: true });
+    }
+
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900">Cuentas</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        {es_super
-                            ? 'Crea y administra las cuentas de administradores y docentes.'
-                            : 'Administra las cuentas de docentes.'}
-                    </p>
-                </div>
-                <button
-                    onClick={abrirAlta}
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
-                >
+            <PageHeader
+                titulo="Cuentas"
+                descripcion={
+                    es_super
+                        ? 'Crea y administra las cuentas de administradores y docentes.'
+                        : 'Administra las cuentas de docentes.'
+                }
+            >
+                <Boton variante="primario" onClick={abrirAlta} className="px-3 py-2 text-sm">
                     <Icono nombre="mas" className="h-4 w-4" /> Nueva cuenta
-                </button>
-            </div>
+                </Boton>
+            </PageHeader>
 
             {mostrarForm && (
-                <form onSubmit={enviarAlta} className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <h2 className="mb-4 text-sm font-bold text-slate-900">Nueva cuenta</h2>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <Campo etiqueta="Nombre completo" error={alta.errors.name}>
+                <form onSubmit={enviarAlta} className="panel-tarjeta mt-4 p-5">
+                    <h2 className="panel-titulo-seccion mb-4">Nueva cuenta</h2>
+                    <div className="panel-rejilla-2 grid gap-4">
+                        <Campo etiqueta="Nombre completo" error={alta.errors.name} id="cuenta-nombre">
                             <input
+                                id="cuenta-nombre"
                                 value={alta.data.name}
                                 onChange={(e) => alta.setData('name', e.target.value)}
-                                className={claseInput}
+                                className="panel-campo w-full"
                             />
                         </Campo>
-                        <Campo etiqueta="Correo electrónico" error={alta.errors.email}>
+                        <Campo etiqueta="Correo electrónico" error={alta.errors.email} id="cuenta-email">
                             <input
+                                id="cuenta-email"
                                 type="email"
                                 value={alta.data.email}
                                 onChange={(e) => alta.setData('email', e.target.value)}
-                                className={claseInput}
+                                className="panel-campo w-full"
                             />
                         </Campo>
-                        <Campo etiqueta="Cargo" error={alta.errors.cargo}>
+                        <Campo etiqueta="Cargo" error={alta.errors.cargo} id="cuenta-cargo">
                             <input
+                                id="cuenta-cargo"
                                 value={alta.data.cargo}
                                 onChange={(e) => alta.setData('cargo', e.target.value)}
-                                className={claseInput}
+                                className="panel-campo w-full"
                             />
                         </Campo>
-                        <Campo etiqueta="Rol" error={alta.errors.role}>
+                        <Campo etiqueta="Rol" error={alta.errors.role} id="cuenta-rol">
                             <select
+                                id="cuenta-rol"
                                 value={alta.data.role}
                                 onChange={(e) => alta.setData('role', e.target.value)}
-                                className={claseInput}
+                                className="panel-campo w-full"
                             >
                                 {roles_asignables.map((rol) => (
                                     <option key={rol.valor} value={rol.valor}>
@@ -144,53 +140,51 @@ export default function Cuentas({ cuentas = [], roles_asignables = [], es_super 
                             etiqueta="Contraseña temporal"
                             error={alta.errors.password}
                             ayuda="La persona deberá cambiarla en su primer ingreso."
+                            id="cuenta-password"
                         >
                             <input
+                                id="cuenta-password"
                                 type="password"
                                 value={alta.data.password}
                                 onChange={(e) => alta.setData('password', e.target.value)}
-                                className={claseInput}
+                                className="panel-campo w-full"
                                 autoComplete="new-password"
                             />
                         </Campo>
-                        <Campo etiqueta="Confirmar contraseña" error={alta.errors.password_confirmation}>
+                        <Campo etiqueta="Confirmar contraseña" error={alta.errors.password_confirmation} id="cuenta-password-confirmacion">
                             <input
+                                id="cuenta-password-confirmacion"
                                 type="password"
                                 value={alta.data.password_confirmation}
                                 onChange={(e) => alta.setData('password_confirmation', e.target.value)}
-                                className={claseInput}
+                                className="panel-campo w-full"
                                 autoComplete="new-password"
                             />
                         </Campo>
                     </div>
                     <div className="mt-4 flex items-center justify-end gap-2">
-                        <button
-                            type="button"
-                            onClick={cerrarAlta}
-                            className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-                        >
+                        <Boton type="button" onClick={cerrarAlta} className="px-3 py-2 text-sm hover:bg-slate-50">
                             Cancelar
-                        </button>
-                        <button
+                        </Boton>
+                        <Boton
+                            variante="primario"
                             type="submit"
                             disabled={alta.processing}
-                            className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
+                            className="px-4 py-2 text-sm disabled:opacity-60"
                         >
                             <Icono nombre="guardar" className="h-4 w-4" /> Crear cuenta
-                        </button>
+                        </Boton>
                     </div>
                 </form>
             )}
 
             <div className="mt-4 space-y-3">
-                {cuentas.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-                        No hay cuentas registradas.
-                    </div>
+                {items.length === 0 && (
+                    <EmptyState icono={null} mensaje="No hay cuentas registradas." className="p-8" />
                 )}
 
-                {cuentas.map((cuenta) => (
-                    <div key={cuenta.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                {items.map((cuenta) => (
+                    <div key={cuenta.id} className="panel-tarjeta p-4">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
@@ -215,20 +209,14 @@ export default function Cuentas({ cuentas = [], roles_asignables = [], es_super 
 
                             <div className="flex shrink-0 items-center gap-2">
                                 {cuenta.puede_gestionar && (
-                                    <button
-                                        onClick={() => abrirReset(cuenta)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-                                    >
+                                    <Boton onClick={() => abrirReset(cuenta)} className="px-3 py-1.5 text-xs border-slate-200 hover:bg-slate-50">
                                         <Icono nombre="editar" className="h-3.5 w-3.5" /> Restablecer contraseña
-                                    </button>
+                                    </Boton>
                                 )}
                                 {cuenta.puede_eliminar && (
-                                    <button
-                                        onClick={() => eliminar(cuenta)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                    >
+                                    <Boton onClick={() => eliminar(cuenta)} className="px-3 py-1.5 text-xs border-red-100 text-red-600 hover:bg-red-50">
                                         <Icono nombre="basura" className="h-3.5 w-3.5" /> Eliminar
-                                    </button>
+                                    </Boton>
                                 )}
                             </div>
                         </div>
@@ -236,56 +224,60 @@ export default function Cuentas({ cuentas = [], roles_asignables = [], es_super 
                         {resetId === cuenta.id && (
                             <form
                                 onSubmit={(e) => enviarReset(e, cuenta)}
-                                className="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2"
+                                className="panel-rejilla-2 mt-4 grid gap-3 border-t border-slate-100 pt-4"
                             >
                                 <Campo
                                     etiqueta="Nueva contraseña"
                                     error={reset.errors.password}
                                     ayuda="Se forzará el cambio al iniciar sesión."
+                                    id={`reset-${cuenta.id}-password`}
                                 >
                                     <input
+                                        id={`reset-${cuenta.id}-password`}
                                         type="password"
                                         value={reset.data.password}
                                         onChange={(e) => reset.setData('password', e.target.value)}
-                                        className={claseInput}
+                                        className="panel-campo w-full"
                                         autoComplete="new-password"
                                     />
                                 </Campo>
-                                <Campo etiqueta="Confirmar contraseña" error={reset.errors.password_confirmation}>
+                                <Campo etiqueta="Confirmar contraseña" error={reset.errors.password_confirmation} id={`reset-${cuenta.id}-confirmacion`}>
                                     <input
+                                        id={`reset-${cuenta.id}-confirmacion`}
                                         type="password"
                                         value={reset.data.password_confirmation}
                                         onChange={(e) => reset.setData('password_confirmation', e.target.value)}
-                                        className={claseInput}
+                                        className="panel-campo w-full"
                                         autoComplete="new-password"
                                     />
                                 </Campo>
-                                <div className="flex items-center justify-end gap-2 sm:col-span-2">
-                                    <button
+                                <div className="panel-celda-2 flex items-center justify-end gap-2">
+                                    <Boton
                                         type="button"
                                         onClick={() => {
                                             setResetId(null);
                                             reset.reset();
                                         }}
-                                        className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                                        className="px-3 py-2 text-sm hover:bg-slate-50"
                                     >
                                         Cancelar
-                                    </button>
-                                    <button
+                                    </Boton>
+                                    <Boton
+                                        variante="primario"
                                         type="submit"
                                         disabled={reset.processing}
-                                        className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
+                                        className="px-4 py-2 text-sm disabled:opacity-60"
                                     >
                                         <Icono nombre="guardar" className="h-4 w-4" /> Guardar contraseña
-                                    </button>
+                                    </Boton>
                                 </div>
                             </form>
                         )}
                     </div>
                 ))}
             </div>
+
+            <Paginacion links={links} onNavegar={visitarPagina} className="mt-4" />
         </div>
     );
 }
-
-Cuentas.layout = (page) => <PanelLayout children={page} />;

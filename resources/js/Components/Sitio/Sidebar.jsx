@@ -222,9 +222,20 @@ export default function Sidebar() {
         irASeccion(item.id);
     };
 
+    useEffect(() => {
+        if (!showMobileMenu) return;
+
+        const onKey = (e) => {
+            if (e.key === 'Escape') setShowMobileMenu(false);
+        };
+
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [showMobileMenu]);
+
     return (
         <>
-            <aside className={`sidebar ${showMobileMenu ? 'mobile-open' : ''}`}>
+            <aside id="menu-lateral" className={`sidebar ${showMobileMenu ? 'mobile-open' : ''}`} aria-label="Menú principal">
                 <button className="mobile-close" onClick={() => setShowMobileMenu(false)} aria-label="Cerrar menú">
                     ✕
                 </button>
@@ -280,6 +291,8 @@ export default function Sidebar() {
                 className={`mobile-menu-btn ${showMobileMenu ? 'hidden' : ''}`}
                 onClick={() => setShowMobileMenu(true)}
                 aria-label="Abrir menú"
+                aria-expanded={showMobileMenu}
+                aria-controls="menu-lateral"
             >
                 <span></span>
                 <span></span>

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
-use App\Rules\TurnstileRule;
 use App\Support\Correo;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
@@ -24,22 +25,8 @@ class PasswordResetController extends Controller
         ]);
     }
 
-    public function send(Request $request): RedirectResponse
+    public function send(ForgotPasswordRequest $request): RedirectResponse
     {
-        $rules = [
-            'email' => ['required', 'email'],
-        ];
-
-        if (config('services.turnstile.site_key') && config('services.turnstile.enabled', true)) {
-            $rules['cf-turnstile-response'] = ['required', new TurnstileRule];
-        }
-
-        $request->validate($rules, [
-            'email.required' => 'Ingresa tu correo electrónico.',
-            'email.email' => 'Ingresa un correo electrónico válido.',
-            'cf-turnstile-response.required' => 'Por favor, completa la verificación de seguridad.',
-        ]);
-
         try {
             $status = Password::sendResetLink([
                 'email' => Correo::normalizar($request->string('email')->toString()),
@@ -67,27 +54,8 @@ class PasswordResetController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(ResetPasswordRequest $request): RedirectResponse
     {
-        $rules = [
-            'token' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ];
-
-        if (config('services.turnstile.site_key') && config('services.turnstile.enabled', true)) {
-            $rules['cf-turnstile-response'] = ['required', new TurnstileRule];
-        }
-
-        $request->validate($rules, [
-            'email.required' => 'Ingresa tu correo electrónico.',
-            'email.email' => 'Ingresa un correo electrónico válido.',
-            'password.required' => 'Ingresa una nueva contraseña.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-            'cf-turnstile-response.required' => 'Por favor, completa la verificación de seguridad.',
-        ]);
-
         $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
         $credentials['email'] = Correo::normalizar($credentials['email']);
 

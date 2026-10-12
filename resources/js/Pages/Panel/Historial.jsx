@@ -2,7 +2,9 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
+import PageHeader from '../../Components/Shared/PageHeader';
+import Paginacion from '../../Components/Shared/Paginacion';
+import { formatearFecha } from '../../lib/fecha';
 
 const ETIQUETAS_ROL = {
     'super-usuario': 'Super Usuario',
@@ -17,14 +19,6 @@ const ESTILOS_ACCION = {
     restaurar: 'bg-teal-50 text-teal-700 ring-teal-200',
     'eliminar permanente': 'bg-red-50 text-red-700 ring-red-200',
 };
-
-function formatearFecha(valor) {
-    if (!valor) return '—';
-    return new Intl.DateTimeFormat('es-PE', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-    }).format(new Date(valor));
-}
 
 function limpiar(params) {
     return Object.fromEntries(
@@ -63,26 +57,23 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
 
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900">Historial de actividad</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Registro de acciones del panel. Visible solo para el Super Usuario.
-                    </p>
-                </div>
+            <PageHeader
+                titulo="Historial de actividad"
+                descripcion="Registro de acciones del panel. Visible solo para el Super Usuario."
+            >
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                     {meta.total ?? 0} registro{(meta.total ?? 0) === 1 ? '' : 's'}
                 </span>
-            </div>
+            </PageHeader>
 
-            <form onSubmit={aplicar} className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <form onSubmit={aplicar} className="panel-tarjeta mt-5 p-4">
+                <div className="panel-rejilla-3 grid gap-3">
                     <label className="block">
                         <span className="mb-1 block text-xs font-semibold text-slate-600">Usuario</span>
                         <select
                             value={form.usuario}
                             onChange={actualizar('usuario')}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            className="panel-campo w-full"
                         >
                             <option value="">Todos</option>
                             {usuarios.map((u) => (
@@ -98,7 +89,7 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                         <select
                             value={form.accion}
                             onChange={actualizar('accion')}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            className="panel-campo w-full"
                         >
                             <option value="">Todas</option>
                             {acciones.map((a) => (
@@ -114,7 +105,7 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                         <select
                             value={form.modelo}
                             onChange={actualizar('modelo')}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            className="panel-campo w-full"
                         >
                             <option value="">Todos</option>
                             {modelos.map((m) => (
@@ -131,7 +122,7 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                             type="date"
                             value={form.desde}
                             onChange={actualizar('desde')}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            className="panel-campo w-full"
                         />
                     </label>
 
@@ -141,7 +132,7 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                             type="date"
                             value={form.hasta}
                             onChange={actualizar('hasta')}
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            className="panel-campo w-full"
                         />
                     </label>
 
@@ -152,7 +143,7 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                             value={form.q}
                             onChange={actualizar('q')}
                             placeholder="Título o descripción"
-                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            className="panel-campo w-full"
                         />
                     </label>
                 </div>
@@ -160,7 +151,7 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                 <div className="mt-4 flex items-center gap-2">
                     <button
                         type="submit"
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
+                        className="panel-boton--primario inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
                     >
                         <Icono nombre="buscar" className="h-4 w-4" />
                         Filtrar
@@ -168,14 +159,14 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                     <button
                         type="button"
                         onClick={limpiarFiltros}
-                        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                        className="panel-boton--secundario inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
                     >
                         Limpiar
                     </button>
                 </div>
             </form>
 
-            <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="panel-tarjeta mt-5 overflow-hidden">
                 {items.length === 0 ? (
                     <p className="px-4 py-10 text-center text-sm text-slate-500">
                         No hay registros que coincidan con los filtros.
@@ -237,26 +228,12 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
             </div>
 
             {registros?.links?.length > 3 && (
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-1">
-                    {registros.links.map((link, i) => (
-                        <button
-                            key={i}
-                            disabled={!link.url}
-                            onClick={() =>
-                                link.url && router.visit(link.url, { preserveScroll: true, preserveState: true })
-                            }
-                            className={`min-w-9 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                                link.active
-                                    ? 'bg-blue-950 text-white'
-                                    : link.url
-                                      ? 'border border-slate-300 text-slate-600 hover:bg-slate-50'
-                                      : 'cursor-not-allowed border border-slate-200 text-slate-300'
-                            }`}
-                        >
-                            {link.label}
-                        </button>
-                    ))}
-                </div>
+                <Paginacion
+                    tamano="normal"
+                    className="mt-4"
+                    links={registros.links}
+                    onNavegar={(url) => router.visit(url, { preserveScroll: true, preserveState: true })}
+                />
             )}
 
             {meta.total > 0 && (
@@ -267,5 +244,3 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
         </div>
     );
 }
-
-Historial.layout = (page) => <PanelLayout children={page} />;

@@ -28,9 +28,28 @@ class CuentasPanelTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Panel/Cuentas')
-                ->has('cuentas', 3)
+                ->has('cuentas.data', 3)
+                ->has('cuentas.links')
+                ->has('cuentas.meta')
                 ->has('roles_asignables', 2)
                 ->where('es_super', true));
+    }
+
+    public function test_el_listado_de_cuentas_esta_paginado(): void
+    {
+        $super = $this->usuario(User::ROLE_SUPER);
+
+        foreach (range(1, 24) as $i) {
+            $this->usuario(User::ROLE_DOCENTE, ['email' => "docente{$i}@lorente.edu.pe"]);
+        }
+
+        $this->actingAs($super)
+            ->get('/lorente-panel/cuentas')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->has('cuentas.data', 20)
+                ->where('cuentas.meta.total', 25)
+                ->where('cuentas.meta.ultima', 2));
     }
 
     public function test_administrador_solo_ve_docentes(): void
@@ -46,7 +65,7 @@ class CuentasPanelTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Panel/Cuentas')
-                ->has('cuentas', 2)
+                ->has('cuentas.data', 2)
                 ->has('roles_asignables', 1)
                 ->where('roles_asignables.0.valor', User::ROLE_DOCENTE)
                 ->where('es_super', false));

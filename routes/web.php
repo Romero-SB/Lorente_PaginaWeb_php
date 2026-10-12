@@ -19,6 +19,7 @@ use App\Http\Controllers\Sitio\DocumentoController;
 use App\Http\Controllers\Sitio\InicioController;
 use App\Http\Controllers\Sitio\NoticiaController;
 use App\Http\Controllers\Sitio\RecorridoController;
+use App\Models\Noticia;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('home');
@@ -31,6 +32,35 @@ Route::post('/contacto', [ContactoController::class, 'store'])
 Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'descargar'])
     ->middleware('auth')
     ->name('sitio.documentos.descargar');
+
+Route::get('/robots.txt', function () {
+    $contenido = "User-agent: *\n"
+        ."Disallow: /lorente-panel/\n"
+        ."\n"
+        .'Sitemap: '.url('/sitemap.xml')."\n";
+
+    return response($contenido, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+})->name('robots');
+
+Route::get('/sitemap.xml', function () {
+    $urls = [
+        ['loc' => url('/'), 'changefreq' => 'weekly', 'priority' => '1.0'],
+        ['loc' => url('/noticias'), 'changefreq' => 'daily', 'priority' => '0.8'],
+    ];
+
+    foreach (Noticia::query()->where('est', Noticia::EST_PUBLICADO)->select(['id', 'slug', 'updated_at'])->orderByDesc('fiso')->get() as $noticia) {
+        $urls[] = [
+            'loc' => route('sitio.noticias.show', $noticia),
+            'lastmod' => $noticia->updated_at?->toAtomString(),
+            'changefreq' => 'monthly',
+            'priority' => '0.6',
+        ];
+    }
+
+    return response()
+        ->view('sitemap', ['urls' => $urls])
+        ->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('sitemap');
 
 Route::middleware('guest')->prefix('lorente-panel')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('panel.login.show');
@@ -80,6 +110,7 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
             Route::post('/docente-categorias', [DocenteCategoriasController::class, 'store'])->name('panel.docente-categorias.store');
             Route::post('/docente-categorias/reordenar', [DocenteCategoriasController::class, 'reordenar'])->name('panel.docente-categorias.reordenar');
             Route::post('/docente-categorias/{categoria}', [DocenteCategoriasController::class, 'update'])->name('panel.docente-categorias.update');
+            Route::post('/docente-categorias/{categoria}/estilo', [DocenteCategoriasController::class, 'estilo'])->name('panel.docente-categorias.estilo');
             Route::post('/docente-categorias/{categoria}/eliminar', [DocenteCategoriasController::class, 'destroy'])->name('panel.docente-categorias.destroy');
         });
 

@@ -10,8 +10,31 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.jsx'],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
+                bunny('Inter', {
+                    weights: [400, 500, 600, 700],
+                    preload: [{ weight: 400 }, { weight: 600 }, { weight: 700 }],
+                }),
+                bunny('Playfair Display', {
+                    weights: [600, 700, 800, 900],
+                    styles: ['normal', 'italic'],
+                    preload: [{ weight: 600 }, { weight: 700 }],
+                }),
+                bunny('Poppins', {
+                    weights: [400, 500, 600, 700],
+                    preload: false,
+                }),
+                bunny('Montserrat', {
+                    weights: [400, 500, 600, 700],
+                    preload: false,
+                }),
+                bunny('Lora', {
+                    weights: [400, 500, 600, 700],
+                    styles: ['normal', 'italic'],
+                    preload: false,
+                }),
+                bunny('Oswald', {
+                    weights: [400, 500, 600, 700],
+                    preload: false,
                 }),
             ],
         }),
@@ -22,5 +45,8 @@ export default defineConfig({
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
+    },
+    build: {
+        chunkSizeWarningLimit: 1100,
     },
 });

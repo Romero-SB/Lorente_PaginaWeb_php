@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\ReordenarDocentesRequest;
+use App\Http\Requests\Panel\StoreDocenteRequest;
+use App\Http\Requests\Panel\UpdateDocenteRequest;
+use App\Http\Resources\DocenteResource;
 use App\Models\Docente;
 use App\Models\DocenteCategoria;
 use App\Models\User;
@@ -10,7 +14,6 @@ use App\Support\Almacenamiento;
 use App\Support\Historial;
 use App\Support\PapeleraDocentes;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,13 +22,16 @@ class DocentesController extends Controller
     public function index(Request $request): Response
     {
         $usuario = $request->user();
-        PapeleraDocentes::purgarVencidas();
+        PapeleraDocentes::purgarVencidasSiCorresponde();
 
         $docentes = Docente::query()
+            ->select(['id', 'nombre', 'cargo', 'categoria', 'orden', 'activo', 'foto'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
-            ->map(fn (Docente $d) => $this->paraVista($d));
+            ->map(fn (Docente $d) => (new DocenteResource($d))->resolve($request))
+            ->values()
+            ->all();
 
         $conteos = Docente::query()
             ->selectRaw('categoria, count(*) as total')
@@ -33,6 +39,7 @@ class DocentesController extends Controller
             ->pluck('total', 'categoria');
 
         $categorias = DocenteCategoria::query()
+            ->select(['id', 'nombre', 'orden', 'estilo'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
@@ -41,6 +48,7 @@ class DocentesController extends Controller
                 'nombre' => $c->nombre,
                 'orden' => $c->orden,
                 'total' => (int) ($conteos[$c->nombre] ?? 0),
+                'estilo' => $c->estilo,
             ]);
 
         return Inertia::render('Panel/Docentes', [
@@ -50,16 +58,11 @@ class DocentesController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreDocenteRequest $request, Historial $historial)
     {
         $usuario = $request->user();
 
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:200'],
-            'cargo' => ['required', 'string', 'max:200'],
-            'categoria' => ['required', 'string', Rule::exists('docente_categorias', 'nombre')],
-            'foto' => ['required', 'file', 'image', 'max:3072'],
-        ]);
+        $datos = $request->validated();
 
         $ruta = Almacenamiento::guardarImagen($request->file('foto'), 'docentes');
 
@@ -68,38 +71,37 @@ class DocentesController extends Controller
         }
 
         $maxOrden = (int) Docente::where('categoria', $datos['categoria'])->max('orden');
+        $categoriaId = DocenteCategoria::where('nombre', $datos['categoria'])->value('id');
 
         $docente = Docente::create([
             'nombre' => trim($datos['nombre']),
             'cargo' => trim($datos['cargo']),
             'categoria' => $datos['categoria'],
+            'categoria_id' => $categoriaId,
             'foto' => $ruta,
             'orden' => $maxOrden + 10,
             'activo' => true,
             'created_by' => $usuario->id,
         ]);
 
-        Historial::registrar($usuario, 'crear', $docente, $docente->nombre);
+        $historial->registrar($usuario, 'crear', $docente, $docente->nombre);
 
         return back()->with('ok', 'Docente registrado correctamente.');
     }
 
-    public function update(Request $request, Docente $docente)
+    public function update(UpdateDocenteRequest $request, Docente $docente, Historial $historial)
     {
+        $this->authorize('gestionar', Docente::class);
+
         $usuario = $request->user();
 
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:200'],
-            'cargo' => ['required', 'string', 'max:200'],
-            'categoria' => ['required', 'string', Rule::exists('docente_categorias', 'nombre')],
-            'foto' => ['nullable', 'file', 'image', 'max:3072'],
-            'foto_borrar' => ['nullable', 'boolean'],
-        ]);
+        $datos = $request->validated();
 
         $cambios = [
             'nombre' => trim($datos['nombre']),
             'cargo' => trim($datos['cargo']),
             'categoria' => $datos['categoria'],
+            'categoria_id' => DocenteCategoria::where('nombre', $datos['categoria'])->value('id'),
         ];
 
         if ($request->boolean('foto_borrar')) {
@@ -116,61 +118,58 @@ class DocentesController extends Controller
 
         $docente->update($cambios);
 
-        Historial::registrar($usuario, 'editar', $docente, $docente->nombre);
+        $historial->registrar($usuario, 'editar', $docente, $docente->nombre);
 
         return back()->with('ok', 'Docente actualizado correctamente.');
     }
 
-    public function destroy(Request $request, Docente $docente)
+    public function destroy(Request $request, Docente $docente, Historial $historial)
     {
+        $this->authorize('gestionar', Docente::class);
+
         $usuario = $request->user();
 
         $docente->deleted_by = $usuario->id;
         $docente->save();
         $docente->delete();
 
-        Historial::registrar($usuario, 'papelera', $docente, $docente->nombre);
+        $historial->registrar($usuario, 'papelera', $docente, $docente->nombre);
 
         return back()->with('ok', 'Docente movido a la papelera.');
     }
 
-    public function restaurar(Request $request, Docente $docente)
+    public function restaurar(Request $request, Docente $docente, Historial $historial)
     {
+        $this->authorize('gestionarEliminada', $docente);
+
         $usuario = $request->user();
-        $this->autorizarEliminada($usuario, $docente);
 
         $docente->restore();
         $docente->deleted_by = null;
         $docente->save();
 
-        Historial::registrar($usuario, 'restaurar', $docente, $docente->nombre);
+        $historial->registrar($usuario, 'restaurar', $docente, $docente->nombre);
 
         return back()->with('ok', 'Docente restaurado.');
     }
 
-    public function permanente(Request $request, Docente $docente)
+    public function permanente(Request $request, Docente $docente, Historial $historial)
     {
-        $usuario = $request->user();
+        $this->authorize('eliminarPermanente', Docente::class);
 
-        if (! $usuario->isSuperUsuario()) {
-            abort(403, 'Solo el Super Usuario puede eliminar docentes permanentemente.');
-        }
+        $usuario = $request->user();
 
         Almacenamiento::eliminar($docente->foto);
         $docente->forceDelete();
 
-        Historial::registrar($usuario, 'eliminar permanente', $docente, (string) $docente->nombre);
+        $historial->registrar($usuario, 'eliminar permanente', $docente, (string) $docente->nombre);
 
         return back()->with('ok', 'Docente eliminado permanentemente.');
     }
 
-    public function reordenar(Request $request)
+    public function reordenar(ReordenarDocentesRequest $request)
     {
-        $datos = $request->validate([
-            'items' => ['required', 'array'],
-            'items.*.id' => ['required', 'integer'],
-            'items.*.orden' => ['required', 'integer'],
-        ]);
+        $datos = $request->validated();
 
         foreach ($datos['items'] as $item) {
             Docente::where('id', $item['id'])->update(['orden' => $item['orden']]);
@@ -182,14 +181,14 @@ class DocentesController extends Controller
     /** @return array<int, array<string, mixed>> */
     private function papelera(User $usuario): array
     {
-        PapeleraDocentes::purgarVencidas();
+        PapeleraDocentes::purgarVencidasSiCorresponde();
 
         return PapeleraDocentes::consultaVisible($usuario)
             ->orderByDesc('deleted_at')
             ->get()
             ->map(function (Docente $d) use ($usuario) {
                 return [
-                    ...$this->paraVista($d),
+                    ...(new DocenteResource($d))->resolve(),
                     'eliminada_por' => $d->deletedBy?->name,
                     'dias_restantes' => PapeleraDocentes::diasRestantes($d),
                     'puede_restaurar' => PapeleraDocentes::puedeGestionarEliminada($usuario, $d),
@@ -198,26 +197,5 @@ class DocentesController extends Controller
             })
             ->values()
             ->all();
-    }
-
-    /** @return array<string, mixed> */
-    private function paraVista(Docente $d): array
-    {
-        return [
-            'id' => $d->id,
-            'nombre' => $d->nombre,
-            'cargo' => $d->cargo,
-            'categoria' => $d->categoria,
-            'orden' => $d->orden,
-            'activo' => $d->activo,
-            'foto' => $d->foto ? Almacenamiento::url($d->foto) : null,
-        ];
-    }
-
-    private function autorizarEliminada(User $usuario, Docente $docente): void
-    {
-        if (! PapeleraDocentes::puedeGestionarEliminada($usuario, $docente)) {
-            abort(403, 'No puedes gestionar este docente de la papelera.');
-        }
     }
 }

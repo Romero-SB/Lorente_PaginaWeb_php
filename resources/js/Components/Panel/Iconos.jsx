@@ -153,6 +153,36 @@ const PATH = {
         </>
     ),
     check: <path d="M20 6 9 17l-5-5" />,
+    paleta: (
+        <>
+            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+        </>
+    ),
+    alineacionIzquierda: (
+        <>
+            <path d="M3 6h18" />
+            <path d="M3 12h12" />
+            <path d="M3 18h16" />
+        </>
+    ),
+    alineacionCentro: (
+        <>
+            <path d="M3 6h18" />
+            <path d="M7 12h10" />
+            <path d="M5 18h14" />
+        </>
+    ),
+    alineacionDerecha: (
+        <>
+            <path d="M3 6h18" />
+            <path d="M9 12h12" />
+            <path d="M7 18h14" />
+        </>
+    ),
     historial: (
         <>
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />

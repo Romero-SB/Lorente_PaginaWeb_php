@@ -1,7 +1,6 @@
 import { Head } from '@inertiajs/react';
 
 import SitioHome from '../../Components/Sitio/SitioHome';
-import SitioLayout from '../../Layouts/SitioLayout';
 
 export default function Inicio(props) {
     const descripcion =
@@ -14,7 +13,7 @@ export default function Inicio(props) {
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="IE N° 31501 Sebastián Lorente · Huancayo" />
                 <meta property="og:description" content={descripcion} />
-                <meta property="og:image" content="/referencial.jpg" />
+                <meta property="og:image" content={new URL('/referencial.jpg', window.location.origin).href} />
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>
 
@@ -23,4 +22,3 @@ export default function Inicio(props) {
     );
 }
 
-Inicio.layout = (page) => <SitioLayout>{page}</SitioLayout>;

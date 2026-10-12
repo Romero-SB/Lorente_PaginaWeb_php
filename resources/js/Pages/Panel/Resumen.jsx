@@ -1,7 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-import PanelLayout from '../../Layouts/PanelLayout';
+import PageHeader from '../../Components/Shared/PageHeader';
 
 function visit(ruta) {
     router.visit(ruta, { preserveScroll: true });
@@ -25,16 +25,12 @@ export default function Resumen({ stats }) {
 
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900">Resumen</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Hola, {auth.user?.name}. Desde aquí puedes gestionar el contenido de la institución.
-                    </p>
-                </div>
-            </div>
+            <PageHeader
+                titulo="Resumen"
+                descripcion={`Hola, ${auth.user?.name}. Desde aquí puedes gestionar el contenido de la institución.`}
+            />
 
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="panel-rejilla-3 mt-5 grid gap-4">
                 {tarjetas.map((t) => {
                     const secc = seccion(t.clave);
                     return (
@@ -42,7 +38,7 @@ export default function Resumen({ stats }) {
                             key={t.clave}
                             disabled={!secc}
                             onClick={() => secc && visit(secc.ruta)}
-                            className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition ${
+                            className={`panel-tarjeta group relative overflow-hidden p-5 text-left transition ${
                                 secc ? 'hover:-translate-y-0.5 hover:shadow-md' : 'opacity-60'
                             }`}
                         >
@@ -68,5 +64,3 @@ export default function Resumen({ stats }) {
         </div>
     );
 }
-
-Resumen.layout = (page) => <PanelLayout children={page} />;

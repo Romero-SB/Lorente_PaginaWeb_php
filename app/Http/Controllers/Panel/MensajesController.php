@@ -11,6 +11,8 @@ use Inertia\Response;
 
 class MensajesController extends Controller
 {
+    private const POR_PAGINA = 20;
+
     public function index(Request $request): Response
     {
         $filtro = $request->query('filtro', 'todos');
@@ -29,13 +31,33 @@ class MensajesController extends Controller
             })
             ->orderByDesc('created_at')
             ->orderByDesc('id')
-            ->get()
-            ->map(fn (ContactoMensaje $m) => $this->paraVista($m))
-            ->values()
-            ->all();
+            ->paginate(self::POR_PAGINA)
+            ->onEachSide(1)
+            ->withQueryString();
 
         return Inertia::render('Panel/Mensajes', [
-            'mensajes' => $mensajes,
+            'mensajes' => [
+                'data' => collect($mensajes->items())->map(fn (ContactoMensaje $m) => $this->paraVista($m))->values()->all(),
+                'links' => collect($mensajes->linkCollection())
+                    ->map(fn (array $link) => [
+                        'url' => $link['url'],
+                        'label' => str_replace(
+                            ['&laquo;', '&raquo;', '&hellip;'],
+                            ['«', '»', '…'],
+                            $link['label'],
+                        ),
+                        'active' => $link['active'],
+                    ])
+                    ->values()
+                    ->all(),
+                'meta' => [
+                    'total' => $mensajes->total(),
+                    'desde' => $mensajes->firstItem(),
+                    'hasta' => $mensajes->lastItem(),
+                    'pagina' => $mensajes->currentPage(),
+                    'ultima' => $mensajes->lastPage(),
+                ],
+            ],
             'filtros' => [
                 'filtro' => $filtro,
                 'q' => $busqueda,

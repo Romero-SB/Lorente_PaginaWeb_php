@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\ResetCuentaPasswordRequest;
+use App\Http\Requests\Panel\StoreCuentaRequest;
 use App\Models\User;
 use App\Support\Historial;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CuentasController extends Controller
 {
+    private const POR_PAGINA = 20;
+
     public function index(Request $request): Response
     {
         /** @var User $usuario */
@@ -24,43 +26,47 @@ class CuentasController extends Controller
             ->when($usuario->isAdministrador(), fn ($query) => $query->where('role', User::ROLE_DOCENTE))
             ->orderBy('role')
             ->orderBy('name')
-            ->get()
-            ->map(fn (User $cuenta) => [
-                'id' => $cuenta->id,
-                'name' => $cuenta->name,
-                'email' => $cuenta->email,
-                'cargo' => $cuenta->cargo,
-                'rol' => $cuenta->role,
-                'rol_etiqueta' => config("panel.labels.{$cuenta->role}", $cuenta->role),
-                'debe_cambiar_password' => $cuenta->must_change_password,
-                'es_propia' => $cuenta->id === $usuario->id,
-                'puede_gestionar' => $this->puedeGestionar($usuario, $cuenta),
-                'puede_eliminar' => $usuario->isSuperUsuario()
-                    && $cuenta->id !== $usuario->id
-                    && ! $cuenta->isSuperUsuario(),
-            ])
-            ->values()
-            ->all();
+            ->paginate(self::POR_PAGINA)
+            ->onEachSide(1)
+            ->withQueryString();
 
         return Inertia::render('Panel/Cuentas', [
-            'cuentas' => $cuentas,
+            'cuentas' => [
+                'data' => collect($cuentas->items())
+                    ->map(fn (User $cuenta) => $this->paraVista($cuenta, $usuario))
+                    ->values()
+                    ->all(),
+                'links' => collect($cuentas->linkCollection())
+                    ->map(fn (array $link) => [
+                        'url' => $link['url'],
+                        'label' => str_replace(
+                            ['&laquo;', '&raquo;', '&hellip;'],
+                            ['«', '»', '…'],
+                            $link['label'],
+                        ),
+                        'active' => $link['active'],
+                    ])
+                    ->values()
+                    ->all(),
+                'meta' => [
+                    'total' => $cuentas->total(),
+                    'desde' => $cuentas->firstItem(),
+                    'hasta' => $cuentas->lastItem(),
+                    'pagina' => $cuentas->currentPage(),
+                    'ultima' => $cuentas->lastPage(),
+                ],
+            ],
             'roles_asignables' => $this->opcionesRoles($usuario),
             'es_super' => $usuario->isSuperUsuario(),
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreCuentaRequest $request, Historial $historial): RedirectResponse
     {
         /** @var User $usuario */
         $usuario = $request->user();
 
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:200'],
-            'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')],
-            'cargo' => ['nullable', 'string', 'max:200'],
-            'role' => ['required', Rule::in($this->rolesAsignables($usuario))],
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ], $this->mensajes());
+        $datos = $request->validated();
 
         $cuenta = new User;
         $cuenta->forceFill([
@@ -73,32 +79,30 @@ class CuentasController extends Controller
             'email_verified_at' => now(),
         ])->save();
 
-        Historial::registrar($usuario, 'crear cuenta', $cuenta, $cuenta->name);
+        $historial->registrar($usuario, 'crear cuenta', $cuenta, $cuenta->name);
 
         return back()->with('ok', 'Cuenta creada correctamente.');
     }
 
-    public function resetPassword(Request $request, User $cuenta): RedirectResponse
+    public function resetPassword(ResetCuentaPasswordRequest $request, User $cuenta, Historial $historial): RedirectResponse
     {
         /** @var User $usuario */
         $usuario = $request->user();
 
         $this->autorizarGestion($usuario, $cuenta);
 
-        $datos = $request->validate([
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ], $this->mensajes());
+        $datos = $request->validated();
 
         $cuenta->password = Hash::make($datos['password']);
         $cuenta->must_change_password = true;
         $cuenta->save();
 
-        Historial::registrar($usuario, 'resetear contraseña', $cuenta, $cuenta->name);
+        $historial->registrar($usuario, 'resetear contraseña', $cuenta, $cuenta->name);
 
         return back()->with('ok', 'Contraseña restablecida. La persona deberá cambiarla al ingresar.');
     }
 
-    public function destroy(Request $request, User $cuenta): RedirectResponse
+    public function destroy(Request $request, User $cuenta, Historial $historial): RedirectResponse
     {
         /** @var User $usuario */
         $usuario = $request->user();
@@ -115,10 +119,31 @@ class CuentasController extends Controller
             abort(403, 'No puedes eliminar una cuenta de Super Usuario.');
         }
 
-        Historial::registrar($usuario, 'eliminar cuenta', $cuenta, $cuenta->name);
+        $historial->registrar($usuario, 'eliminar cuenta', $cuenta, $cuenta->name);
         $cuenta->delete();
 
         return back()->with('ok', 'Cuenta eliminada.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function paraVista(User $cuenta, User $usuario): array
+    {
+        return [
+            'id' => $cuenta->id,
+            'name' => $cuenta->name,
+            'email' => $cuenta->email,
+            'cargo' => $cuenta->cargo,
+            'rol' => $cuenta->role,
+            'rol_etiqueta' => config("panel.labels.{$cuenta->role}", $cuenta->role),
+            'debe_cambiar_password' => $cuenta->must_change_password,
+            'es_propia' => $cuenta->id === $usuario->id,
+            'puede_gestionar' => $this->puedeGestionar($usuario, $cuenta),
+            'puede_eliminar' => $usuario->isSuperUsuario()
+                && $cuenta->id !== $usuario->id
+                && ! $cuenta->isSuperUsuario(),
+        ];
     }
 
     /**
@@ -156,23 +181,5 @@ class CuentasController extends Controller
         if (! $this->puedeGestionar($usuario, $objetivo)) {
             abort(403, 'No puedes gestionar esta cuenta.');
         }
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function mensajes(): array
-    {
-        return [
-            'name.required' => 'Ingresa el nombre de la persona.',
-            'email.required' => 'Ingresa el correo electrónico.',
-            'email.email' => 'Ingresa un correo electrónico válido.',
-            'email.unique' => 'Ese correo ya está en uso por otra cuenta.',
-            'role.required' => 'Selecciona un rol.',
-            'role.in' => 'El rol seleccionado no es válido.',
-            'password.required' => 'Ingresa una contraseña.',
-            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-        ];
     }
 }

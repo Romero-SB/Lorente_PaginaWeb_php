@@ -3,18 +3,16 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\DocumentoCategoriaRequest;
+use App\Http\Requests\Panel\ReordenarCategoriasRequest;
 use App\Models\Documento;
 use App\Models\DocumentoCategoria;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class DocumentoCategoriasController extends Controller
 {
-    public function store(Request $request)
+    public function store(DocumentoCategoriaRequest $request)
     {
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:100', Rule::unique('documento_categorias', 'nombre')],
-        ]);
+        $datos = $request->validated();
 
         $maxOrden = (int) DocumentoCategoria::max('orden');
 
@@ -26,11 +24,9 @@ class DocumentoCategoriasController extends Controller
         return back()->with('ok', "Categoría \"{$categoria->nombre}\" creada.");
     }
 
-    public function update(Request $request, DocumentoCategoria $categoria)
+    public function update(DocumentoCategoriaRequest $request, DocumentoCategoria $categoria)
     {
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:100', Rule::unique('documento_categorias', 'nombre')->ignore($categoria->id)],
-        ]);
+        $datos = $request->validated();
 
         $anterior = $categoria->nombre;
         $nuevo = trim($datos['nombre']);
@@ -58,12 +54,9 @@ class DocumentoCategoriasController extends Controller
         return back()->with('ok', "Categoría \"{$categoria->nombre}\" eliminada.");
     }
 
-    public function reordenar(Request $request)
+    public function reordenar(ReordenarCategoriasRequest $request)
     {
-        $datos = $request->validate([
-            'categorias' => ['required', 'array'],
-            'categorias.*' => ['required', 'string'],
-        ]);
+        $datos = $request->validated();
 
         foreach ($datos['categorias'] as $i => $nombre) {
             DocumentoCategoria::where('nombre', $nombre)->update(['orden' => ($i + 1) * 10]);

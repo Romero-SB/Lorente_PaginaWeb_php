@@ -33,6 +33,7 @@ class SitioDatos
     public static function docentes(): array
     {
         return Docente::query()
+            ->select(['id', 'nombre', 'cargo', 'foto', 'categoria'])
             ->where('activo', true)
             ->orderBy('orden')
             ->orderBy('id')
@@ -41,7 +42,7 @@ class SitioDatos
                 'id' => $d->id,
                 'nombre' => $d->nombre,
                 'cargo' => $d->cargo,
-                'foto' => $d->foto,
+                'foto' => $d->foto ? Almacenamiento::url($d->foto) : null,
                 'categoria' => $d->categoria,
             ])
             ->values()

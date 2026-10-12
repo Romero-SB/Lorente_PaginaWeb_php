@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\StoreDocumentoRequest;
+use App\Http\Requests\Panel\UpdateDocumentoRequest;
+use App\Http\Resources\DocumentoResource;
 use App\Models\Documento;
 use App\Models\DocumentoCategoria;
 use App\Models\User;
@@ -11,26 +14,26 @@ use App\Support\Historial;
 use App\Support\PapeleraDocumentos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DocumentosController extends Controller
 {
-    private const MAX_KB = 20480;
-
     public function index(Request $request): Response
     {
         $usuario = $request->user();
-        PapeleraDocumentos::purgarVencidas();
+        PapeleraDocumentos::purgarVencidasSiCorresponde();
 
         $documentos = Documento::query()
+            ->select(['id', 'titulo', 'categoria', 'visibilidad', 'descripcion', 'instrucciones', 'archivo_url', 'archivo_nombre', 'author_id'])
             ->with(['author:id,name,cargo'])
             ->when($usuario->isDocente(), fn ($q) => $q->where('author_id', $usuario->id))
             ->orderByDesc('id')
             ->get()
-            ->map(fn (Documento $d) => $this->paraVista($d, $usuario));
+            ->map(fn (Documento $d) => (new DocumentoResource($d))->resolve($request))
+            ->values()
+            ->all();
 
         $conteos = Documento::query()
             ->selectRaw('categoria, count(*) as total')
@@ -38,6 +41,7 @@ class DocumentosController extends Controller
             ->pluck('total', 'categoria');
 
         $categorias = DocumentoCategoria::query()
+            ->select(['id', 'nombre', 'orden'])
             ->orderBy('orden')
             ->orderBy('id')
             ->get()
@@ -56,10 +60,10 @@ class DocumentosController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreDocumentoRequest $request, Historial $historial)
     {
         $usuario = $request->user();
-        $datos = $request->validate($this->reglas());
+        $datos = $request->validated();
 
         $archivo = $request->file('archivo');
 
@@ -80,6 +84,7 @@ class DocumentosController extends Controller
         $documento = Documento::create([
             'titulo' => trim($datos['titulo']),
             'categoria' => $datos['categoria'],
+            'categoria_id' => DocumentoCategoria::where('nombre', $datos['categoria'])->value('id'),
             'visibilidad' => $datos['visibilidad'],
             'descripcion' => trim((string) ($datos['descripcion'] ?? '')) ?: null,
             'instrucciones' => trim((string) ($datos['instrucciones'] ?? '')) ?: null,
@@ -89,21 +94,23 @@ class DocumentosController extends Controller
             'created_by' => $usuario->id,
         ]);
 
-        Historial::registrar($usuario, 'crear', $documento, $documento->titulo);
+        $historial->registrar($usuario, 'crear', $documento, $documento->titulo);
 
         return back()->with('ok', 'Documento registrado correctamente.');
     }
 
-    public function update(Request $request, Documento $documento)
+    public function update(UpdateDocumentoRequest $request, Documento $documento, Historial $historial)
     {
-        $usuario = $request->user();
-        $this->autorizarGestion($usuario, $documento);
+        $this->authorize('gestionar', $documento);
 
-        $datos = $request->validate($this->reglas(true));
+        $usuario = $request->user();
+
+        $datos = $request->validated();
 
         $cambios = [
             'titulo' => trim($datos['titulo']),
             'categoria' => $datos['categoria'],
+            'categoria_id' => DocumentoCategoria::where('nombre', $datos['categoria'])->value('id'),
             'visibilidad' => $datos['visibilidad'],
             'descripcion' => trim((string) ($datos['descripcion'] ?? '')) ?: null,
             'instrucciones' => trim((string) ($datos['instrucciones'] ?? '')) ?: null,
@@ -139,51 +146,51 @@ class DocumentosController extends Controller
 
         $documento->update($cambios);
 
-        Historial::registrar($usuario, 'editar', $documento, $documento->titulo);
+        $historial->registrar($usuario, 'editar', $documento, $documento->titulo);
 
         return back()->with('ok', 'Documento actualizado correctamente.');
     }
 
-    public function destroy(Request $request, Documento $documento)
+    public function destroy(Request $request, Documento $documento, Historial $historial)
     {
+        $this->authorize('gestionar', $documento);
+
         $usuario = $request->user();
-        $this->autorizarGestion($usuario, $documento);
 
         $documento->deleted_by = $usuario->id;
         $documento->save();
         $documento->delete();
 
-        Historial::registrar($usuario, 'papelera', $documento, $documento->titulo);
+        $historial->registrar($usuario, 'papelera', $documento, $documento->titulo);
 
         return back()->with('ok', 'Documento movido a la papelera.');
     }
 
-    public function restaurar(Request $request, Documento $documento)
+    public function restaurar(Request $request, Documento $documento, Historial $historial)
     {
+        $this->authorize('gestionarEliminada', $documento);
+
         $usuario = $request->user();
-        $this->autorizarEliminada($usuario, $documento);
 
         $documento->restore();
         $documento->deleted_by = null;
         $documento->save();
 
-        Historial::registrar($usuario, 'restaurar', $documento, $documento->titulo);
+        $historial->registrar($usuario, 'restaurar', $documento, $documento->titulo);
 
         return back()->with('ok', 'Documento restaurado.');
     }
 
-    public function permanente(Request $request, Documento $documento)
+    public function permanente(Request $request, Documento $documento, Historial $historial)
     {
-        $usuario = $request->user();
+        $this->authorize('eliminarPermanente', Documento::class);
 
-        if (! $usuario->isSuperUsuario()) {
-            abort(403, 'Solo el Super Usuario puede eliminar documentos permanentemente.');
-        }
+        $usuario = $request->user();
 
         ArchivosDocumentos::eliminar($documento->archivo_url, $documento->visibilidad);
         $documento->forceDelete();
 
-        Historial::registrar($usuario, 'eliminar permanente', $documento, (string) $documento->titulo);
+        $historial->registrar($usuario, 'eliminar permanente', $documento, (string) $documento->titulo);
 
         return back()->with('ok', 'Documento eliminado permanentemente.');
     }
@@ -198,38 +205,17 @@ class DocumentosController extends Controller
         return Storage::disk($disco)->download($ruta, $documento->archivo_nombre ?: basename($ruta));
     }
 
-    /** @return array<string, mixed> */
-    private function reglas(bool $actualizar = false): array
-    {
-        return [
-            'titulo' => ['required', 'string', 'max:200'],
-            'categoria' => ['required', 'string', Rule::exists('documento_categorias', 'nombre')],
-            'visibilidad' => ['required', Rule::in([
-                Documento::VISIBILIDAD_PUBLICO,
-                Documento::VISIBILIDAD_PRIVADO,
-            ])],
-            'descripcion' => ['nullable', 'string', 'max:1000'],
-            'instrucciones' => ['nullable', 'string', 'max:2000'],
-            'archivo' => [
-                $actualizar ? 'nullable' : 'required',
-                'file',
-                'mimes:'.implode(',', ArchivosDocumentos::extensiones()),
-                'max:'.self::MAX_KB,
-            ],
-        ];
-    }
-
     /** @return array<int, array<string, mixed>> */
     private function papelera(User $usuario): array
     {
-        PapeleraDocumentos::purgarVencidas();
+        PapeleraDocumentos::purgarVencidasSiCorresponde();
 
         return PapeleraDocumentos::consultaVisible($usuario)
             ->orderByDesc('deleted_at')
             ->get()
             ->map(function (Documento $d) use ($usuario) {
                 return [
-                    ...$this->paraVista($d, $usuario),
+                    ...(new DocumentoResource($d))->resolve(),
                     'eliminada_por' => $d->deletedBy?->name,
                     'dias_restantes' => PapeleraDocumentos::diasRestantes($d),
                     'puede_restaurar' => PapeleraDocumentos::puedeGestionarEliminada($usuario, $d),
@@ -238,48 +224,5 @@ class DocumentosController extends Controller
             })
             ->values()
             ->all();
-    }
-
-    /** @return array<string, mixed> */
-    private function paraVista(Documento $d, User $usuario): array
-    {
-        $puede = $this->puedeGestionar($usuario, $d);
-
-        return [
-            'id' => $d->id,
-            'titulo' => $d->titulo,
-            'categoria' => $d->categoria,
-            'visibilidad' => $d->visibilidad,
-            'descripcion' => $d->descripcion,
-            'instrucciones' => $d->instrucciones,
-            'archivo' => [
-                'nombre' => $d->archivo_nombre,
-                'url' => ArchivosDocumentos::url($d),
-            ],
-            'autor' => $d->author
-                ? ['name' => $d->author->name, 'cargo' => $d->author->cargo]
-                : ['name' => '—', 'cargo' => null],
-            'puede_editar' => $puede,
-            'puede_eliminar' => $puede,
-        ];
-    }
-
-    private function puedeGestionar(User $usuario, Documento $documento): bool
-    {
-        return ! $usuario->isDocente() || $documento->author_id === $usuario->id;
-    }
-
-    private function autorizarGestion(User $usuario, Documento $documento): void
-    {
-        if (! $this->puedeGestionar($usuario, $documento)) {
-            abort(403, 'Solo puedes gestionar tus propios documentos.');
-        }
-    }
-
-    private function autorizarEliminada(User $usuario, Documento $documento): void
-    {
-        if (! PapeleraDocumentos::puedeGestionarEliminada($usuario, $documento)) {
-            abort(403, 'No puedes gestionar este documento de la papelera.');
-        }
     }
 }

@@ -5,15 +5,13 @@ namespace App\Support;
 use App\Models\Actividad;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Historial
 {
-    /**
-     * Registra una acción en el historial de actividad.
-     *
-     * @param  array<string, mixed>|null  $cambios
-     */
-    public static function registrar(
+    public function __construct(protected Request $request) {}
+
+    public function registrar(
         ?User $usuario,
         string $accion,
         Model $modelo,
@@ -29,8 +27,8 @@ class Historial
             'titulo' => $titulo,
             'descripcion' => $descripcion,
             'cambios' => $cambios,
-            'ip' => request()->ip(),
-            'user_agent' => substr((string) request()->userAgent(), 0, 500),
+            'ip' => $this->request->ip(),
+            'user_agent' => substr((string) $this->request->userAgent(), 0, 500),
         ]);
     }
 }

@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\DocenteCategoriaRequest;
+use App\Http\Requests\Panel\EstiloDocenteCategoriaRequest;
+use App\Http\Requests\Panel\ReordenarCategoriasRequest;
 use App\Models\Docente;
 use App\Models\DocenteCategoria;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class DocenteCategoriasController extends Controller
 {
-    public function store(Request $request)
+    public function store(DocenteCategoriaRequest $request)
     {
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:100', Rule::unique('docente_categorias', 'nombre')],
-        ]);
+        $datos = $request->validated();
 
         $maxOrden = (int) DocenteCategoria::max('orden');
 
@@ -26,11 +25,9 @@ class DocenteCategoriasController extends Controller
         return back()->with('ok', "Categoría \"{$categoria->nombre}\" creada.");
     }
 
-    public function update(Request $request, DocenteCategoria $categoria)
+    public function update(DocenteCategoriaRequest $request, DocenteCategoria $categoria)
     {
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:100', Rule::unique('docente_categorias', 'nombre')->ignore($categoria->id)],
-        ]);
+        $datos = $request->validated();
 
         $anterior = $categoria->nombre;
         $nuevo = trim($datos['nombre']);
@@ -58,17 +55,29 @@ class DocenteCategoriasController extends Controller
         return back()->with('ok', "Categoría \"{$categoria->nombre}\" eliminada.");
     }
 
-    public function reordenar(Request $request)
+    public function reordenar(ReordenarCategoriasRequest $request)
     {
-        $datos = $request->validate([
-            'categorias' => ['required', 'array'],
-            'categorias.*' => ['required', 'string'],
-        ]);
+        $datos = $request->validated();
 
         foreach ($datos['categorias'] as $i => $nombre) {
             DocenteCategoria::where('nombre', $nombre)->update(['orden' => ($i + 1) * 10]);
         }
 
         return back();
+    }
+
+    public function estilo(EstiloDocenteCategoriaRequest $request, DocenteCategoria $categoria)
+    {
+        $datos = $request->validated();
+
+        $estilo = collect($datos)
+            ->map(fn ($valor) => is_string($valor) ? trim($valor) : $valor)
+            ->filter(fn ($valor) => $valor !== null && $valor !== '')
+            ->map(fn ($valor) => str_starts_with($valor, '#') ? strtolower($valor) : $valor)
+            ->all();
+
+        $categoria->update(['estilo' => $estilo === [] ? null : $estilo]);
+
+        return back()->with('ok', "Estilo de \"{$categoria->nombre}\" actualizado.");
     }
 }

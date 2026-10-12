@@ -4,14 +4,17 @@ namespace App\Mail;
 
 use App\Models\ContactoMensaje;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ContactoRecibido extends Mailable
+class ContactoRecibido extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public $tries = 3;
 
     public function __construct(public ContactoMensaje $mensaje) {}
 

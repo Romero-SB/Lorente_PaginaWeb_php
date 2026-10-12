@@ -153,7 +153,7 @@ class SitioPublicoTest extends TestCase
             'asunto' => 'Matrícula',
         ]);
 
-        Mail::assertSent(ContactoRecibido::class, fn ($mail) => $mail->hasTo('secretaria@lorente.edu.pe'));
+        Mail::assertQueued(ContactoRecibido::class, fn ($mail) => $mail->hasTo('secretaria@lorente.edu.pe'));
     }
 
     public function test_el_formulario_de_contacto_valida_los_datos(): void

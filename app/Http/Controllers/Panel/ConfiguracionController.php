@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\ConfiguracionRequest;
 use App\Models\Config;
 use App\Support\Historial;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,28 +34,11 @@ class ConfiguracionController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(ConfiguracionRequest $request, Historial $historial): RedirectResponse
     {
         $usuario = $request->user();
 
-        $datos = $request->validate([
-            'phone' => ['nullable', 'string', 'max:40'],
-            'email' => ['nullable', 'email', 'max:150'],
-            'direccion' => ['nullable', 'string', 'max:255'],
-            'estudiantes' => ['nullable', 'integer', 'min:0', 'max:100000'],
-            'docentes_count' => ['nullable', 'integer', 'min:0', 'max:10000'],
-            'anio_fundacion' => ['nullable', 'integer', 'min:1900', 'max:2100'],
-            'niveles' => ['nullable', 'string', 'max:255'],
-            'mision' => ['nullable', 'string', 'max:2000'],
-            'vision' => ['nullable', 'string', 'max:2000'],
-        ], [
-            'email.email' => 'Ingresa un correo electrónico válido.',
-            'estudiantes.integer' => 'La cantidad de estudiantes debe ser un número.',
-            'docentes_count.integer' => 'La cantidad de docentes debe ser un número.',
-            'anio_fundacion.integer' => 'El año de fundación debe ser un número.',
-            'anio_fundacion.min' => 'El año de fundación no parece válido.',
-            'anio_fundacion.max' => 'El año de fundación no parece válido.',
-        ]);
+        $datos = $request->validated();
 
         $texto = fn (mixed $valor): ?string => (trim((string) ($valor ?? '')) ?: null);
 
@@ -74,7 +57,7 @@ class ConfiguracionController extends Controller
         ]);
         $config->save();
 
-        Historial::registrar($usuario, 'editar', $config, 'Configuración institucional');
+        $historial->registrar($usuario, 'editar', $config, 'Configuración institucional');
 
         return back()->with('ok', 'Configuración guardada correctamente.');
     }

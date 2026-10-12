@@ -3,20 +3,20 @@
 namespace App\Console\Commands;
 
 use App\Support\PapeleraNoticias;
-use Illuminate\Console\Command;
 
-class PurgarNoticiasPapelera extends Command
+class PurgarNoticiasPapelera extends PurgarPapelera
 {
     protected $signature = 'noticias:purgar-papelera';
 
     protected $description = 'Elimina definitivamente las noticias que superaron el límite de días en la papelera.';
 
-    public function handle(): int
+    protected function papelera(): string
     {
-        $eliminadas = PapeleraNoticias::purgarVencidas();
+        return PapeleraNoticias::class;
+    }
 
-        $this->info("Noticias purgadas de la papelera: {$eliminadas}");
-
-        return self::SUCCESS;
+    protected function mensaje(int $eliminados): string
+    {
+        return "Noticias purgadas de la papelera: {$eliminados}";
     }
 }
