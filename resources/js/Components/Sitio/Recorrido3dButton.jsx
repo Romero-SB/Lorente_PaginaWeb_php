@@ -1,24 +1,20 @@
-import { useEffect, useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function Recorrido3dButton() {
-    const [aviso, setAviso] = useState(false);
+    const { url } = usePage();
 
-    useEffect(() => {
-        if (!aviso) return undefined;
-        const id = setTimeout(() => setAviso(false), 3200);
-        return () => clearTimeout(id);
-    }, [aviso]);
+    // Si ya estamos en la página del recorrido virtual, no mostrar el botón flotante
+    if (url === '/recorrido' || (url && url.startsWith('/recorrido?'))) {
+        return null;
+    }
 
     return (
         <div className="recorrido-3d-wrap">
-            <div className={`recorrido-3d-aviso ${aviso ? 'show' : ''}`} role="status" aria-live="polite">
-                Recorrido 3D &mdash; pr&oacute;ximamente
-            </div>
-            <button
-                type="button"
+            <Link
+                href="/recorrido"
+                prefetch
                 className="recorrido-3d"
-                onClick={() => setAviso(true)}
-                aria-label="Ver recorrido 3D del colegio"
+                aria-label="Ver recorrido virtual 360° del colegio"
             >
                 <svg
                     viewBox="0 0 24 24"
@@ -34,7 +30,7 @@ export default function Recorrido3dButton() {
                     <path d="M12 22V12" />
                 </svg>
                 Ver Recorrido 3D
-            </button>
+            </Link>
         </div>
     );
 }

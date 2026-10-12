@@ -1,0 +1,619 @@
+{
+    "version":  1,
+    "startScene":  "escena-01",
+    "scenes":  [
+                   {
+                       "id":  "escena-01",
+                       "name":  "2do piso 6to y 5to grado",
+                       "panorama":  "/tour/scenes/escena-01.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-01.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.11,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765633629-1007",
+                                         "target":  "escena-02",
+                                         "yaw":  5.807742353391758,
+                                         "pitch":  -0.21067133820508266,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791765641971-1008",
+                                         "target":  "escena-14",
+                                         "yaw":  5.651242116842992,
+                                         "pitch":  -0.8110593669421093,
+                                         "type":  "stairs-down"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-02",
+                       "name":  "2do piso 4to y 3er grado",
+                       "panorama":  "/tour/scenes/escena-02.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-02.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.22,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765680851-1009",
+                                         "target":  "escena-03",
+                                         "yaw":  5.886985712276079,
+                                         "pitch":  -0.3842000681137725,
+                                         "type":  "stairs-down"
+                                     },
+                                     {
+                                         "id":  "l-1791765690156-1010",
+                                         "target":  "escena-01",
+                                         "yaw":  0.03107813355065667,
+                                         "pitch":  -0.6338657672038877,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-03",
+                       "name":  "1er piso salones de 1ro y 2do",
+                       "panorama":  "/tour/scenes/escena-03.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-03.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.33,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765708764-1011",
+                                         "target":  "escena-17",
+                                         "yaw":  2.8215537506147776,
+                                         "pitch":  -0.43286503620497907,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791765747012-1012",
+                                         "target":  "escena-04",
+                                         "yaw":  1.2954829732911772,
+                                         "pitch":  -0.41689172221150517,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791765810900-1013",
+                                         "target":  "escena-06",
+                                         "yaw":  5.779534073075859,
+                                         "pitch":  -0.2517816929485144,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791765991732-1022",
+                                         "target":  "escena-10",
+                                         "yaw":  4.462415744365932,
+                                         "pitch":  -0.17772066735888847,
+                                         "type":  "forward"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-04",
+                       "name":  "Vista al biohuerto",
+                       "panorama":  "/tour/scenes/escena-04.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-04.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.44,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765848483-1014",
+                                         "target":  "escena-05",
+                                         "yaw":  5.716158972852604,
+                                         "pitch":  -0.41784920599503383,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791765856412-1015",
+                                         "target":  "escena-03",
+                                         "yaw":  5.706492859585462,
+                                         "pitch":  -0.802057774881221,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-05",
+                       "name":  "Vista al jardín",
+                       "panorama":  "/tour/scenes/escena-05.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-05.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.55,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765870004-1016",
+                                         "target":  "escena-06",
+                                         "yaw":  3.8904329716707062,
+                                         "pitch":  -0.40412255170074163,
+                                         "type":  "door"
+                                     },
+                                     {
+                                         "id":  "l-1791765877603-1017",
+                                         "target":  "escena-04",
+                                         "yaw":  5.844904203119917,
+                                         "pitch":  -0.7328334631652469,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791765899636-1018",
+                                         "target":  "escena-08",
+                                         "yaw":  6.065510461067169,
+                                         "pitch":  -0.4901658969580467,
+                                         "type":  "forward"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-06",
+                       "name":  "Entrada al patio 2",
+                       "panorama":  "/tour/scenes/escena-06.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-06.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.66,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765937852-1019",
+                                         "target":  "escena-03",
+                                         "yaw":  5.529268893652386,
+                                         "pitch":  -0.46198837303665785,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791765949924-1020",
+                                         "target":  "escena-09",
+                                         "yaw":  5.613999105206288,
+                                         "pitch":  -0.28630352681927707,
+                                         "type":  "forward"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-07",
+                       "name":  "Escaleras a las losas deportivas",
+                       "panorama":  "/tour/scenes/escena-07.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-07.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.77,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766406979-1039",
+                                         "target":  "escena-09",
+                                         "yaw":  5.965897521298362,
+                                         "pitch":  -1.1093359756135412,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791766415996-1040",
+                                         "target":  "escena-08",
+                                         "yaw":  0.5615505941990013,
+                                         "pitch":  -0.7756631774921874,
+                                         "type":  "forward"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-08",
+                       "name":  "Escalones zig zag",
+                       "panorama":  "/tour/scenes/escena-08.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-08.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.88,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766394260-1038",
+                                         "target":  "escena-05",
+                                         "yaw":  3.9388290954282383,
+                                         "pitch":  -0.434004431137605,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-09",
+                       "name":  "Patio 2",
+                       "panorama":  "/tour/scenes/escena-09.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-09.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.11,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766026772-1023",
+                                         "target":  "escena-07",
+                                         "yaw":  0.21037208374815433,
+                                         "pitch":  -0.2030321655941092,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791766036092-1024",
+                                         "target":  "escena-06",
+                                         "yaw":  4.230363841234326,
+                                         "pitch":  -0.11429332901151312,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791766049628-1025",
+                                         "target":  "escena-10",
+                                         "yaw":  3.984248526914377,
+                                         "pitch":  -0.1550931921587162,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791766094420-1026",
+                                         "target":  "escena-13",
+                                         "yaw":  0.14951177500897428,
+                                         "pitch":  -0.22613488808813975,
+                                         "type":  "stairs-up"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-10",
+                       "name":  "Escena 10",
+                       "panorama":  "/tour/scenes/escena-10.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-10.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.22,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766112875-1027",
+                                         "target":  "escena-17",
+                                         "yaw":  2.76570380801164,
+                                         "pitch":  -0.11244852487232282,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791766132620-1028",
+                                         "target":  "escena-09",
+                                         "yaw":  3.173385883338611,
+                                         "pitch":  -0.2524417712419087,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-11",
+                       "name":  "Sala de profesores",
+                       "panorama":  "/tour/scenes/escena-11.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-11.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.33,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766307531-1034",
+                                         "target":  "escena-12",
+                                         "yaw":  3.1539162382061847,
+                                         "pitch":  -0.5922127991212571,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791766315340-1035",
+                                         "target":  "escena-14",
+                                         "yaw":  3.476645414762043,
+                                         "pitch":  -0.629909417402553,
+                                         "type":  "stairs-down"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-12",
+                       "name":  "Servicios higienicos 2do piso",
+                       "panorama":  "/tour/scenes/escena-12.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-12.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.44,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766329020-1036",
+                                         "target":  "escena-01",
+                                         "yaw":  5.804035744795102,
+                                         "pitch":  -0.19157322806502397,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791766332484-1037",
+                                         "target":  "escena-02",
+                                         "yaw":  0.3097793942105917,
+                                         "pitch":  -0.5020016067124042,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-13",
+                       "name":  "2do piso patio 2 salones 5to y 6to",
+                       "panorama":  "/tour/scenes/escena-13.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-13.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.55,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766227508-1032",
+                                         "target":  "escena-09",
+                                         "yaw":  5.964004562051673,
+                                         "pitch":  -0.6055550296757386,
+                                         "type":  "stairs-down"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-14",
+                       "name":  "Mesa de partes y administrativos",
+                       "panorama":  "/tour/scenes/escena-14.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-14.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.66,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765520196-1004",
+                                         "target":  "escena-17",
+                                         "yaw":  5.736237732954713,
+                                         "pitch":  -0.35289755556651126,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791765538301-1005",
+                                         "target":  "escena-15",
+                                         "yaw":  5.598543340454408,
+                                         "pitch":  -0.706936827687001,
+                                         "type":  "back"
+                                     },
+                                     {
+                                         "id":  "l-1791765611908-1006",
+                                         "target":  "escena-01",
+                                         "yaw":  0.3580228965615041,
+                                         "pitch":  -0.41489560013053217,
+                                         "type":  "stairs-up"
+                                     },
+                                     {
+                                         "id":  "l-1791766264604-1033",
+                                         "target":  "escena-11",
+                                         "yaw":  5.075406543862577,
+                                         "pitch":  -0.1807034618377925,
+                                         "type":  "stairs-up"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-15",
+                       "name":  "Entrada al Sebastian Lorente",
+                       "panorama":  "/tour/scenes/escena-15.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-15.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.77,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765448572-1002",
+                                         "target":  "escena-14",
+                                         "yaw":  6.009784759490152,
+                                         "pitch":  -0.45296208132672566,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791765476188-1003",
+                                         "target":  "escena-16",
+                                         "yaw":  6.234537204834262,
+                                         "pitch":  -0.6680030384291813,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-16",
+                       "name":  "Vista externa a la I.E. Sebastian Lorente",
+                       "panorama":  "/tour/scenes/escena-16.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-16.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.88,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791765377308-1001",
+                                         "target":  "escena-15",
+                                         "yaw":  5.785712576672024,
+                                         "pitch":  -0.4649562580172826,
+                                         "type":  "forward"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   },
+                   {
+                       "id":  "escena-17",
+                       "name":  "Patio 1",
+                       "panorama":  "/tour/scenes/escena-17.jpg",
+                       "thumbnail":  "/tour/thumbs/escena-17.jpg",
+                       "initialView":  {
+                                           "yaw":  0,
+                                           "pitch":  0,
+                                           "fov":  70
+                                       },
+                       "mapPosition":  {
+                                           "x":  0.11,
+                                           "y":  0.5
+                                       },
+                       "links":  [
+                                     {
+                                         "id":  "l-1791766169885-1029",
+                                         "target":  "escena-03",
+                                         "yaw":  5.969163271073478,
+                                         "pitch":  -0.40404490369680546,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791766175227-1030",
+                                         "target":  "escena-10",
+                                         "yaw":  5.481922176584519,
+                                         "pitch":  -0.22392575756258526,
+                                         "type":  "forward"
+                                     },
+                                     {
+                                         "id":  "l-1791766186595-1031",
+                                         "target":  "escena-14",
+                                         "yaw":  5.9118782772829945,
+                                         "pitch":  -0.31394089857815377,
+                                         "type":  "back"
+                                     }
+                                 ],
+                       "infoPoints":  [
+
+                                      ]
+                   }
+               ]
+}

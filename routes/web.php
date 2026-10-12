@@ -18,9 +18,11 @@ use App\Http\Controllers\Sitio\ContactoController;
 use App\Http\Controllers\Sitio\DocumentoController;
 use App\Http\Controllers\Sitio\InicioController;
 use App\Http\Controllers\Sitio\NoticiaController;
+use App\Http\Controllers\Sitio\RecorridoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('home');
+Route::get('/recorrido', [RecorridoController::class, 'index'])->name('sitio.recorrido');
 Route::get('/noticias', [NoticiaController::class, 'index'])->name('sitio.noticias.index');
 Route::get('/noticias/{noticia:slug}', [NoticiaController::class, 'show'])->name('sitio.noticias.show');
 Route::post('/contacto', [ContactoController::class, 'store'])

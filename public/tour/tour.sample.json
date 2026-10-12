@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "startScene": "piso2-pasillo-norte",
+  "northConvention": "Frente a la entrada principal del edificio = yaw 0. El pasillo corre de norte (entrada) a sur (fondo).",
+  "floors": [
+    { "id": "piso1", "name": "Primer piso",   "order": 1 },
+    { "id": "piso2", "name": "Segundo piso",  "order": 2 }
+  ],
+  "scenes": [
+    {
+      "id": "piso2-pasillo-norte",
+      "name": "Segundo piso — Pasillo Norte",
+      "floor": "piso2",
+      "panorama": "/tour/scenes/piso2-pasillo-norte.webp",
+      "thumbnail": "/tour/thumbs/piso2-pasillo-norte.webp",
+      "initialView": { "yaw": 0, "pitch": 0, "fov": 70 },
+      "mapPosition": { "x": 0.5, "y": 0.2 },
+      "links": [
+        {
+          "id": "l-pn-ps",
+          "target": "piso2-pasillo-sur",
+          "yaw": 3.14,
+          "pitch": -0.15,
+          "type": "forward",
+          "label": "Avanzar hacia el sur"
+        },
+        {
+          "id": "l-pn-esc",
+          "target": "piso1-escalera",
+          "yaw": -1.2,
+          "pitch": -0.3,
+          "type": "stairs-down",
+          "label": "Bajar al primer piso"
+        }
+      ],
+      "infoPoints": [
+        {
+          "id": "ip-pn-aula2b",
+          "yaw": 1.4,
+          "pitch": 0.1,
+          "title": "Aula 2B",
+          "content": "Segundo grado grupo B. Capacidad: 35 estudiantes.",
+          "media": null
+        }
+      ]
+    },
+    {
+      "id": "piso2-pasillo-sur",
+      "name": "Segundo piso — Pasillo Sur",
+      "floor": "piso2",
+      "panorama": "/tour/scenes/piso2-pasillo-sur.webp",
+      "thumbnail": "/tour/thumbs/piso2-pasillo-sur.webp",
+      "initialView": { "yaw": 0, "pitch": 0, "fov": 70 },
+      "mapPosition": { "x": 0.5, "y": 0.7 },
+      "links": [
+        {
+          "id": "l-ps-pn",
+          "target": "piso2-pasillo-norte",
+          "yaw": 0,
+          "pitch": -0.15,
+          "type": "back",
+          "label": "Volver al norte"
+        },
+        {
+          "id": "l-ps-esc",
+          "target": "piso1-escalera",
+          "yaw": 1.57,
+          "pitch": -0.3,
+          "type": "stairs-down",
+          "label": "Bajar al primer piso"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "piso1-escalera",
+      "name": "Primer piso — Escalera",
+      "floor": "piso1",
+      "panorama": "/tour/scenes/piso1-escalera.webp",
+      "thumbnail": "/tour/thumbs/piso1-escalera.webp",
+      "initialView": { "yaw": 0, "pitch": 0, "fov": 70 },
+      "mapPosition": { "x": 0.5, "y": 0.3 },
+      "links": [
+        {
+          "id": "l-esc-pn",
+          "target": "piso2-pasillo-norte",
+          "yaw": 0,
+          "pitch": -0.4,
+          "type": "stairs-up",
+          "label": "Subir al segundo piso"
+        },
+        {
+          "id": "l-esc-patio",
+          "target": "piso1-patio",
+          "yaw": 3.14,
+          "pitch": -0.1,
+          "type": "outdoor",
+          "label": "Ir al patio"
+        }
+      ],
+      "infoPoints": [
+        {
+          "id": "ip-esc-info",
+          "yaw": 0.8,
+          "pitch": 0.2,
+          "title": "Dirección",
+          "content": "La escalera principal conecta ambos pisos. Hay rampa de acceso en el sector norte.",
+          "media": null
+        }
+      ]
+    },
+    {
+      "id": "piso1-patio",
+      "name": "Primer piso — Patio Central",
+      "floor": "piso1",
+      "panorama": "/tour/scenes/piso1-patio.webp",
+      "thumbnail": "/tour/thumbs/piso1-patio.webp",
+      "initialView": { "yaw": 0, "pitch": 0.1, "fov": 80 },
+      "mapPosition": { "x": 0.5, "y": 0.7 },
+      "links": [
+        {
+          "id": "l-patio-esc",
+          "target": "piso1-escalera",
+          "yaw": 0,
+          "pitch": -0.2,
+          "type": "forward",
+          "label": "Ir a la escalera"
+        }
+      ],
+      "infoPoints": [
+        {
+          "id": "ip-patio-cancha",
+          "yaw": -1.57,
+          "pitch": -0.1,
+          "title": "Cancha deportiva",
+          "content": "Espacio de recreo y actividades físicas. Capacidad para 200 personas.",
+          "media": null
+        }
+      ]
+    }
+  ]
+}
