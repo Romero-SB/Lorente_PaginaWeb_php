@@ -55,27 +55,31 @@ request. Sin cambios de contrato en props.
 
 ## Fase 2 — Integridad referencial de categorías (aislada)
 
-- [ ] Migración: `docentes.categoria_id` y `documentos.categoria_id`
-      (`nullable`, FK a `docente_categorias`/`documento_categorias`).
-- [ ] Backfill por nombre existente; conservar `categoria` (nombre) durante la
+- [x] Migración: `docentes.categoria_id` y `documentos.categoria_id`
+      (`nullable`, índice; FK con `nullOnDelete` en MySQL, omitida en SQLite).
+- [x] Backfill por nombre existente; conservar `categoria` (nombre) durante la
       transición.
-- [ ] Modelos: relaciones `categoria()`; validaciones a `exists:...,id`;
-      ajustar `ContenidoSitio`, purgas, reorden y `GestorCategorias.jsx`.
-- [ ] Renombrar/eliminar categoría deja de depender de strings.
-- [ ] Fase posterior: deprecar la columna `nombre` duplicada.
+- [x] Modelos: relaciones `categoriaRef()`; los controladores resuelven y
+      persisten `categoria_id` al crear/editar (validación por nombre se
+      mantiene para no romper el frontend).
+- [x] Renombrar categoría conserva el `categoria_id` (id estable); el borrado
+      sigue bloqueado por nombre y la columna de nombre se sincroniza.
+- [ ] Fase posterior: deprecar la columna `nombre` duplicada y validar por id
+      (`exists:...,id`), migrando `GestorCategorias.jsx` a enviar ids.
 
 **Criterios:** tests nuevos de renombrar/eliminar categoría; datos migrados sin
-pérdida.
+pérdida. ✔ `tests/Feature/Panel/CategoriaRelacionTest.php` (4 tests).
 
 ## Fase 3 — Backend mantenible (reduce duplicación, habilita escala)
 
-- [ ] **FormRequests por acción** (23 validaciones inline; solo `LoginRequest`).
-- [ ] **Resources/presenters** para unificar `paraVista`.
-- [ ] **Policies** (`NoticiaPolicy`, `DocumentoPolicy`, `DocentePolicy`).
-- [ ] **Unificar `PapeleraNoticias/Documentos/Docentes`** en un servicio genérico
+- [x] **FormRequests por acción** (todas las validaciones inline extraídas a
+      `app/Http/Requests/{Panel,Auth,Sitio}`).
+- [x] **Resources/presenters** para unificar `paraVista`.
+- [x] **Policies** (`NoticiaPolicy`, `DocumentoPolicy`, `DocentePolicy`).
+- [x] **Unificar `PapeleraNoticias/Documentos/Docentes`** en un servicio genérico
       con hooks por modelo + un comando parametrizado.
-- [ ] **Extraer Actions**: sincronización de imágenes/adjuntos de noticias.
-- [ ] **Inyección de dependencias** en `Historial` (usa `request()` global).
+- [x] **Extraer Actions**: sincronización de imágenes/adjuntos de noticias.
+- [x] **Inyección de dependencias** en `Historial` (usa `request()` global).
 
 **Criterios:** menos líneas, tests verdes + tests unitarios de Support/Actions.
 

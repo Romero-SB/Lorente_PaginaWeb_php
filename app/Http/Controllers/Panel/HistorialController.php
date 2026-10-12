@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\HistorialFiltrosRequest;
 use App\Models\Actividad;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,16 +23,9 @@ class HistorialController extends Controller
         'App\Models\User' => 'Cuenta',
     ];
 
-    public function index(Request $request): Response
+    public function index(HistorialFiltrosRequest $request): Response
     {
-        $filtros = $request->validate([
-            'usuario' => ['nullable', 'integer', 'exists:users,id'],
-            'accion' => ['nullable', 'string', 'max:50'],
-            'modelo' => ['nullable', 'string', 'max:150'],
-            'desde' => ['nullable', 'date'],
-            'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
-            'q' => ['nullable', 'string', 'max:100'],
-        ]);
+        $filtros = $request->validated();
 
         $registros = Actividad::query()
             ->with('user:id,name,role')

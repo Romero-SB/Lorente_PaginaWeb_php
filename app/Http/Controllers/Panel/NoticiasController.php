@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Panel;
 
+use App\Actions\Noticias\SincronizarAdjuntos;
+use App\Actions\Noticias\SincronizarImagenes;
 use App\Http\Controllers\Controller;
-use App\Models\Adjunto;
+use App\Http\Requests\Panel\StoreNoticiaRequest;
+use App\Http\Requests\Panel\UpdateNoticiaRequest;
+use App\Http\Resources\NoticiaResource;
 use App\Models\Noticia;
-use App\Models\NoticiaImagen;
 use App\Models\User;
-use App\Support\Almacenamiento;
 use App\Support\Historial;
 use App\Support\PapeleraNoticias;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,7 +29,9 @@ class NoticiasController extends Controller
             ->orderByDesc('fiso')
             ->orderByDesc('id')
             ->get()
-            ->map(fn (Noticia $n) => $this->paraVista($n, $usuario));
+            ->map(fn (Noticia $n) => (new NoticiaResource($n))->resolve($request))
+            ->values()
+            ->all();
 
         return Inertia::render('Panel/Noticias', [
             'noticias' => $noticias,
@@ -38,11 +40,10 @@ class NoticiasController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreNoticiaRequest $request, SincronizarImagenes $imagenes, SincronizarAdjuntos $adjuntos, Historial $historial)
     {
         $usuario = $request->user();
-        $reglas = $this->reglas();
-        $datos = $request->validate($reglas);
+        $datos = $request->validated();
 
         $noticia = Noticia::create([
             'titulo' => trim($datos['titulo']),
@@ -56,20 +57,20 @@ class NoticiasController extends Controller
             'aut' => $usuario->name,
         ]);
 
-        $this->sincronizarImagenes($noticia, $request);
-        $this->sincronizarAdjuntos($noticia, $request);
+        $imagenes->ejecutar($noticia, $request->input('imagenes_plan'), $request->file('imagenes_nuevas', []));
+        $adjuntos->ejecutar($noticia, $request->input('adjuntos_plan'), $request->file('adjuntos_nuevas', []));
 
-        Historial::registrar($usuario, 'crear', $noticia, $noticia->titulo);
+        $historial->registrar($usuario, 'crear', $noticia, $noticia->titulo);
 
         return back()->with('ok', 'Noticia creada correctamente.');
     }
 
-    public function update(Request $request, Noticia $noticia)
+    public function update(UpdateNoticiaRequest $request, Noticia $noticia, SincronizarImagenes $imagenes, SincronizarAdjuntos $adjuntos, Historial $historial)
     {
-        $usuario = $request->user();
-        $this->autorizarGestion($usuario, $noticia);
+        $this->authorize('gestionar', $noticia);
 
-        $datos = $request->validate($this->reglas());
+        $usuario = $request->user();
+        $datos = $request->validated();
 
         $noticia->update([
             'titulo' => trim($datos['titulo']),
@@ -82,184 +83,56 @@ class NoticiasController extends Controller
             'updated_by' => $usuario->id,
         ]);
 
-        $this->sincronizarImagenes($noticia, $request);
-        $this->sincronizarAdjuntos($noticia, $request);
+        $imagenes->ejecutar($noticia, $request->input('imagenes_plan'), $request->file('imagenes_nuevas', []));
+        $adjuntos->ejecutar($noticia, $request->input('adjuntos_plan'), $request->file('adjuntos_nuevas', []));
 
-        Historial::registrar($usuario, 'editar', $noticia, $noticia->titulo);
+        $historial->registrar($usuario, 'editar', $noticia, $noticia->titulo);
 
         return back()->with('ok', 'Noticia actualizada correctamente.');
     }
 
-    public function destroy(Request $request, Noticia $noticia)
+    public function destroy(Request $request, Noticia $noticia, Historial $historial)
     {
+        $this->authorize('gestionar', $noticia);
+
         $usuario = $request->user();
-        $this->autorizarGestion($usuario, $noticia);
 
         $noticia->deleted_by = $usuario->id;
         $noticia->save();
         $noticia->delete();
 
-        Historial::registrar($usuario, 'papelera', $noticia, $noticia->titulo);
+        $historial->registrar($usuario, 'papelera', $noticia, $noticia->titulo);
 
         return back()->with('ok', 'Noticia movida a la papelera.');
     }
 
-    public function restaurar(Request $request, Noticia $noticia)
+    public function restaurar(Request $request, Noticia $noticia, Historial $historial)
     {
+        $this->authorize('gestionarEliminada', $noticia);
+
         $usuario = $request->user();
-        $this->autorizarEliminada($usuario, $noticia);
 
         $noticia->restore();
         $noticia->deleted_by = null;
         $noticia->save();
 
-        Historial::registrar($usuario, 'restaurar', $noticia, $noticia->titulo);
+        $historial->registrar($usuario, 'restaurar', $noticia, $noticia->titulo);
 
         return back()->with('ok', 'Noticia restaurada.');
     }
 
-    public function permanente(Request $request, Noticia $noticia)
+    public function permanente(Request $request, Noticia $noticia, Historial $historial)
     {
+        $this->authorize('gestionarEliminada', $noticia);
+
         $usuario = $request->user();
-        $this->autorizarEliminada($usuario, $noticia);
 
         PapeleraNoticias::eliminarArchivos($noticia);
         $noticia->forceDelete();
 
-        Historial::registrar($usuario, 'eliminar permanente', $noticia, (string) $noticia->titulo);
+        $historial->registrar($usuario, 'eliminar permanente', $noticia, (string) $noticia->titulo);
 
         return back()->with('ok', 'Noticia eliminada permanentemente.');
-    }
-
-    /** @return array<string, mixed> */
-    private function reglas(): array
-    {
-        return [
-            'titulo' => ['required', 'string', 'max:200'],
-            'fec' => ['required', 'date'],
-            'cat' => ['nullable', 'string', Rule::in(array_keys(config('panel.categorias_noticias')))],
-            'res' => ['nullable', 'string', 'min:10'],
-            'con' => ['nullable', 'string', 'min:20'],
-            'est' => ['required', Rule::in([Noticia::EST_PUBLICADO, Noticia::EST_BORRADOR])],
-            'imagenes_plan' => ['nullable', 'string'],
-            'imagenes_nuevas' => ['array', 'max:10'],
-            'imagenes_nuevas.*' => ['file', 'image', 'max:3072'],
-            'adjuntos_plan' => ['nullable', 'string'],
-            'adjuntos_nuevas' => ['array'],
-            'adjuntos_nuevas.*' => ['file', 'mimetypes:'.implode(',', array_keys(Almacenamiento::adjuntosPermitidos())), 'max:15360'],
-        ];
-    }
-
-    private function sincronizarImagenes(Noticia $noticia, Request $request): void
-    {
-        $plan = $this->descifrarPlan($request->input('imagenes_plan'));
-        $nuevas = array_values($request->file('imagenes_nuevas', []));
-
-        $cuentaNuevas = count(array_filter($plan, fn ($e) => ($e['tipo'] ?? '') === 'nueva'));
-
-        if ($cuentaNuevas !== count($nuevas)) {
-            throw ValidationException::withMessages([
-                'imagenes_plan' => 'Los archivos de imagen no coinciden con el orden enviado.',
-            ]);
-        }
-
-        if (count($plan) > 10) {
-            throw ValidationException::withMessages([
-                'imagenes_plan' => 'Máximo 10 imágenes por noticia.',
-            ]);
-        }
-
-        $existentes = collect($plan)
-            ->filter(fn ($e) => ($e['tipo'] ?? '') !== 'nueva')
-            ->pluck('id');
-
-        $removidas = $noticia->imagenes()->whereNotIn('id', $existentes)->get();
-        foreach ($removidas as $imagen) {
-            Almacenamiento::eliminar($imagen->ruta);
-            $imagen->delete();
-        }
-
-        $ref = 0;
-        foreach ($plan as $orden => $item) {
-            if (($item['tipo'] ?? '') === 'nueva') {
-                $archivo = $nuevas[$ref];
-                $ruta = Almacenamiento::guardarImagen($archivo);
-                if ($ruta === null) {
-                    throw ValidationException::withMessages([
-                        'imagenes_nuevas' => "El archivo {$archivo->getClientOriginalName()} no es una imagen válida.",
-                    ]);
-                }
-                NoticiaImagen::create([
-                    'noticia_id' => $noticia->id,
-                    'ruta' => $ruta,
-                    'es_portada' => $orden === 0,
-                    'orden' => $orden,
-                ]);
-                $ref++;
-            } else {
-                $imagen = $noticia->imagenes()->find($item['id']);
-                if ($imagen === null) {
-                    throw ValidationException::withMessages([
-                        'imagenes_plan' => 'La imagen existe en el orden enviado no existe.',
-                    ]);
-                }
-                $imagen->update(['es_portada' => $orden === 0, 'orden' => $orden]);
-            }
-        }
-    }
-
-    private function sincronizarAdjuntos(Noticia $noticia, Request $request): void
-    {
-        $plan = $this->descifrarPlan($request->input('adjuntos_plan'));
-        $nuevas = array_values($request->file('adjuntos_nuevas', []));
-
-        $cuentaNuevas = count(array_filter($plan, fn ($e) => ($e['tipo'] ?? '') === 'nueva'));
-
-        if ($cuentaNuevas !== count($nuevas)) {
-            throw ValidationException::withMessages([
-                'adjuntos_plan' => 'Los archivos adjuntos no coinciden con el orden enviado.',
-            ]);
-        }
-
-        $existentes = collect($plan)
-            ->filter(fn ($e) => ($e['tipo'] ?? '') !== 'nueva')
-            ->pluck('id');
-
-        $removidos = $noticia->adjuntos()->whereNotIn('id', $existentes)->get();
-        foreach ($removidos as $adjunto) {
-            Almacenamiento::eliminar($adjunto->ruta);
-            $adjunto->delete();
-        }
-
-        $ref = 0;
-        foreach ($plan as $orden => $item) {
-            if (($item['tipo'] ?? '') === 'nueva') {
-                $archivo = $nuevas[$ref];
-                $guardado = Almacenamiento::guardarAdjunto($archivo);
-                if ($guardado === null) {
-                    throw ValidationException::withMessages([
-                        'adjuntos_nuevas' => "El archivo {$archivo->getClientOriginalName()} no es un tipo permitido.",
-                    ]);
-                }
-                Adjunto::create([
-                    'noticia_id' => $noticia->id,
-                    'nombre' => $archivo->getClientOriginalName(),
-                    'ruta' => $guardado['ruta'],
-                    'mime' => $guardado['mime'],
-                    'peso' => $guardado['peso'],
-                    'orden' => $orden,
-                ]);
-                $ref++;
-            } else {
-                $adjunto = $noticia->adjuntos()->find($item['id']);
-                if ($adjunto === null) {
-                    throw ValidationException::withMessages([
-                        'adjuntos_plan' => 'Un archivo adjunto del orden enviado ya no existe.',
-                    ]);
-                }
-                $adjunto->update(['orden' => $orden]);
-            }
-        }
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -286,67 +159,14 @@ class NoticiasController extends Controller
         return PapeleraNoticias::consultaVisible($usuario)
             ->orderByDesc('deleted_at')
             ->get()
-            ->map(function (Noticia $n) use ($usuario) {
+            ->map(function (Noticia $n) {
                 return [
-                    ...$this->paraVista($n, $usuario),
+                    ...(new NoticiaResource($n))->resolve(),
                     'eliminada_por' => $n->deletedBy?->name,
                     'dias_restantes' => PapeleraNoticias::diasRestantes($n),
                 ];
             })
             ->values()
             ->all();
-    }
-
-    /** @return array<string, mixed> */
-    private function paraVista(Noticia $n, User $usuario): array
-    {
-        $puede = $this->puedeGestionar($usuario, $n);
-
-        return [
-            'id' => $n->id,
-            'titulo' => $n->titulo,
-            'slug' => $n->slug,
-            'cat' => $n->cat,
-            'fec' => $n->fec?->toDateString(),
-            'res' => $n->res,
-            'est' => $n->est,
-            'aut' => $n->aut,
-            'imagenes' => $n->imagenes->map(fn (NoticiaImagen $i) => [
-                'id' => $i->id,
-                'url' => Almacenamiento::url($i->ruta),
-                'es_portada' => $i->es_portada,
-            ]),
-            'adjuntos' => $n->adjuntos->map(fn (Adjunto $a) => [
-                'id' => $a->id,
-                'nombre' => $a->nombre,
-                'peso' => $a->peso,
-                'mime' => $a->mime,
-            ]),
-            'autor' => $n->author
-                ? ['name' => $n->author->name, 'cargo' => $n->author->cargo]
-                : ['name' => $n->aut ?? '—', 'cargo' => null],
-            'modificado_por' => $n->updatedBy ? ['name' => $n->updatedBy->name] : null,
-            'puede_editar' => $puede,
-            'puede_eliminar' => $puede,
-        ];
-    }
-
-    private function puedeGestionar(User $usuario, Noticia $noticia): bool
-    {
-        return ! $usuario->isDocente() || $noticia->author_id === $usuario->id;
-    }
-
-    private function autorizarGestion(User $usuario, Noticia $noticia): void
-    {
-        if (! $this->puedeGestionar($usuario, $noticia)) {
-            abort(403, 'Solo puedes gestionar tus propias noticias.');
-        }
-    }
-
-    private function autorizarEliminada(User $usuario, Noticia $noticia): void
-    {
-        if (! PapeleraNoticias::puedeGestionarEliminada($usuario, $noticia)) {
-            abort(403, 'No puedes gestionar esta noticia de la papelera.');
-        }
     }
 }

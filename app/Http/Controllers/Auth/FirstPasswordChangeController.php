@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\FirstPasswordChangeRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -25,18 +25,10 @@ class FirstPasswordChangeController extends Controller
         return Inertia::render('Auth/FirstPasswordChange');
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(FirstPasswordChangeRequest $request): RedirectResponse
     {
         /** @var User $usuario */
         $usuario = $request->user();
-
-        $request->validate([
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ], [
-            'password.required' => 'Debes ingresar una nueva contraseña.',
-            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-        ]);
 
         $usuario->password = Hash::make($request->string('password')->toString());
         $usuario->must_change_password = false;

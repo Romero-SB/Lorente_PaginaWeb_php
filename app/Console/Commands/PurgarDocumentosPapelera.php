@@ -3,20 +3,20 @@
 namespace App\Console\Commands;
 
 use App\Support\PapeleraDocumentos;
-use Illuminate\Console\Command;
 
-class PurgarDocumentosPapelera extends Command
+class PurgarDocumentosPapelera extends PurgarPapelera
 {
     protected $signature = 'documentos:purgar-papelera';
 
     protected $description = 'Elimina definitivamente los documentos que superaron el límite de días en la papelera.';
 
-    public function handle(): int
+    protected function papelera(): string
     {
-        $eliminados = PapeleraDocumentos::purgarVencidas();
+        return PapeleraDocumentos::class;
+    }
 
-        $this->info("Documentos purgados de la papelera: {$eliminados}");
-
-        return self::SUCCESS;
+    protected function mensaje(int $eliminados): string
+    {
+        return "Documentos purgados de la papelera: {$eliminados}";
     }
 }

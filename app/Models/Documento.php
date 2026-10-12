@@ -18,6 +18,7 @@ class Documento extends Model
     protected $fillable = [
         'titulo',
         'categoria',
+        'categoria_id',
         'visibilidad',
         'descripcion',
         'instrucciones',
@@ -26,6 +27,11 @@ class Documento extends Model
         'author_id',
         'created_by',
     ];
+
+    public function categoriaRef()
+    {
+        return $this->belongsTo(DocumentoCategoria::class, 'categoria_id');
+    }
 
     public function author()
     {

@@ -16,6 +16,7 @@ class Docente extends Model
         'cargo',
         'foto',
         'categoria',
+        'categoria_id',
         'orden',
         'activo',
         'created_by',
@@ -26,9 +27,9 @@ class Docente extends Model
         'activo' => 'boolean',
     ];
 
-    public function categoriaModel()
+    public function categoriaRef()
     {
-        return $this->belongsTo(DocenteCategoria::class, 'categoria', 'nombre');
+        return $this->belongsTo(DocenteCategoria::class, 'categoria_id');
     }
 
     public function createdBy()
