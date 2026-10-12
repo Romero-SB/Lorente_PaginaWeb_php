@@ -97,6 +97,7 @@
 - [x] Contacto real + bandeja (Admin/Super)
 - [x] Acceso a documentos privados con sesión
 - [x] Animaciones, skeletons y reveal
+- [x] Recorrido Virtual 360° (/recorrido) integrado con Photo Sphere Viewer (17 escenas 360°, indicador de pisos, validación Zod y botón flotante 3D conectado)
 
 ## Fase 9.1 — Login y panel superpuestos al sitio
 - [x] Login como modal sobre el home público (`/lorente-panel/login` renderiza el sitio + modal)

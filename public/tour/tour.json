@@ -1,0 +1,641 @@
+{
+  "version": 1,
+  "startScene": "escena-01",
+  "northConvention": "Por definir",
+  "scenes": [
+    {
+      "id": "escena-01",
+      "name": "2do piso 6to y 5to grado",
+      "panorama": "/tour/scenes/escena-01.jpg",
+      "thumbnail": "/tour/thumbs/escena-01.jpg",
+      "initialView": {
+        "yaw": 1.57,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.1,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l01-02",
+          "target": "escena-02",
+          "yaw": 1.57,
+          "pitch": -0.21,
+          "type": "forward",
+          "label": "Siguiente"
+        },
+        {
+          "id": "l01-14",
+          "target": "escena-14",
+          "yaw": -2,
+          "pitch": -0.21,
+          "type": "stairs-down",
+          "label": "Bajar"
+        },
+        {
+          "id": "l01-12",
+          "target": "escena-12",
+          "yaw": -1.57,
+          "pitch": -0.21,
+          "type": "stairs-up",
+          "label": "Bajar"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-02",
+      "name": "2do piso 4to y 3er grado",
+      "panorama": "/tour/scenes/escena-02.jpg",
+      "thumbnail": "/tour/thumbs/escena-02.jpg",
+      "initialView": {
+        "yaw": 1.57,
+        "pitch": -0.1,
+        "fov": 100
+      },
+      "mapPosition": {
+        "x": 0.2,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l02-03",
+          "target": "escena-03",
+          "yaw": 1.57,
+          "pitch": -0.1,
+          "type": "stairs-down",
+          "label": "Bajar"
+        },
+        {
+          "id": "l02-01",
+          "target": "escena-01",
+          "yaw": -1.57,
+          "pitch": -0.1,
+          "type": "back",
+          "label": "Anterior"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-03",
+      "name": "1er piso salones de 1ro y 2do",
+      "panorama": "/tour/scenes/escena-03.jpg",
+      "thumbnail": "/tour/thumbs/escena-03.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 100
+      },
+      "mapPosition": {
+        "x": 0.3,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l03-17",
+          "target": "escena-17",
+          "yaw": -1.57,
+          "pitch": -0.43286503620497907,
+          "type": "back",
+          "label": "Patio 1"
+        },
+        {
+          "id": "l03-04",
+          "target": "escena-04",
+          "yaw": 3.14,
+          "pitch": -0.40,
+          "type": "forward",
+          "label": "Biohuerto"
+        },
+        {
+          "id": "l03-06",
+          "target": "escena-06",
+          "yaw": 1.57,
+          "pitch": -0.2517816929485144,
+          "type": "forward",
+          "label": "Entrada patio 2"
+        },
+        {
+          "id": "l03-10",
+          "target": "escena-10",
+          "yaw": 6.28,
+          "pitch": -0.10,
+          "type": "forward",
+          "label": "Siguiente"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-04",
+      "name": "Vista al biohuerto",
+      "panorama": "/tour/scenes/escena-04.jpg",
+      "thumbnail": "/tour/thumbs/escena-04.jpg",
+      "initialView": {
+        "yaw": 1.57,
+        "pitch": -0.1,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.4,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l04-05",
+          "target": "escena-05",
+          "yaw": 1.57,
+          "pitch": -0.1,
+          "type": "forward",
+          "label": "Siguiente"
+        },
+        {
+          "id": "l04-03",
+          "target": "escena-03",
+          "yaw": 0,
+          "pitch": 0.80,
+          "type": "back",
+          "label": "Anterior"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-05",
+      "name": "Vista al jardín",
+      "panorama": "/tour/scenes/escena-05.jpg",
+      "thumbnail": "/tour/thumbs/escena-05.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l05-06",
+          "target": "escena-06",
+          "yaw": 0,
+          "pitch": -0.1,
+          "type": "door",
+          "label": "Entrada patio 2"
+        },
+        {
+          "id": "l05-04",
+          "target": "escena-04",
+          "yaw": -1.57,
+          "pitch": 0.73,
+          "type": "back",
+          "label": "Anterior"
+        },
+        {
+          "id": "l05-08",
+          "target": "escena-08",
+          "yaw": 1.57,
+          "pitch": -0.1,
+          "type": "forward",
+          "label": "Escalones zig zag"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-06",
+      "name": "Entrada al patio 2",
+      "panorama": "/tour/scenes/escena-06.jpg",
+      "thumbnail": "/tour/thumbs/escena-06.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 100
+      },
+      "mapPosition": {
+        "x": 0.6,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l06-03",
+          "target": "escena-03",
+          "yaw": 3.14,
+          "pitch": 0.46,
+          "type": "back",
+          "label": "Anterior"
+        },
+        {
+          "id": "l06-09",
+          "target": "escena-09",
+          "yaw": -1,
+          "pitch": -0.1,
+          "type": "forward",
+          "label": "Patio 2"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-07",
+      "name": "Escaleras a las losas deportivas",
+      "panorama": "/tour/scenes/escena-07.jpg",
+      "thumbnail": "/tour/thumbs/escena-07.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.7,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l07-09",
+          "target": "escena-09",
+          "yaw": 3.14,
+          "pitch": -0.1,
+          "type": "back",
+          "label": "Patio 2"
+        },
+        {
+          "id": "l07-08",
+          "target": "escena-08",
+          "yaw": 1.57,
+          "pitch": 0.1,
+          "type": "forward",
+          "label": "Siguiente"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-08",
+      "name": "Escalones zig zag",
+      "panorama": "/tour/scenes/escena-08.jpg",
+      "thumbnail": "/tour/thumbs/escena-08.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.8,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l08-05",
+          "target": "escena-05",
+          "yaw": 0,
+          "pitch": -0.1,
+          "type": "back",
+          "label": "Anterior"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-09",
+      "name": "Patio 2",
+      "panorama": "/tour/scenes/escena-09.jpg",
+      "thumbnail": "/tour/thumbs/escena-09.jpg",
+      "initialView": {
+        "yaw": 1.57,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.1,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l09-07",
+          "target": "escena-07",
+          "yaw": 4,
+          "pitch": -0.42,
+          "type": "forward",
+          "label": "Losas deportivas"
+        },
+        {
+          "id": "l09-06",
+          "target": "escena-06",
+          "yaw": -0.50,
+          "pitch": -0.112,
+          "type": "back",
+          "label": "Entrada patio 2"
+        },
+        {
+          "id": "l09-10",
+          "target": "escena-10",
+          "yaw": 1.198,
+          "pitch": -0.42,
+          "type": "back",
+          "label": "Anterior"
+        },
+        {
+          "id": "l09-13",
+          "target": "escena-13",
+          "yaw": 4.50,
+          "pitch": -0.22,
+          "type": "stairs-up",
+          "label": "2do piso"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-10",
+      "name": "Escena 10 (por nombrar)",
+      "panorama": "/tour/scenes/escena-10.jpg",
+      "thumbnail": "/tour/thumbs/escena-10.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.2,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l10-17",
+          "target": "escena-17",
+          "yaw": 0,
+          "pitch": -0.12,
+          "type": "forward",
+          "label": "Patio 1"
+        },
+        {
+          "id": "l10-09",
+          "target": "escena-09",
+          "yaw": 3.14,
+          "pitch": -0.12,
+          "type": "back",
+          "label": "Patio 2"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-11",
+      "name": "Sala de profesores",
+      "panorama": "/tour/scenes/escena-11.jpg",
+      "thumbnail": "/tour/thumbs/escena-11.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.3,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l11-12",
+          "target": "escena-12",
+          "yaw": -1.57,
+          "pitch": -0.1,
+          "type": "forward",
+          "label": "Servicios higiénicos"
+        },
+        {
+          "id": "l11-14",
+          "target": "escena-14",
+          "yaw": 1.57,
+          "pitch": -0.1,
+          "type": "stairs-down",
+          "label": "Bajar"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-12",
+      "name": "Servicios higienicos",
+      "panorama": "/tour/scenes/escena-12.jpg",
+      "thumbnail": "/tour/thumbs/escena-12.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.4,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l12-01",
+          "target": "escena-01",
+          "yaw": 0,
+          "pitch": -0.1,
+          "type": "forward",
+          "label": "6to y 5to grado"
+        },
+        {
+          "id": "l12-011",
+          "target": "escena-11",
+          "yaw": -2.28,
+          "pitch": -0.1,
+          "type": "back",
+          "label": "Anterior"
+        },
+        {
+          "id": "l12-014",
+          "target": "escena-14",
+          "yaw": 1,
+          "pitch": -0.1,
+          "type": "stairs-up",
+          "label": "Bajar al primer piso"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-13",
+      "name": "2do piso patio 2 salones 5to y 6to",
+      "panorama": "/tour/scenes/escena-13.jpg",
+      "thumbnail": "/tour/thumbs/escena-13.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l13-09",
+          "target": "escena-09",
+          "yaw": 5.964004562051673,
+          "pitch": -0.6055550296757386,
+          "type": "stairs-down",
+          "label": "Bajar al patio 2"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-14",
+      "name": "Mesa de partes y administrativos",
+      "panorama": "/tour/scenes/escena-14.jpg",
+      "thumbnail": "/tour/thumbs/escena-14.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.6,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l14-17",
+          "target": "escena-17",
+          "yaw": 3.14,
+          "pitch": -0.10,
+          "type": "forward",
+          "label": "Patio 1"
+        },
+        {
+          "id": "l14-15",
+          "target": "escena-15",
+          "yaw": 0,
+          "pitch": -0.1,
+          "type": "back",
+          "label": "Entrada"
+        },
+        {
+          "id": "l14-01",
+          "target": "escena-01",
+          "yaw": -2.14,
+          "pitch": -0.41489560013053217,
+          "type": "stairs-up",
+          "label": "2do piso"
+        },
+        {
+          "id": "l14-11",
+          "target": "escena-11",
+          "yaw": 2.14,
+          "pitch": -0.1807034618377925,
+          "type": "stairs-up",
+          "label": "Sala de profesores"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-15",
+      "name": "Entrada al Sebastian Lorente",
+      "panorama": "/tour/scenes/escena-15.jpg",
+      "thumbnail": "/tour/thumbs/escena-15.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.7,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l15-14",
+          "target": "escena-14",
+          "yaw": 3.14,
+          "pitch": -0.45,
+          "type": "forward",
+          "label": "Mesa de partes"
+        },
+        {
+          "id": "l15-16",
+          "target": "escena-16",
+          "yaw": 6,
+          "pitch": -0.45,
+          "type": "back",
+          "label": "Vista externa"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-16",
+      "name": "Vista externa a la I.E. Sebastian Lorente",
+      "panorama": "/tour/scenes/escena-16.jpg",
+      "thumbnail": "/tour/thumbs/escena-16.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.8,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l16-15",
+          "target": "escena-15",
+          "yaw": 3.14,
+          "pitch": -0.45,
+          "type": "forward",
+          "label": "Entrada"
+        }
+      ],
+      "infoPoints": []
+    },
+    {
+      "id": "escena-17",
+      "name": "Escena 17 (por nombrar)",
+      "panorama": "/tour/scenes/escena-17.jpg",
+      "thumbnail": "/tour/thumbs/escena-17.jpg",
+      "initialView": {
+        "yaw": 0,
+        "pitch": 0,
+        "fov": 70
+      },
+      "mapPosition": {
+        "x": 0.9,
+        "y": 0.5
+      },
+      "links": [
+        {
+          "id": "l17-03",
+          "target": "escena-03",
+          "yaw": 1,
+          "pitch": -0.1,
+          "type": "forward",
+          "label": "Salones 1ro y 2do"
+        },
+        {
+          "id": "l17-10",
+          "target": "escena-10",
+          "yaw": 5.48,
+          "pitch": -0.22,
+          "type": "forward",
+          "label": "Siguiente"
+        },
+        {
+          "id": "l17-14",
+          "target": "escena-14",
+          "yaw": -3.14,
+          "pitch": -0.1,
+          "type": "back",
+          "label": "Mesa de partes"
+        }
+      ],
+      "infoPoints": []
+    }
+  ]
+}
