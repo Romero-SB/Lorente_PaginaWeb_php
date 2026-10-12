@@ -1,5 +1,7 @@
 import { router, useForm } from '@inertiajs/react';
 
+import '../../../css/login.css';
+
 export default function FirstPasswordChange() {
     const { data, setData, post, processing, errors } = useForm({
         password: '',

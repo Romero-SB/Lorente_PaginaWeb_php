@@ -46,7 +46,7 @@ export default function Noticias({ noticias }) {
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Noticias · IE N° 31501 Sebastián Lorente" />
                 <meta property="og:description" content={descripcion} />
-                <meta property="og:image" content="/referencial.jpg" />
+                <meta property="og:image" content={new URL('/referencial.jpg', window.location.origin).href} />
             </Head>
 
             <section className="seccion lista-noticias">

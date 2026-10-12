@@ -1,6 +1,8 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
+import Modal from '../Shared/Modal';
+import Boton from '../Shared/Boton';
 import { toast } from '../../lib/toast';
 import { FUENTES, OPCIONES_ALINEACION, contraste, estiloCategoria, oscurecer } from '../../lib/fuentes';
 import { Icono } from './Iconos';
@@ -45,21 +47,18 @@ export default function EditorEstiloCategoria({ categoria, baseUrl = '/lorente-p
     }
 
     return (
-        <div className="fixed inset-0 z-[60] grid place-items-center bg-slate-900/70 p-4" onClick={onClose}>
-            <div
-                className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-xl"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                    <div>
-                        <h3 className="text-sm font-bold text-slate-800">Estilo de “{categoria.nombre}”</h3>
-                        <p className="text-[11px] text-slate-400">Se aplica a todos los docentes de esta categoría.</p>
-                    </div>
-                    <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
-                        <Icono nombre="cerrar" className="h-4 w-4" />
-                    </button>
+        <Modal onCerrar={onClose} ariaLabel={`Estilo de “${categoria.nombre}”`} ancho="max-w-3xl" z="z-[60]">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                <div>
+                    <h3 className="text-sm font-bold text-slate-800">Estilo de “{categoria.nombre}”</h3>
+                    <p className="text-[11px] text-slate-400">Se aplica a todos los docentes de esta categoría.</p>
                 </div>
+                <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
+                    <Icono nombre="cerrar" className="h-4 w-4" />
+                </button>
+            </div>
 
+            <div className="max-h-[86vh] overflow-y-auto">
                 <div className="grid gap-5 p-4 md:grid-cols-[1fr_240px]">
                     <div className="space-y-4">
                         <Grupo titulo="Nombre del docente">
@@ -80,7 +79,7 @@ export default function EditorEstiloCategoria({ categoria, baseUrl = '/lorente-p
                                     type="color"
                                     value={fondo || AZUL_DEFECTO}
                                     onChange={(e) => setFondo(e.target.value)}
-                                    className="h-8 w-10 cursor-pointer rounded border border-slate-200"
+                                    className="h-8 w-10 cursor-pointer rounded-lg border border-slate-200"
                                 />
                                 <span className="text-xs text-slate-500">{fondo || 'Azul (predeterminado)'}</span>
                                 {fondo && (
@@ -114,27 +113,24 @@ export default function EditorEstiloCategoria({ categoria, baseUrl = '/lorente-p
                         <span className="text-center text-[11px] text-slate-400">Así se verá en la página principal.</span>
                     </div>
                 </div>
-
-                <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-3">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-                    >
-                        Cancelar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={guardar}
-                        disabled={guardando}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
-                    >
-                        <Icono nombre="guardar" className="h-4 w-4" />
-                        {guardando ? 'Guardando…' : 'Guardar estilo'}
-                    </button>
-                </div>
             </div>
-        </div>
+
+            <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-3">
+                <Boton type="button" onClick={onClose} className="px-4 py-2 text-sm hover:bg-slate-50">
+                    Cancelar
+                </Boton>
+                <Boton
+                    variante="primario"
+                    type="button"
+                    onClick={guardar}
+                    disabled={guardando}
+                    className="px-4 py-2 text-sm disabled:opacity-60"
+                >
+                    <Icono nombre="guardar" className="h-4 w-4" />
+                    {guardando ? 'Guardando…' : 'Guardar estilo'}
+                </Boton>
+            </div>
+        </Modal>
     );
 }
 
@@ -154,7 +150,7 @@ function CampoFuente({ valor, onChange }) {
             <select
                 value={valor}
                 onChange={(e) => onChange(e.target.value)}
-                className="flex-1 rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                className="panel-campo flex-1 px-2 py-1.5"
             >
                 <option value="">Predeterminada</option>
                 {FUENTES.map((f) => (
@@ -175,7 +171,7 @@ function CampoColor({ valor, onChange, porDefecto, aviso }) {
                 type="color"
                 value={valor || porDefecto}
                 onChange={(e) => onChange(e.target.value)}
-                className="h-8 w-10 cursor-pointer rounded border border-slate-200"
+                className="h-8 w-10 cursor-pointer rounded-lg border border-slate-200"
             />
             <span className="flex-1">{valor || 'Predeterminado'}</span>
             {valor && (
@@ -189,9 +185,9 @@ function CampoColor({ valor, onChange, porDefecto, aviso }) {
 }
 
 const ICONO_ALINEACION = {
-    left: 'alinear-izquierda',
-    center: 'alinear-centro',
-    right: 'alinear-derecha',
+    left: 'alineacionIzquierda',
+    center: 'alineacionCentro',
+    right: 'alineacionDerecha',
 };
 
 const ETIQUETA_ALINEACION = {

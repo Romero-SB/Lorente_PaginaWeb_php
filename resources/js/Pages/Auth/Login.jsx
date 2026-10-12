@@ -1,6 +1,8 @@
 import { Link, router, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
+import '../../../css/login.css';
+
 import Turnstile from '../../Components/Auth/Turnstile';
 
 export default function Login() {

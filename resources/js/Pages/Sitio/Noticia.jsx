@@ -8,6 +8,7 @@ import SectionHeader from '../../Components/Sitio/SectionHeader';
 export default function Noticia({ noticia, relacionadas = [] }) {
     const descripcion = (noticia.res || noticia.con || '').substring(0, 160);
     const imagen = (noticia.imagenes || [])[0] || '/referencial.jpg';
+    const imagenAbsoluta = new URL(imagen, window.location.origin).href;
 
     return (
         <>
@@ -16,7 +17,7 @@ export default function Noticia({ noticia, relacionadas = [] }) {
                 <meta property="og:type" content="article" />
                 <meta property="og:title" content={noticia.titulo} />
                 <meta property="og:description" content={descripcion} />
-                <meta property="og:image" content={imagen} />
+                <meta property="og:image" content={imagenAbsoluta} />
                 <meta property="article:published_time" content={noticia.fec} />
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>

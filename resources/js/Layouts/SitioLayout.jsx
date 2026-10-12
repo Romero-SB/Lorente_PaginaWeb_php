@@ -1,5 +1,8 @@
 import { usePage } from '@inertiajs/react';
+import { lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
+
+import '../../css/sitio.css';
 
 import Footer from '../Components/Sitio/Footer';
 import Recorrido3dButton from '../Components/Sitio/Recorrido3dButton';
@@ -7,7 +10,8 @@ import Sidebar from '../Components/Sitio/Sidebar';
 import SitioHome from '../Components/Sitio/SitioHome';
 import Toast from '../Components/Sitio/Toast';
 import WhatsAppButton from '../Components/Sitio/WhatsAppButton';
-import PanelLayout from './PanelLayout';
+
+const PanelLayout = lazy(() => import('./PanelLayout'));
 
 export default function SitioLayout({ children }) {
     const { component, props } = usePage();
@@ -30,7 +34,14 @@ export default function SitioLayout({ children }) {
             </main>
 
             {esAuth && createPortal(children, document.body)}
-            {esPanel && createPortal(<PanelLayout>{children}</PanelLayout>, document.body)}
+            {esPanel && (
+                createPortal(
+                    <Suspense fallback={null}>
+                        <PanelLayout>{children}</PanelLayout>
+                    </Suspense>,
+                    document.body,
+                )
+            )}
 
             <Recorrido3dButton />
             <WhatsAppButton />

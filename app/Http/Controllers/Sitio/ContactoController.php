@@ -38,6 +38,6 @@ class ContactoController extends Controller
             return;
         }
 
-        Mail::to($destino)->send(new ContactoRecibido($mensaje));
+        Mail::to($destino)->queue(new ContactoRecibido($mensaje));
     }
 }

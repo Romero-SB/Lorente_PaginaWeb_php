@@ -1,10 +1,13 @@
 import { Link, router, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 
+import '../../css/panel.css';
+
 import { Icono } from '../Components/Panel/Iconos';
 import { Toasts } from '../Components/Panel/Toasts';
 import { usePanelWindow } from '../hooks/usePanelWindow';
 import { guardarBorrador, limpiarBorrador, restaurarBorrador } from '../lib/draft';
+import { fijarThemeColor, THEME_COLOR_PANEL, THEME_COLOR_SITIO } from '../lib/themeColor';
 import { toast } from '../lib/toast';
 
 const DIRECCIONES_RESIZE = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
@@ -42,6 +45,11 @@ export default function PanelLayout({ children }) {
             document.removeEventListener('visibilitychange', alOcultar);
             window.removeEventListener('pagehide', guardar);
         };
+    }, []);
+
+    useEffect(() => {
+        fijarThemeColor(THEME_COLOR_PANEL);
+        return () => fijarThemeColor(THEME_COLOR_SITIO);
     }, []);
 
     useEffect(() => {

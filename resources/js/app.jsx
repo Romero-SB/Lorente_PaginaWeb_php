@@ -1,6 +1,4 @@
 import '../css/app.css';
-import '../css/sitio.css';
-import '../css/panel.css';
 
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';

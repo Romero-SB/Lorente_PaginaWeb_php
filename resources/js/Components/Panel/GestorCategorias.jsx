@@ -1,17 +1,11 @@
 import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
+import Modal from '../Shared/Modal';
 import { toast } from '../../lib/toast';
+import { reordenarLista } from '../../lib/reordenar';
 import EditorEstiloCategoria from './EditorEstiloCategoria';
 import { Icono } from './Iconos';
-
-function reordenarLista(lista, desde, hasta) {
-    if (desde === hasta || desde == null || hasta == null) return lista;
-    const copia = [...lista];
-    const [movida] = copia.splice(desde, 1);
-    copia.splice(hasta, 0, movida);
-    return copia;
-}
 
 export default function GestorCategorias({
     titulo = 'Administrar categorías',
@@ -91,8 +85,7 @@ export default function GestorCategorias({
 
     return (
         <>
-            <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/70 p-4" onClick={onClose}>
-                <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <Modal onCerrar={onClose} ariaLabel={titulo}>
                 <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
                     <h3 className="text-sm font-bold text-slate-800">{titulo}</h3>
                     <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
@@ -107,13 +100,13 @@ export default function GestorCategorias({
                             onChange={(e) => setNuevo(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && crear()}
                             placeholder="Nueva categoría"
-                            className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo flex-1 px-3 py-2"
                         />
                         <button
                             type="button"
                             onClick={crear}
                             disabled={creando || !nuevo.trim()}
-                            className="rounded-lg bg-blue-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
+                            className="panel-boton--primario rounded-lg px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
                         >
                             Crear
                         </button>
@@ -161,7 +154,7 @@ export default function GestorCategorias({
                                                 if (e.key === 'Enter') confirmarRenombre(cat);
                                                 if (e.key === 'Escape') setRenombrando(null);
                                             }}
-                                            className="min-w-0 flex-1 rounded-md border border-slate-200 px-2 py-1 text-sm outline-none focus:border-blue-400"
+                                            className="panel-campo min-w-0 flex-1 rounded-md px-2 py-1"
                                         />
                                         <button type="button" onClick={() => confirmarRenombre(cat)} className="text-emerald-600 transition hover:text-emerald-700" title="Confirmar">
                                             <Icono nombre="check" className="h-4 w-4" />
@@ -203,8 +196,7 @@ export default function GestorCategorias({
                         ))}
                     </div>
                 </div>
-            </div>
-            </div>
+            </Modal>
 
             {estiloCategoria && (
                 <EditorEstiloCategoria

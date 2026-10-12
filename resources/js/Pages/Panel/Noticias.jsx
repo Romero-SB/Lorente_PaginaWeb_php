@@ -2,33 +2,21 @@ import { router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
+import Boton from '../../Components/Shared/Boton';
+import Campo from '../../Components/Shared/Campo';
+import EmptyState from '../../Components/Shared/EmptyState';
+import PageHeader from '../../Components/Shared/PageHeader';
+import Papelera from '../../Components/Shared/Papelera';
+import { EXTENSIONES, extensionDe } from '../../lib/archivos';
 import { registerDraftSaver, restaurarBorrador, limpiarBorrador } from '../../lib/draft';
+import { formatoFecha } from '../../lib/fecha';
 import { comprimirAWebp, formatoPeso } from '../../lib/image';
+import { reordenar } from '../../lib/reordenar';
 import { toast } from '../../lib/toast';
 
 const LIMITE_IMAGENES = 10;
 const PESO_IMAGEN = 3 * 1024 * 1024;
 const PESO_ADJUNTO = 15 * 1024 * 1024;
-const EXTENSIONES_ADJUNTO = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
-
-function formatoFecha(valor) {
-    if (!valor) return '—';
-    const [a, m, d] = valor.slice(0, 10).split('-');
-    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    return `${d} ${meses[Number(m) - 1]} ${a}`;
-}
-
-function extensionDe(nombre) {
-    return (nombre || '').split('.').pop()?.toLowerCase() || '';
-}
-
-function reordenar(lista, setLista, desde, hasta) {
-    if (desde === hasta || desde == null || hasta == null) return;
-    const copia = [...lista];
-    const [movida] = copia.splice(desde, 1);
-    copia.splice(hasta, 0, movida);
-    setLista(copia);
-}
 
 export default function Noticias({ noticias = [], categorias = {}, papelera }) {
     const { auth } = usePage().props;
@@ -189,7 +177,7 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
 
         const nuevos = [];
         for (const archivo of archivos) {
-            if (!EXTENSIONES_ADJUNTO.includes(extensionDe(archivo.name))) {
+            if (!EXTENSIONES.includes(extensionDe(archivo.name))) {
                 toast(`${archivo.name} no es un tipo permitido`, 'error');
                 continue;
             }
@@ -230,34 +218,25 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
 
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900">Noticias</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        {esDocente
-                            ? 'Gestiona las noticias que has publicado.'
-                            : 'Administra todas las noticias de la institución.'}
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={abrirPapelera}
-                        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
-                            vista === 'papelera'
-                                ? 'border-blue-300 bg-blue-50 text-blue-800'
-                                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                    >
-                        <Icono nombre="basura" className="h-4 w-4" /> Papelera
-                    </button>
-                    <button
-                        onClick={abrirNueva}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
-                    >
-                        <Icono nombre="mas" className="h-4 w-4" /> Nueva noticia
-                    </button>
-                </div>
-            </div>
+            <PageHeader
+                titulo="Noticias"
+                descripcion={esDocente ? 'Gestiona las noticias que has publicado.' : 'Administra todas las noticias de la institución.'}
+            >
+                <button
+                    type="button"
+                    onClick={abrirPapelera}
+                    className={`panel-boton--secundario inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                        vista === 'papelera'
+                            ? 'border-blue-300 bg-blue-50 text-blue-800'
+                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                    }`}
+                >
+                    <Icono nombre="basura" className="h-4 w-4" /> Papelera
+                </button>
+                <Boton variante="primario" onClick={abrirNueva} className="px-3 py-2 text-sm">
+                    <Icono nombre="mas" className="h-4 w-4" /> Nueva noticia
+                </Boton>
+            </PageHeader>
 
             {vista === 'lista' && (
                 <Lista
@@ -272,7 +251,20 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
             )}
 
             {vista === 'papelera' && (
-                <Papelera papelera={papelera} onRestaurar={restaurar} onEliminarPermanente={eliminarPermanente} />
+                <Papelera
+                    items={papelera}
+                    aviso="Las noticias se eliminan permanentemente 7 días después de enviarlas a la papelera."
+                    renderTitulo={(n) => (
+                        <>
+                            <h3 className="truncate text-sm font-bold text-slate-900">{n.titulo}</h3>
+                            <p className="mt-0.5 text-[11px] text-slate-400">
+                                Autor: {n.autor?.name} · {formatoFecha(n.fec)}
+                            </p>
+                        </>
+                    )}
+                    onRestaurar={restaurar}
+                    onEliminarPermanente={eliminarPermanente}
+                />
             )}
 
             {vista === 'form' && (
@@ -297,12 +289,7 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
 
 function Lista({ noticias, categorias, busqueda, setBusqueda, chipEst, onEditar, onEliminar }) {
     if (!noticias.length) {
-        return (
-            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-                <Icono nombre="noticias" className="mx-auto h-8 w-8 text-slate-300" />
-                <p className="mt-3 text-sm text-slate-500">No hay noticias para mostrar.</p>
-            </div>
-        );
+        return <EmptyState icono="noticias" mensaje="No hay noticias para mostrar." />;
     }
 
     return (
@@ -313,18 +300,15 @@ function Lista({ noticias, categorias, busqueda, setBusqueda, chipEst, onEditar,
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     placeholder="Buscar por título…"
-                    className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    className="panel-campo w-full pl-9"
                 />
             </div>
 
-            <div className="space-y-3">
+            <div className="panel-tarjeta--lista space-y-3">
                 {noticias.map((n) => {
                     const portada = (n.imagenes || []).find((i) => i.es_portada) || (n.imagenes || [])[0];
                     return (
-                        <div
-                            key={n.id}
-                            className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-                        >
+                        <div key={n.id} className="panel-tarjeta flex gap-4 p-4">
                             <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-100">
                                 {portada ? (
                                     <img src={portada.url} alt="" className="h-full w-full object-cover" />
@@ -369,74 +353,17 @@ function Lista({ noticias, categorias, busqueda, setBusqueda, chipEst, onEditar,
                             </div>
 
                             <div className="flex shrink-0 flex-col items-end justify-center gap-2">
-                                <button
-                                    onClick={() => onEditar(n)}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-                                >
+                                <Boton onClick={() => onEditar(n)} className="px-3 py-1.5 text-xs border-slate-200 hover:bg-slate-50">
                                     <Icono nombre="editar" className="h-3.5 w-3.5" /> Editar
-                                </button>
-                                <button
-                                    onClick={() => onEliminar(n)}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                >
+                                </Boton>
+                                <Boton onClick={() => onEliminar(n)} className="px-3 py-1.5 text-xs border-red-100 text-red-600 hover:bg-red-50">
                                     <Icono nombre="basura" className="h-3.5 w-3.5" /> Eliminar
-                                </button>
+                                </Boton>
                             </div>
                         </div>
                     );
                 })}
             </div>
-        </div>
-    );
-}
-
-function Papelera({ papelera, onRestaurar, onEliminarPermanente }) {
-    const items = papelera;
-
-    return (
-        <div className="mt-4">
-            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-                Las noticias se eliminan permanentemente 7 días después de enviarlas a la papelera.
-            </div>
-
-            {items == null ? (
-                <p className="mt-6 text-center text-sm text-slate-400">Cargando papelera…</p>
-            ) : items.length === 0 ? (
-                <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-                    <Icono nombre="basura" className="mx-auto h-8 w-8 text-slate-300" />
-                    <p className="mt-3 text-sm text-slate-500">La papelera está vacía.</p>
-                </div>
-            ) : (
-                <div className="mt-3 space-y-3">
-                    {items.map((n) => (
-                        <div key={n.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <div className="min-w-0 flex-1">
-                                <h3 className="truncate text-sm font-bold text-slate-900">{n.titulo}</h3>
-                                <p className="mt-0.5 text-[11px] text-slate-400">
-                                    Autor: {n.autor?.name} · {formatoFecha(n.fec)}
-                                </p>
-                                <span className="mt-1 inline-flex rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700 ring-1 ring-red-200">
-                                    Se elimina en {n.dias_restantes} día{n.dias_restantes === 1 ? '' : 's'}
-                                </span>
-                            </div>
-                            <div className="flex shrink-0 items-center gap-2">
-                                <button
-                                    onClick={() => onRestaurar(n)}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-                                >
-                                    <Icono nombre="deshacer" className="h-3.5 w-3.5" /> Restaurar
-                                </button>
-                                <button
-                                    onClick={() => onEliminarPermanente(n)}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                >
-                                    <Icono nombre="basura" className="h-3.5 w-3.5" /> Eliminar
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
         </div>
     );
 }
@@ -461,35 +388,33 @@ function Formulario({
 
     return (
         <form onSubmit={onSubmit} className="mt-4 space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Título *</label>
+            <div className="panel-tarjeta p-5">
+                <div className="panel-rejilla-2 grid gap-4">
+                    <Campo etiqueta="Título *" error={error('titulo')} id="noticia-titulo" className="panel-celda-2">
                         <input
+                            id="noticia-titulo"
                             value={form.data.titulo}
                             onChange={(e) => form.setData('titulo', e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         />
-                        {error('titulo') && <p className="mt-1 text-xs text-red-600">{error('titulo')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Fecha *</label>
+                    <Campo etiqueta="Fecha *" error={error('fec')} id="noticia-fec">
                         <input
+                            id="noticia-fec"
                             type="date"
                             value={form.data.fec}
                             onChange={(e) => form.setData('fec', e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         />
-                        {error('fec') && <p className="mt-1 text-xs text-red-600">{error('fec')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Categoría</label>
+                    <Campo etiqueta="Categoría" error={error('cat')} id="noticia-cat">
                         <select
+                            id="noticia-cat"
                             value={form.data.cat}
                             onChange={(e) => form.setData('cat', e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         >
                             <option value="">Sin categoría</option>
                             {Object.entries(categorias).map(([valor, etiqueta]) => (
@@ -498,56 +423,58 @@ function Formulario({
                                 </option>
                             ))}
                         </select>
-                        {error('cat') && <p className="mt-1 text-xs text-red-600">{error('cat')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">
-                            Resumen <span className="font-normal text-slate-400">(mín. 10 caracteres)</span>
-                        </label>
+                    <Campo
+                        etiqueta={<>Resumen <span className="font-normal text-slate-400">(mín. 10 caracteres)</span></>}
+                        error={error('res')}
+                        id="noticia-res"
+                        className="panel-celda-2"
+                    >
                         <textarea
+                            id="noticia-res"
                             rows={2}
                             value={form.data.res}
                             onChange={(e) => form.setData('res', e.target.value)}
-                            className="w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full resize-y"
                         />
-                        {error('res') && <p className="mt-1 text-xs text-red-600">{error('res')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">
-                            Contenido <span className="font-normal text-slate-400">(mín. 20 caracteres)</span>
-                        </label>
+                    <Campo
+                        etiqueta={<>Contenido <span className="font-normal text-slate-400">(mín. 20 caracteres)</span></>}
+                        error={error('con')}
+                        id="noticia-con"
+                        className="panel-celda-2"
+                    >
                         <textarea
+                            id="noticia-con"
                             rows={7}
                             value={form.data.con}
                             onChange={(e) => form.setData('con', e.target.value)}
-                            className="w-full resize-y rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full resize-y"
                         />
-                        {error('con') && <p className="mt-1 text-xs text-red-600">{error('con')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Estado</label>
+                    <Campo etiqueta="Estado" error={error('est')} id="noticia-est">
                         <select
+                            id="noticia-est"
                             value={form.data.est}
                             onChange={(e) => form.setData('est', e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         >
                             <option value="borrador">Borrador</option>
                             <option value="publicado">Publicado</option>
                         </select>
-                        {error('est') && <p className="mt-1 text-xs text-red-600">{error('est')}</p>}
-                    </div>
+                    </Campo>
                 </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="panel-tarjeta p-5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-800">
+                    <h3 className="panel-titulo-bloque">
                         Imágenes <span className="font-normal text-slate-400">({imagenes.length}/{LIMITE_IMAGENES})</span>
                     </h3>
-                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
+                    <label className="panel-boton--secundario inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
                         <Icono nombre="subir" className="h-3.5 w-3.5" /> Agregar
                         <input type="file" accept="image/*" multiple className="hidden" onChange={alSeleccionarImagenes} />
                     </label>
@@ -557,7 +484,7 @@ function Formulario({
                 </p>
 
                 {imagenes.length > 0 && (
-                    <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                    <div className="panel-rejilla-mini mt-3 grid gap-3">
                         {imagenes.map((img, idx) => (
                             <div
                                 key={img.key}
@@ -603,10 +530,10 @@ function Formulario({
                 {error('imagenes_nuevas') && <p className="mt-1 text-xs text-red-600">{error('imagenes_nuevas')}</p>}
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="panel-tarjeta p-5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-slate-800">Adjuntos</h3>
-                    <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
+                    <h3 className="panel-titulo-bloque">Adjuntos</h3>
+                    <label className="panel-boton--secundario inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
                         <Icono nombre="subir" className="h-3.5 w-3.5" /> Agregar
                         <input
                             type="file"
@@ -648,21 +575,18 @@ function Formulario({
             </div>
 
             <div className="flex items-center justify-end gap-2">
-                <button
-                    type="button"
-                    onClick={onCancelar}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-                >
+                <Boton type="button" onClick={onCancelar} className="px-4 py-2 text-sm hover:bg-slate-50">
                     Cancelar
-                </button>
-                <button
+                </Boton>
+                <Boton
+                    variante="primario"
                     type="submit"
                     disabled={form.processing}
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
+                    className="px-4 py-2 text-sm disabled:opacity-60"
                 >
                     <Icono nombre="guardar" className="h-4 w-4" />
                     {form.processing ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Crear noticia'}
-                </button>
+                </Boton>
             </div>
         </form>
     );

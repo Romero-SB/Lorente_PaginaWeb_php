@@ -14,7 +14,7 @@ export function Toasts() {
     useEffect(() => subscribeToasts(setItems), []);
 
     return (
-        <div className="pointer-events-none fixed right-4 bottom-4 z-[80] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2">
+        <div role="status" aria-live="polite" className="pointer-events-none fixed right-4 bottom-4 z-[80] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2">
             {items.map((t) => (
                 <div
                     key={t.id}

@@ -15,6 +15,8 @@ use Inertia\Response;
 
 class CuentasController extends Controller
 {
+    private const POR_PAGINA = 20;
+
     public function index(Request $request): Response
     {
         /** @var User $usuario */
@@ -24,26 +26,36 @@ class CuentasController extends Controller
             ->when($usuario->isAdministrador(), fn ($query) => $query->where('role', User::ROLE_DOCENTE))
             ->orderBy('role')
             ->orderBy('name')
-            ->get()
-            ->map(fn (User $cuenta) => [
-                'id' => $cuenta->id,
-                'name' => $cuenta->name,
-                'email' => $cuenta->email,
-                'cargo' => $cuenta->cargo,
-                'rol' => $cuenta->role,
-                'rol_etiqueta' => config("panel.labels.{$cuenta->role}", $cuenta->role),
-                'debe_cambiar_password' => $cuenta->must_change_password,
-                'es_propia' => $cuenta->id === $usuario->id,
-                'puede_gestionar' => $this->puedeGestionar($usuario, $cuenta),
-                'puede_eliminar' => $usuario->isSuperUsuario()
-                    && $cuenta->id !== $usuario->id
-                    && ! $cuenta->isSuperUsuario(),
-            ])
-            ->values()
-            ->all();
+            ->paginate(self::POR_PAGINA)
+            ->onEachSide(1)
+            ->withQueryString();
 
         return Inertia::render('Panel/Cuentas', [
-            'cuentas' => $cuentas,
+            'cuentas' => [
+                'data' => collect($cuentas->items())
+                    ->map(fn (User $cuenta) => $this->paraVista($cuenta, $usuario))
+                    ->values()
+                    ->all(),
+                'links' => collect($cuentas->linkCollection())
+                    ->map(fn (array $link) => [
+                        'url' => $link['url'],
+                        'label' => str_replace(
+                            ['&laquo;', '&raquo;', '&hellip;'],
+                            ['«', '»', '…'],
+                            $link['label'],
+                        ),
+                        'active' => $link['active'],
+                    ])
+                    ->values()
+                    ->all(),
+                'meta' => [
+                    'total' => $cuentas->total(),
+                    'desde' => $cuentas->firstItem(),
+                    'hasta' => $cuentas->lastItem(),
+                    'pagina' => $cuentas->currentPage(),
+                    'ultima' => $cuentas->lastPage(),
+                ],
+            ],
             'roles_asignables' => $this->opcionesRoles($usuario),
             'es_super' => $usuario->isSuperUsuario(),
         ]);
@@ -111,6 +123,27 @@ class CuentasController extends Controller
         $cuenta->delete();
 
         return back()->with('ok', 'Cuenta eliminada.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function paraVista(User $cuenta, User $usuario): array
+    {
+        return [
+            'id' => $cuenta->id,
+            'name' => $cuenta->name,
+            'email' => $cuenta->email,
+            'cargo' => $cuenta->cargo,
+            'rol' => $cuenta->role,
+            'rol_etiqueta' => config("panel.labels.{$cuenta->role}", $cuenta->role),
+            'debe_cambiar_password' => $cuenta->must_change_password,
+            'es_propia' => $cuenta->id === $usuario->id,
+            'puede_gestionar' => $this->puedeGestionar($usuario, $cuenta),
+            'puede_eliminar' => $usuario->isSuperUsuario()
+                && $cuenta->id !== $usuario->id
+                && ! $cuenta->isSuperUsuario(),
+        ];
     }
 
     /**

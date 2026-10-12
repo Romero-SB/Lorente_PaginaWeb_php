@@ -2,14 +2,10 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 
 import { Icono } from '../../Components/Panel/Iconos';
-
-function formatearFecha(valor) {
-    if (!valor) return '—';
-    return new Intl.DateTimeFormat('es-PE', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-    }).format(new Date(valor));
-}
+import Boton from '../../Components/Shared/Boton';
+import PageHeader from '../../Components/Shared/PageHeader';
+import Paginacion from '../../Components/Shared/Paginacion';
+import { formatearFecha } from '../../lib/fecha';
 
 export default function Mensajes({ mensajes = { data: [], links: [], meta: {} }, filtros = {}, stats = {} }) {
     const items = mensajes?.data ?? [];
@@ -51,6 +47,14 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
         }
     }
 
+    function visitarPagina(url) {
+        router.visit(url, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => setSeleccion(null),
+        });
+    }
+
     const FILTROS = [
         { clave: 'todos', label: 'Todos', total: stats.total ?? 0 },
         { clave: 'no-leidos', label: 'No leídos', total: stats.no_leidos ?? 0 },
@@ -59,17 +63,14 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
 
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900">Mensajes de contacto</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Bandeja de mensajes enviados desde el sitio público.
-                    </p>
-                </div>
+            <PageHeader
+                titulo="Mensajes de contacto"
+                descripcion="Bandeja de mensajes enviados desde el sitio público."
+            >
                 <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">
                     {stats.no_leidos ?? 0} sin leer
                 </span>
-            </div>
+            </PageHeader>
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
                 {FILTROS.map((f) => (
@@ -78,7 +79,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                         onClick={() => cambiarFiltro(f.clave)}
                         className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
                             filtro === f.clave
-                                ? 'bg-blue-950 text-white'
+                                ? 'panel-boton--primario text-white'
                                 : 'border border-slate-300 text-slate-600 hover:bg-slate-50'
                         }`}
                     >
@@ -97,19 +98,16 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder="Buscar nombre, correo o asunto"
-                        className="w-64 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        className="panel-campo w-64"
                     />
-                    <button
-                        type="submit"
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
-                    >
+                    <Boton variante="primario" type="submit" className="px-3 py-2 text-sm">
                         <Icono nombre="buscar" className="h-4 w-4" />
-                    </button>
+                    </Boton>
                 </form>
             </div>
 
-            <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[340px_1fr]">
-                <div className="flex max-h-[70vh] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="panel-rejilla-detalle mt-5 grid gap-4">
+                <div className="panel-tarjeta flex max-h-[70vh] flex-col overflow-hidden">
                     <div className="flex-1 overflow-y-auto">
                         {items.length === 0 ? (
                             <p className="px-4 py-10 text-center text-sm text-slate-500">
@@ -147,30 +145,8 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                     </div>
 
                     {mensajes?.links?.length > 3 && (
-                        <div className="flex flex-wrap items-center justify-center gap-1 border-t border-slate-100 p-2">
-                            {mensajes.links.map((link, i) => (
-                                <button
-                                    key={i}
-                                    disabled={!link.url}
-                                    onClick={() =>
-                                        link.url &&
-                                        router.visit(link.url, {
-                                            preserveScroll: true,
-                                            preserveState: true,
-                                            onSuccess: () => setSeleccion(null),
-                                        })
-                                    }
-                                    className={`min-w-8 rounded-lg px-2.5 py-1 text-xs font-medium transition ${
-                                        link.active
-                                            ? 'bg-blue-950 text-white'
-                                            : link.url
-                                              ? 'border border-slate-300 text-slate-600 hover:bg-slate-50'
-                                              : 'cursor-not-allowed border border-slate-200 text-slate-300'
-                                    }`}
-                                >
-                                    {link.label}
-                                </button>
-                            ))}
+                        <div className="border-t border-slate-100 p-2">
+                            <Paginacion links={mensajes.links} onNavegar={visitarPagina} />
                         </div>
                     )}
 
@@ -181,7 +157,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                     )}
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="panel-tarjeta p-5">
                     {!actual ? (
                         <div className="flex h-64 flex-col items-center justify-center text-slate-400">
                             <Icono nombre="mensajes" className="h-10 w-10" />
@@ -191,7 +167,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                         <div>
                             <div className="flex flex-wrap items-start justify-between gap-3">
                                 <div>
-                                    <h2 className="text-lg font-bold text-slate-900">{actual.asunto}</h2>
+                                    <h2 className="panel-titulo-seccion">{actual.asunto}</h2>
                                     <p className="mt-1 text-sm text-slate-500">
                                         De <strong className="text-slate-700">{actual.nombre}</strong> ·{' '}
                                         <a href={`mailto:${actual.email}`} className="text-blue-600 hover:underline">
@@ -206,27 +182,27 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button
+                                    <Boton
                                         onClick={() => accion(`/lorente-panel/mensajes/${actual.id}/leido`)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                                        className="px-3 py-1.5 text-xs border-slate-300 hover:bg-slate-50"
                                     >
                                         <Icono nombre="check" className="h-4 w-4" />
                                         {actual.leido ? 'Marcar no leído' : 'Marcar leído'}
-                                    </button>
-                                    <button
+                                    </Boton>
+                                    <Boton
                                         onClick={() => accion(`/lorente-panel/mensajes/${actual.id}/respondido`)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                                        className="px-3 py-1.5 text-xs border-slate-300 hover:bg-slate-50"
                                     >
                                         <Icono nombre="publicar" className="h-4 w-4" />
                                         {actual.respondido ? 'Quitar respondido' : 'Marcar respondido'}
-                                    </button>
-                                    <button
+                                    </Boton>
+                                    <Boton
                                         onClick={() => eliminar(actual.id)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100"
+                                        className="bg-red-50 px-3 py-1.5 text-xs border-red-200 text-red-600 hover:bg-red-100"
                                     >
                                         <Icono nombre="basura" className="h-4 w-4" />
                                         Eliminar
-                                    </button>
+                                    </Boton>
                                 </div>
                             </div>
 
@@ -237,7 +213,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                             <div className="mt-5">
                                 <a
                                     href={`mailto:${actual.email}?subject=${encodeURIComponent(`Re: ${actual.asunto}`)}`}
-                                    className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
+                                    className="panel-boton--primario inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
                                 >
                                     <Icono nombre="publicar" className="h-4 w-4" />
                                     Responder por correo
@@ -250,4 +226,3 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
         </div>
     );
 }
-

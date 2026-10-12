@@ -4,17 +4,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { Icono } from '../../Components/Panel/Iconos';
 import GestorCategorias from '../../Components/Panel/GestorCategorias';
 import Recortador from '../../Components/Panel/Recortador';
+import Boton from '../../Components/Shared/Boton';
+import Campo from '../../Components/Shared/Campo';
+import EmptyState from '../../Components/Shared/EmptyState';
+import FileDropzone from '../../Components/Shared/FileDropzone';
+import PageHeader from '../../Components/Shared/PageHeader';
+import Papelera from '../../Components/Shared/Papelera';
+import { reordenarLista } from '../../lib/reordenar';
 import { toast } from '../../lib/toast';
 
 const PESO_FOTO = 3 * 1024 * 1024;
-
-function reordenarLista(lista, desde, hasta) {
-    if (desde === hasta || desde == null || hasta == null) return lista;
-    const copia = [...lista];
-    const [movida] = copia.splice(desde, 1);
-    copia.splice(hasta, 0, movida);
-    return copia;
-}
 
 export default function Docentes({ docentes = [], categorias = [], papelera }) {
     const { auth } = usePage().props;
@@ -202,38 +201,28 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
 
     return (
         <div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-xl font-bold text-slate-900">Docentes</h1>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Registra al personal y organízalo por categorías.
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setGestorAbierto(true)}
-                        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-                    >
-                        <Icono nombre="caja" className="h-4 w-4" /> Categorías
-                    </button>
-                    <button
-                        onClick={abrirPapelera}
-                        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
-                            vista === 'papelera'
-                                ? 'border-blue-300 bg-blue-50 text-blue-800'
-                                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                        }`}
-                    >
-                        <Icono nombre="basura" className="h-4 w-4" /> Papelera
-                    </button>
-                    <button
-                        onClick={abrirNueva}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
-                    >
-                        <Icono nombre="mas" className="h-4 w-4" /> Nuevo docente
-                    </button>
-                </div>
-            </div>
+            <PageHeader
+                titulo="Docentes"
+                descripcion="Registra al personal y organízalo por categorías."
+            >
+                <Boton onClick={() => setGestorAbierto(true)} className="px-3 py-2 text-sm border-slate-200 hover:bg-slate-50">
+                    <Icono nombre="caja" className="h-4 w-4" /> Categorías
+                </Boton>
+                <button
+                    type="button"
+                    onClick={abrirPapelera}
+                    className={`panel-boton--secundario inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${
+                        vista === 'papelera'
+                            ? 'border-blue-300 bg-blue-50 text-blue-800'
+                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                    }`}
+                >
+                    <Icono nombre="basura" className="h-4 w-4" /> Papelera
+                </button>
+                <Boton variante="primario" onClick={abrirNueva} className="px-3 py-2 text-sm">
+                    <Icono nombre="mas" className="h-4 w-4" /> Nuevo docente
+                </Boton>
+            </PageHeader>
 
             {vista === 'lista' && (
                 <Lista
@@ -248,7 +237,34 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
             )}
 
             {vista === 'papelera' && (
-                <Papelera papelera={papelera} esAdmin={esAdmin} onRestaurar={restaurar} onEliminarPermanente={eliminarPermanente} />
+                <Papelera
+                    items={papelera}
+                    aviso={`Los docentes se eliminan permanentemente 7 días después de enviarlos a la papelera.${
+                        esAdmin ? ' Solo ves los que tú enviaste.' : ''
+                    }`}
+                    thumb={(d) => (
+                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                            {d.foto ? (
+                                <img src={d.foto} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                                <div className="grid h-full w-full place-items-center text-slate-300">
+                                    <Icono nombre="docentes" className="h-5 w-5" />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    renderTitulo={(d) => (
+                        <>
+                            <h3 className="truncate text-sm font-bold text-slate-900">{d.nombre}</h3>
+                            <p className="mt-0.5 text-[11px] text-slate-400">
+                                {d.cargo}
+                                {d.eliminada_por ? ` · Eliminado por ${d.eliminada_por}` : ''}
+                            </p>
+                        </>
+                    )}
+                    onRestaurar={restaurar}
+                    onEliminarPermanente={eliminarPermanente}
+                />
             )}
 
             {vista === 'form' && (
@@ -316,20 +332,17 @@ function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onElimin
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     placeholder="Buscar por nombre o cargo…"
-                    className="w-full rounded-lg border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    className="panel-campo w-full pl-9"
                 />
             </div>
 
             {grupos.length === 0 ? (
-                <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-                    <Icono nombre="docentes" className="mx-auto h-8 w-8 text-slate-300" />
-                    <p className="mt-3 text-sm text-slate-500">Aún no hay docentes registrados.</p>
-                </div>
+                <EmptyState icono="docentes" mensaje="Aún no hay docentes registrados." />
             ) : (
                 <div className="space-y-6">
                     {grupos.map(({ categoria, items }) => (
-                        <div key={categoria.nombre} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
+                        <div key={categoria.nombre} className="panel-tarjeta p-4">
+                            <h3 className="panel-titulo-bloque mb-3 flex items-center gap-2">
                                 <Icono nombre="caja" className="h-4 w-4 text-slate-400" /> {categoria.nombre}
                                 <span className="text-xs font-normal text-slate-400">({items.length})</span>
                             </h3>
@@ -375,18 +388,12 @@ function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onElimin
                                             <p className="truncate text-xs text-slate-500">{doc.cargo}</p>
                                         </div>
                                         <div className="flex shrink-0 items-center gap-2">
-                                            <button
-                                                onClick={() => onEditar(doc)}
-                                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-                                            >
+                                            <Boton onClick={() => onEditar(doc)} className="px-3 py-1.5 text-xs border-slate-200 hover:bg-slate-50">
                                                 <Icono nombre="editar" className="h-3.5 w-3.5" /> Editar
-                                            </button>
-                                            <button
-                                                onClick={() => onEliminar(doc)}
-                                                className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                            >
+                                            </Boton>
+                                            <Boton onClick={() => onEliminar(doc)} className="px-3 py-1.5 text-xs border-red-100 text-red-600 hover:bg-red-50">
                                                 <Icono nombre="basura" className="h-3.5 w-3.5" /> Eliminar
-                                            </button>
+                                            </Boton>
                                         </div>
                                     </div>
                                 ))}
@@ -400,41 +407,38 @@ function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onElimin
 }
 
 function Formulario({ form, editingId, categorias, fotoPreview, alSeleccionarFoto, alSoltarFoto, quitarFoto, onSubmit, onCancelar }) {
-    const [arrastrando, setArrastrando] = useState(false);
     const error = (campo) => form.errors[campo];
 
     return (
         <form onSubmit={onSubmit} className="mt-4 space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Nombre y apellidos *</label>
+            <div className="panel-tarjeta p-5">
+                <div className="panel-rejilla-2 grid gap-4">
+                    <Campo etiqueta="Nombre y apellidos *" error={error('nombre')} id="docente-nombre" className="panel-celda-2">
                         <input
+                            id="docente-nombre"
                             value={form.data.nombre}
                             onChange={(e) => form.setData('nombre', e.target.value)}
                             placeholder="Ej. Ghena Tacuri Victorio"
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         />
-                        {error('nombre') && <p className="mt-1 text-xs text-red-600">{error('nombre')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Cargo / Curso asignado *</label>
+                    <Campo etiqueta="Cargo / Curso asignado *" error={error('cargo')} id="docente-cargo">
                         <input
+                            id="docente-cargo"
                             value={form.data.cargo}
                             onChange={(e) => form.setData('cargo', e.target.value)}
                             placeholder="Ej. Docente de Primaria"
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         />
-                        {error('cargo') && <p className="mt-1 text-xs text-red-600">{error('cargo')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">Categoría *</label>
+                    <Campo etiqueta="Categoría *" error={error('categoria')} id="docente-categoria">
                         <select
+                            id="docente-categoria"
                             value={form.data.categoria}
                             onChange={(e) => form.setData('categoria', e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="panel-campo w-full"
                         >
                             <option value="">Seleccionar categoría</option>
                             {categorias.map((c) => (
@@ -443,143 +447,52 @@ function Formulario({ form, editingId, categorias, fotoPreview, alSeleccionarFot
                                 </option>
                             ))}
                         </select>
-                        {error('categoria') && <p className="mt-1 text-xs text-red-600">{error('categoria')}</p>}
-                    </div>
+                    </Campo>
 
-                    <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-semibold text-slate-600">
-                            Fotografía de perfil {!editingId && '*'}
-                        </label>
+                    <Campo
+                        etiqueta={`Fotografía de perfil ${!editingId ? '*' : ''}`}
+                        error={error('foto')}
+                        id="docente-foto"
+                        className="panel-celda-2"
+                    >
                         {fotoPreview ? (
                             <div className="flex items-center gap-4">
                                 <div className="h-28 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                                     <img src={fotoPreview} alt="" className="h-full w-full object-cover" />
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={quitarFoto}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                >
+                                <Boton onClick={quitarFoto} className="px-3 py-1.5 text-xs border-red-100 text-red-600 hover:bg-red-50">
                                     <Icono nombre="cerrar" className="h-3.5 w-3.5" /> Quitar foto
-                                </button>
+                                </Boton>
                             </div>
                         ) : (
-                            <label
-                                onDragOver={(ev) => {
-                                    ev.preventDefault();
-                                    if (!arrastrando) setArrastrando(true);
-                                }}
-                                onDragLeave={(ev) => {
-                                    if (ev.currentTarget.contains(ev.relatedTarget)) return;
-                                    setArrastrando(false);
-                                }}
-                                onDrop={(ev) => {
-                                    ev.preventDefault();
-                                    setArrastrando(false);
-                                    const archivo = ev.dataTransfer.files?.[0];
-                                    if (archivo) alSoltarFoto(archivo);
-                                }}
-                                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition ${
-                                    arrastrando ? 'border-blue-400 bg-blue-50' : 'border-slate-300 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40'
-                                }`}
-                            >
-                                <Icono nombre="imagen" className="h-7 w-7 text-slate-400" />
-                                <span className="text-xs font-semibold text-slate-600">
-                                    {arrastrando ? 'Suelta la imagen aquí' : 'Subir foto del docente'}
-                                </span>
-                                <span className="text-[11px] text-slate-400">JPG, PNG o WebP (máx. 3 MB). Se recorta a 4:5.</span>
-                                <input type="file" accept="image/*" className="hidden" onChange={alSeleccionarFoto} />
-                            </label>
+                            <FileDropzone
+                                icono="imagen"
+                                texto="Subir foto del docente"
+                                textoArrastrando="Suelta la imagen aquí"
+                                nota="JPG, PNG o WebP (máx. 3 MB). Se recorta a 4:5."
+                                aceptacion="image/*"
+                                onSoltarArchivo={alSoltarFoto}
+                                onSeleccionar={alSeleccionarFoto}
+                            />
                         )}
-                        {error('foto') && <p className="mt-1 text-xs text-red-600">{error('foto')}</p>}
-                    </div>
+                    </Campo>
                 </div>
             </div>
 
             <div className="flex items-center justify-end gap-2">
-                <button
-                    type="button"
-                    onClick={onCancelar}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-                >
+                <Boton type="button" onClick={onCancelar} className="px-4 py-2 text-sm hover:bg-slate-50">
                     Cancelar
-                </button>
-                <button
+                </Boton>
+                <Boton
+                    variante="primario"
                     type="submit"
                     disabled={form.processing}
-                    className="inline-flex items-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900 disabled:opacity-60"
+                    className="px-4 py-2 text-sm disabled:opacity-60"
                 >
                     <Icono nombre="guardar" className="h-4 w-4" />
                     {form.processing ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Registrar docente'}
-                </button>
+                </Boton>
             </div>
         </form>
     );
 }
-
-function Papelera({ papelera, esAdmin, onRestaurar, onEliminarPermanente }) {
-    const items = papelera;
-
-    return (
-        <div className="mt-4">
-            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-                Los docentes se eliminan permanentemente 7 días después de enviarlos a la papelera.
-                {esAdmin && ' Solo ves los que tú enviaste.'}
-            </div>
-
-            {items == null ? (
-                <p className="mt-6 text-center text-sm text-slate-400">Cargando papelera…</p>
-            ) : items.length === 0 ? (
-                <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-                    <Icono nombre="basura" className="mx-auto h-8 w-8 text-slate-300" />
-                    <p className="mt-3 text-sm text-slate-500">La papelera está vacía.</p>
-                </div>
-            ) : (
-                <div className="mt-3 space-y-3">
-                    {items.map((d) => (
-                        <div key={d.id} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                                {d.foto ? (
-                                    <img src={d.foto} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                    <div className="grid h-full w-full place-items-center text-slate-300">
-                                        <Icono nombre="docentes" className="h-5 w-5" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <h3 className="truncate text-sm font-bold text-slate-900">{d.nombre}</h3>
-                                <p className="mt-0.5 text-[11px] text-slate-400">
-                                    {d.cargo}
-                                    {d.eliminada_por ? ` · Eliminado por ${d.eliminada_por}` : ''}
-                                </p>
-                                <span className="mt-1 inline-flex rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700 ring-1 ring-red-200">
-                                    Se elimina en {d.dias_restantes} día{d.dias_restantes === 1 ? '' : 's'}
-                                </span>
-                            </div>
-                            <div className="flex shrink-0 items-center gap-2">
-                                {d.puede_restaurar && (
-                                    <button
-                                        onClick={() => onRestaurar(d)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
-                                    >
-                                        <Icono nombre="deshacer" className="h-3.5 w-3.5" /> Restaurar
-                                    </button>
-                                )}
-                                {d.puede_permanente && (
-                                    <button
-                                        onClick={() => onEliminarPermanente(d)}
-                                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                    >
-                                        <Icono nombre="basura" className="h-3.5 w-3.5" /> Eliminar
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
