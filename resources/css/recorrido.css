@@ -1,0 +1,213 @@
+.recorrido-page-root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    background-color: #0a1026;
+    color: #f6f4ef;
+    font-family: 'Inter', sans-serif;
+}
+
+.recorrido-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, auto) auto;
+    align-items: center;
+    gap: 12px;
+    height: 60px;
+    min-height: 60px;
+    padding: 0 18px;
+    background-color: #0f1b42;
+    border-bottom: 1px solid rgba(194, 154, 43, 0.35);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 30;
+}
+
+.recorrido-header__brand,
+.recorrido-header__identity,
+.recorrido-header__scene,
+.recorrido-header__actions,
+.recorrido-header__back-link,
+.recorrido-header__help {
+    display: flex;
+    align-items: center;
+}
+
+.recorrido-header__brand {
+    min-width: 0;
+    gap: 14px;
+}
+
+.recorrido-header__back-link {
+    flex: 0 0 auto;
+    gap: 8px;
+    padding: 7px 14px;
+    border: 1px solid rgba(194, 154, 43, 0.4);
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #d9b45a;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.recorrido-header__identity {
+    min-width: 0;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.recorrido-header__identity span:first-child {
+    font-size: 0.95rem;
+}
+
+.recorrido-header__scene {
+    justify-self: center;
+    min-width: 0;
+    max-width: min(42vw, 480px);
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid rgba(194, 154, 43, 0.25);
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.recorrido-header__scene-name {
+    overflow: hidden;
+    max-width: 100%;
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recorrido-header__actions {
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.recorrido-header__help {
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #f6f4ef;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.recorrido-help {
+    position: absolute;
+    top: 70px;
+    right: 18px;
+    z-index: 50;
+    box-sizing: border-box;
+    width: min(320px, calc(100vw - 36px));
+    padding: 16px 18px;
+    border: 1px solid rgba(194, 154, 43, 0.45);
+    border-radius: 12px;
+    background-color: #0f1b42;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+    color: #f6f4ef;
+}
+
+.recorrido-viewer {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 760px) {
+    .recorrido-header {
+        grid-template-areas:
+            'brand actions'
+            'scene scene';
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 12px;
+        height: auto;
+        min-height: 0;
+        padding: 10px 12px;
+    }
+
+    .recorrido-header__brand {
+        grid-area: brand;
+    }
+
+    .recorrido-header__scene {
+        grid-area: scene;
+        justify-self: stretch;
+        max-width: none;
+        padding: 6px 12px;
+    }
+
+    .recorrido-header__scene-name {
+        flex: 1;
+    }
+
+    .recorrido-header__actions {
+        grid-area: actions;
+    }
+
+    .recorrido-help {
+        top: 112px;
+        right: 12px;
+        width: min(320px, calc(100vw - 24px));
+    }
+}
+
+@media (max-width: 420px) {
+    .recorrido-header {
+        gap: 7px 8px;
+        padding: 8px;
+    }
+
+    .recorrido-header__brand {
+        gap: 7px;
+    }
+
+    .recorrido-header__back-link {
+        gap: 4px;
+        padding: 6px 9px;
+    }
+
+    .recorrido-header__back-label,
+    .recorrido-header__school,
+    .recorrido-header__help-label {
+        display: none;
+    }
+
+    .recorrido-header__identity span:first-child {
+        font-size: 0.8rem;
+    }
+
+    .recorrido-header__help {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+    }
+
+    .recorrido-header__scene {
+        padding: 6px 10px;
+    }
+
+    .recorrido-header__scene-name {
+        font-size: 0.82rem;
+    }
+
+    .recorrido-help {
+        top: 100px;
+        right: 8px;
+        width: calc(100vw - 16px);
+        padding: 14px;
+    }
+}

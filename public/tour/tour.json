@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "startScene": "escena-01",
+  "startScene": "escena-16",
   "northConvention": "Por definir",
   "scenes": [
     {
@@ -575,7 +575,7 @@
       "panorama": "/tour/scenes/escena-16.jpg",
       "thumbnail": "/tour/thumbs/escena-16.jpg",
       "initialView": {
-        "yaw": 0,
+        "yaw": 3.14,
         "pitch": 0,
         "fov": 70
       },

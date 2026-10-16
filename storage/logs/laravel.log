@@ -1369,3 +1369,72 @@ Did you mean one of these?
 [stacktrace]
 #0 {main}
 "} 
+[2026-10-13 16:53:36] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Query/Grammars/Grammar.php:15)
+[stacktrace]
+#0 {main}
+"} 
+[2026-10-13 16:53:36] local.ERROR: Class "Illuminate\Database\Query\Grammars\SQLiteGrammar" not found {"exception":"[object] (Error(code: 0): Class \"Illuminate\\Database\\Query\\Grammars\\SQLiteGrammar\" not found at C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/SQLiteConnection.php:94)
+[stacktrace]
+#0 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(270): Illuminate/Database/SQLiteConnection->getDefaultQueryGrammar()
+#1 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connection.php(258): Illuminate/Database/Connection->useDefaultQueryGrammar()
+#2 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(312): Illuminate/Database/Connection->__construct()
+#3 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(82): Illuminate/Database/Connectors/ConnectionFactory->createConnection()
+#4 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(57): Illuminate/Database/Connectors/ConnectionFactory->createSingleConnection()
+#5 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(208): Illuminate/Database/Connectors/ConnectionFactory->make()
+#6 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(103): Illuminate/Database/DatabaseManager->makeConnection()
+#7 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Session/SessionManager.php(110): Illuminate/Database/DatabaseManager->connection()
+#8 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Session/SessionManager.php(97): Illuminate/Session/SessionManager->getDatabaseConnection()
+#9 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Support/Manager.php(105): Illuminate/Session/SessionManager->createDatabaseDriver()
+#10 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Support/Manager.php(82): Illuminate/Support/Manager->createDriver()
+#11 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Session/SessionServiceProvider.php(52): Illuminate/Support/Manager->driver()
+#12 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(1140): Illuminate/Session/SessionServiceProvider->Illuminate/Session/{closure}()
+#13 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(939): Illuminate/Container/Container->build()
+#14 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1086): Illuminate/Container/Container->resolve()
+#15 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(867): Illuminate/Foundation/Application->resolve()
+#16 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1066): Illuminate/Container/Container->make()
+#17 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(1846): Illuminate/Foundation/Application->make()
+#18 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Routing/RoutingServiceProvider.php(121): Illuminate/Container/Container->offsetGet()
+#19 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(1140): Illuminate/Routing/RoutingServiceProvider->Illuminate/Routing/{closure}()
+#20 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(939): Illuminate/Container/Container->build()
+#21 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1086): Illuminate/Container/Container->resolve()
+#22 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(867): Illuminate/Foundation/Application->resolve()
+#23 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1066): Illuminate/Container/Container->make()
+#24 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(1846): Illuminate/Foundation/Application->make()
+#25 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Routing/RoutingServiceProvider.php(181): Illuminate/Container/Container->offsetGet()
+#26 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(1140): Illuminate/Routing/RoutingServiceProvider->Illuminate/Routing/{closure}()
+#27 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(939): Illuminate/Container/Container->build()
+#28 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1086): Illuminate/Container/Container->resolve()
+#29 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Container/Container.php(867): Illuminate/Foundation/Application->resolve()
+#30 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1066): Illuminate/Container/Container->make()
+#31 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php(138): Illuminate/Foundation/Application->make()
+#32 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php(850): app()
+#33 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(1120): response()
+#34 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(843): Illuminate/Foundation/Exceptions/Handler->prepareJsonResponse()
+#35 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(731): Illuminate/Foundation/Exceptions/Handler->renderExceptionResponse()
+#36 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(228): Illuminate/Foundation/Exceptions/Handler->render()
+#37 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(205): Illuminate/Foundation/Bootstrap/HandleExceptions->renderHttpResponse()
+#38 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(241): Illuminate/Foundation/Bootstrap/HandleExceptions->handleException()
+#39 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(265): Illuminate/Foundation/Bootstrap/HandleExceptions->handleShutdown()
+#40 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->Illuminate/Foundation/Bootstrap/{closure}()
+#41 {main}
+"} 
+[2026-10-16 15:01:10] local.ERROR: There are no commands defined in the "boost" namespace. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"boost\" namespace. at C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php:694)
+[stacktrace]
+#0 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(743): Symfony/Component/Console/Application->findNamespace()
+#1 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(298): Symfony/Component/Console/Application->find()
+#2 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#3 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#4 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1243): Illuminate/Foundation/Console/Kernel->handle()
+#5 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/artisan(16): Illuminate/Foundation/Application->handleCommand()
+#6 {main}
+"} 
+[2026-10-16 15:02:19] local.ERROR: There are no commands defined in the "boost" namespace. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"boost\" namespace. at C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php:694)
+[stacktrace]
+#0 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(743): Symfony/Component/Console/Application->findNamespace()
+#1 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(298): Symfony/Component/Console/Application->find()
+#2 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#3 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#4 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1243): Illuminate/Foundation/Console/Kernel->handle()
+#5 C:/Users/USUARIO/Downloads/Lorente/Lorente_PaginaWeb_php/artisan(16): Illuminate/Foundation/Application->handleCommand()
+#6 {main}
+"} 

@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
+import '../../../css/recorrido.css';
 import { TourViewer } from '../../virtual-tour/components/TourViewer';
 import { useTour } from '../../virtual-tour/hooks/useTour';
 
@@ -17,16 +18,6 @@ export default function Recorrido() {
     return (
         <div
             className="recorrido-page-root"
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100vw',
-                height: '100dvh',
-                overflow: 'hidden',
-                backgroundColor: '#0a1026',
-                color: '#f6f4ef',
-                fontFamily: "'Inter', sans-serif",
-            }}
         >
             <Head title="Recorrido Virtual 360°">
                 <meta
@@ -43,38 +34,13 @@ export default function Recorrido() {
             </Head>
 
             {/* Barra Superior Institucional */}
-            <header
-                style={{
-                    height: '60px',
-                    minHeight: '60px',
-                    backgroundColor: '#0f1b42',
-                    borderBottom: '1px solid rgba(194, 154, 43, 0.35)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 18px',
-                    zIndex: 30,
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-                }}
-            >
+            <header className="recorrido-header">
                 {/* Lado izquierdo: Volver al sitio e insignia */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div className="recorrido-header__brand">
                     <Link
                         href="/"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '7px 14px',
-                            borderRadius: '9999px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                            border: '1px solid rgba(194, 154, 43, 0.4)',
-                            color: '#d9b45a',
-                            fontSize: '0.82rem',
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                            transition: 'all 0.2s ease',
-                        }}
+                        className="recorrido-header__back-link"
+                        aria-label="Volver al portal"
                         title="Regresar a la página principal"
                     >
                         <svg
@@ -89,31 +55,21 @@ export default function Recorrido() {
                         >
                             <path d="m15 18-6-6 6-6" />
                         </svg>
-                        <span>Volver al portal</span>
+                        <span className="recorrido-header__back-label">Volver al portal</span>
                     </Link>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f6f4ef', letterSpacing: '0.3px' }}>
+                    <div className="recorrido-header__identity">
+                        <span style={{ fontWeight: 700, color: '#f6f4ef', letterSpacing: '0.3px' }}>
                             IE N° 31501
                         </span>
-                        <span style={{ fontSize: '0.85rem', color: '#c29a2b', fontWeight: 600 }}>
+                        <span className="recorrido-header__school" style={{ fontSize: '0.85rem', color: '#c29a2b', fontWeight: 600 }}>
                             «Sebastián Lorente»
                         </span>
                     </div>
                 </div>
 
                 {/* Centro: Escena actual con icono de ubicación */}
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '6px 16px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: '9999px',
-                        border: '1px solid rgba(194, 154, 43, 0.25)',
-                    }}
-                >
+                <div className="recorrido-header__scene">
                     <svg
                         width="15"
                         height="15"
@@ -127,40 +83,18 @@ export default function Recorrido() {
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                         <circle cx="12" cy="10" r="3" />
                     </svg>
-                    <span
-                        style={{
-                            fontSize: '0.88rem',
-                            fontWeight: 600,
-                            color: '#ffffff',
-                            maxWidth: '380px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            letterSpacing: '0.2px',
-                        }}
-                    >
+                    <span className="recorrido-header__scene-name">
                         {currentScene?.name ?? 'Recorrido Virtual'}
                     </span>
                 </div>
 
                 {/* Lado derecho: Botón de ayuda */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="recorrido-header__actions">
                     <button
                         type="button"
                         onClick={() => setMostrarAyuda(!mostrarAyuda)}
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '6px 12px',
-                            borderRadius: '8px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            color: '#f6f4ef',
-                            fontSize: '0.78rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                        }}
+                        className="recorrido-header__help"
+                        aria-label="Cómo navegar el recorrido"
                     >
                         <svg
                             width="15"
@@ -176,7 +110,7 @@ export default function Recorrido() {
                             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                             <path d="M12 17h.01" />
                         </svg>
-                        <span>Cómo navegar</span>
+                        <span className="recorrido-header__help-label">Cómo navegar</span>
                     </button>
                 </div>
             </header>
@@ -184,19 +118,7 @@ export default function Recorrido() {
             {/* Modal flotante de ayuda */}
             {mostrarAyuda && (
                 <div
-                    style={{
-                        position: 'absolute',
-                        top: '70px',
-                        right: '18px',
-                        width: '320px',
-                        backgroundColor: '#0f1b42',
-                        border: '1px solid rgba(194, 154, 43, 0.45)',
-                        borderRadius: '12px',
-                        padding: '16px 18px',
-                        zIndex: 50,
-                        boxShadow: '0 12px 35px rgba(0, 0, 0, 0.6)',
-                        color: '#f6f4ef',
-                    }}
+                    className="recorrido-help"
                 >
                     <div
                         style={{
@@ -243,13 +165,7 @@ export default function Recorrido() {
 
             {/* Contenedor del visor principal */}
             <main
-                style={{
-                    flex: 1,
-                    position: 'relative',
-                    width: '100%',
-                    height: 'calc(100dvh - 60px)',
-                    overflow: 'hidden',
-                }}
+                className="recorrido-viewer"
             >
                 {status === 'loading' && <LoadingScreen />}
                 {status === 'error' && <ErrorScreen error={error} />}
