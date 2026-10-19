@@ -104,10 +104,15 @@ Da permisos de escritura a:
 chmod -R 775 storage bootstrap/cache
 ```
 
-## 8. Tareas programadas (opcional)
+## 8. Tareas programadas (obligatorio)
 
-El proyecto purga la papelera de forma diferida (cada 6 horas) y, además, define
-tareas diarias. Si el hosting permite cron:
+El cron es **obligatorio** para procesar la cola de correos y purgar la papelera.
+El planificador ejecuta:
+
+- Purga de noticias, docentes y documentos a las 03:00, 03:15 y 03:30.
+- Un worker de cola cada minuto (correo de contacto y recuperación de contraseña).
+
+Sin cron, los correos quedan en la tabla `jobs` y nunca se envían.
 
 ```cron
 * * * * * cd ~/lorente && php artisan schedule:run >> /dev/null 2>&1
@@ -121,6 +126,7 @@ tareas diarias. Si el hosting permite cron:
 
 ## 10. Verificación
 
+- `php artisan app:estado` reporta entorno, base de datos, caché, cola y papelera.
 - La portada carga con HTTPS y sin errores en consola.
 - Login en `/lorente-panel/login` y acceso al panel.
 - El modelo 3D (`/LOGASO.glb`) carga y los assets de `/build/` se cachean.

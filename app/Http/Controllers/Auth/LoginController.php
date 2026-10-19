@@ -40,7 +40,7 @@ class LoginController extends Controller
         if (! Auth::attempt($credenciales, $request->boolean('remember'))) {
             $intentos = $limiter->hit($key, 600);
 
-            if ($intentos >= 3) {
+            if ($intentos >= 5) {
                 $limiter->hit($lockKey, 3600);
             }
 

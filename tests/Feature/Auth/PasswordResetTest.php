@@ -45,6 +45,44 @@ class PasswordResetTest extends TestCase
         $response->assertSessionMissing('errors');
     }
 
+    public function test_se_limita_el_envio_de_enlaces_de_recuperacion(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create(['email' => 'docente@lorente.edu.pe']);
+
+        foreach (range(1, 5) as $i) {
+            $this->post(route('panel.password.email'), [
+                'email' => $user->email,
+            ])->assertRedirect();
+        }
+
+        $this->post(route('panel.password.email'), [
+            'email' => $user->email,
+        ])->assertStatus(429);
+    }
+
+    public function test_se_limita_el_restablecimiento_con_token(): void
+    {
+        $user = User::factory()->create(['email' => 'docente@lorente.edu.pe']);
+
+        foreach (range(1, 5) as $i) {
+            $this->post(route('panel.password.update'), [
+                'token' => 'token-invalido',
+                'email' => $user->email,
+                'password' => 'NuevaContrasena1234',
+                'password_confirmation' => 'NuevaContrasena1234',
+            ])->assertRedirect();
+        }
+
+        $this->post(route('panel.password.update'), [
+            'token' => 'token-invalido',
+            'email' => $user->email,
+            'password' => 'NuevaContrasena1234',
+            'password_confirmation' => 'NuevaContrasena1234',
+        ])->assertStatus(429);
+    }
+
     public function test_usuario_puede_cambiar_su_contrasena_con_el_token(): void
     {
         $user = User::factory()->create([

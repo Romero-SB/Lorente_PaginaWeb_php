@@ -75,7 +75,7 @@ class ArchivosDocumentos
         }
 
         return $documento->esPrivado()
-            ? route('panel.documentos.descargar', $documento)
+            ? route('sitio.documentos.descargar', $documento)
             : Almacenamiento::url($documento->archivo_url);
     }
 }

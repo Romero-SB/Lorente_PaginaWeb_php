@@ -1,58 +1,71 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# IE N° 31501 «Sebastián Lorente»
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sitio web institucional y panel administrativo de la I.E. N° 31501 «Sebastián
+Lorente» (Huancayo). Incluye noticias, documentos públicos y privados, docentes,
+recorrido virtual 360°, formulario de contacto y gestión de contenidos por roles.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend:** PHP 8.3+, Laravel 13, Inertia.js 3
+- **Frontend:** React 19, Vite 8, Tailwind CSS
+- **Base de datos:** MySQL/MariaDB en producción, SQLite en local
+- **Calidad:** PHPUnit, Vitest + Testing Library, Pint, GitHub Actions
+- **Extras:** Cloudflare Turnstile, colas en base de datos, Photo Sphere Viewer
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3 con `pdo_mysql`/`pdo_sqlite`, `mbstring`, `openssl`, `fileinfo`, `gd`
+- Composer 2
+- Node.js 22+ y npm
 
-## Learning Laravel
+## Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```sh
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm install
+npm run build
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Para desarrollo con recarga en caliente, ejecuta `npm run dev` en otra terminal.
 
-## Contributing
+El seeder crea cuentas de demostración (Super Usuario, Administrador y Docente)
+y la configuración institucional. **Cambia sus contraseñas antes de publicar** y
+no ejecutes el seeder en producción.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Comandos útiles
 
-## Code of Conduct
+```sh
+php artisan app:estado      # estado de entorno, BD, caché, colas y papelera
+php artisan optimize:clear  # limpia configuración, rutas y vistas cacheadas
+composer test               # suite PHP (PHPUnit)
+vendor/bin/pint --test      # verifica el estilo de código
+npm run test                # suite de componentes (Vitest)
+npm run build               # compila los assets de producción
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Estructura
 
-## Security Vulnerabilities
+- `app/Http/Controllers/Panel` — panel administrativo (contenidos, cuentas, papelera)
+- `app/Http/Controllers/Sitio` — páginas públicas, contacto y descargas
+- `app/Support` — caché del sitio, almacenamiento, papelera e historial
+- `resources/js/Pages` — páginas Inertia (sitio, panel y autenticación)
+- `resources/js/Components` — componentes compartidos y del sitio
+- `resources/js/virtual-tour` — visor 360° y escenas
+- `tests` — pruebas de feature y unitarias
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Despliegue
 
-## License
+Consulta [DEPLOY.md](DEPLOY.md) para la publicación en cPanel: variables de
+entorno, migraciones, cachés, cron de colas y verificación.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Seguridad
+
+- Sesiones y CSRF nativos de Laravel; contraseñas con bcrypt.
+- Bloqueo de login tras 5 intentos fallidos durante 1 hora.
+- Límite de solicitudes en recuperación de contraseña y contacto.
+- Documentos privados servidos únicamente a usuarios autenticados.
+- Cabeceras de seguridad y CSP en producción (Turnstile y Font Awesome incluidos).

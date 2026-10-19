@@ -78,4 +78,18 @@ class ArchivosDocumentosTest extends TestCase
         $this->assertNull($vacia);
         Storage::disk('public')->assertExists('docs/documento.pdf');
     }
+
+    public function test_url_de_un_documento_privado_usa_la_ruta_del_sitio(): void
+    {
+        $documento = new Documento([
+            'visibilidad' => Documento::VISIBILIDAD_PRIVADO,
+            'archivo_url' => 'documentos/privado.pdf',
+        ]);
+        $documento->id = 42;
+
+        $this->assertSame(
+            route('sitio.documentos.descargar', 42),
+            ArchivosDocumentos::url($documento)
+        );
+    }
 }

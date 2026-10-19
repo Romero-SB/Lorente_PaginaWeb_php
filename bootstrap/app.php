@@ -3,9 +3,11 @@
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\DebeCambiarPassword;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             HandleInertiaRequests::class,
+            SecurityHeaders::class,
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('panel.login.show'));
@@ -31,4 +34,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
+            if (! $request->header('X-Inertia')) {
+                return null;
+            }
+
+            $esPassword = str_starts_with((string) $request->route()?->getName(), 'panel.password.');
+
+            $campo = match (true) {
+                $request->routeIs('panel.password.update') => 'password',
+                $esPassword => 'email',
+                default => 'mensaje',
+            };
+
+            $respuesta = back()->withErrors([
+                $campo => 'Demasiados intentos. Inténtalo de nuevo más tarde.',
+            ]);
+
+            return $esPassword ? $respuesta->onlyInput('email') : $respuesta->withInput();
+        });
     })->create();

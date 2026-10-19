@@ -197,4 +197,18 @@ class SitioPublicoTest extends TestCase
             ->get("/documentos/{$privado->id}/descargar")
             ->assertNotFound();
     }
+
+    public function test_el_sitemap_incluye_portada_noticias_y_recorrido(): void
+    {
+        $noticia = $this->noticia('Noticia indexada');
+
+        $response = $this->get('/sitemap.xml');
+
+        $response->assertOk();
+
+        $contenido = $response->getContent();
+        $this->assertStringContainsString(url('/'), $contenido);
+        $this->assertStringContainsString(url('/recorrido'), $contenido);
+        $this->assertStringContainsString(route('sitio.noticias.show', $noticia), $contenido);
+    }
 }

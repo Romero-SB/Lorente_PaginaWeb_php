@@ -46,6 +46,7 @@ Route::get('/sitemap.xml', function () {
     $urls = [
         ['loc' => url('/'), 'changefreq' => 'weekly', 'priority' => '1.0'],
         ['loc' => url('/noticias'), 'changefreq' => 'daily', 'priority' => '0.8'],
+        ['loc' => url('/recorrido'), 'changefreq' => 'monthly', 'priority' => '0.7'],
     ];
 
     foreach (Noticia::query()->where('est', Noticia::EST_PUBLICADO)->select(['id', 'slug', 'updated_at'])->orderByDesc('fiso')->get() as $noticia) {
@@ -67,10 +68,14 @@ Route::middleware('guest')->prefix('lorente-panel')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('panel.login.store');
 
     Route::get('/recuperar', [PasswordResetController::class, 'showForgot'])->name('panel.password.request');
-    Route::post('/recuperar', [PasswordResetController::class, 'send'])->name('panel.password.email');
+    Route::post('/recuperar', [PasswordResetController::class, 'send'])
+        ->middleware('throttle:5,60')
+        ->name('panel.password.email');
 
     Route::get('/restablecer/{token}', [PasswordResetController::class, 'showReset'])->name('panel.password.reset');
-    Route::post('/restablecer', [PasswordResetController::class, 'update'])->name('panel.password.update');
+    Route::post('/restablecer', [PasswordResetController::class, 'update'])
+        ->middleware('throttle:5,1')
+        ->name('panel.password.update');
 });
 
 Route::middleware('auth')->prefix('lorente-panel')->group(function () {

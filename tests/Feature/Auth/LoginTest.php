@@ -65,13 +65,13 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_despues_de_tres_fallos_se_bloquea_el_login_una_hora(): void
+    public function test_despues_de_cinco_fallos_se_bloquea_el_login_una_hora(): void
     {
         $user = User::factory()->create([
             'email' => 'docente@lorente.edu.pe',
         ]);
 
-        foreach (range(1, 3) as $i) {
+        foreach (range(1, 5) as $i) {
             $this->post(route('panel.login.store'), [
                 'email' => $user->email,
                 'password' => 'incorrecta',

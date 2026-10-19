@@ -1,10 +1,13 @@
 /node_modules
 /public/build
 /public/hot
+/public/fonts-manifest.dev.json
 /public/storage
 /public/uploads
 /storage/*.key
 /storage/pail
+/storage/framework/views/*.php
+/storage/logs/*.log
 /vendor
 .env
 .env.backup
