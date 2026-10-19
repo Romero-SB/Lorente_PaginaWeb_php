@@ -34,6 +34,7 @@ class PerfilPanelTest extends TestCase
     public function test_actualiza_los_datos_personales(): void
     {
         $usuario = $this->usuario(User::ROLE_DOCENTE);
+        $correoOriginal = $usuario->email;
 
         $this->actingAs($usuario)->post('/lorente-panel/perfil', [
             'name' => '  Juana Pérez  ',
@@ -43,7 +44,7 @@ class PerfilPanelTest extends TestCase
 
         $usuario->refresh();
         $this->assertSame('Juana Pérez', $usuario->name);
-        $this->assertSame('juana.perez@lorente.edu.pe', $usuario->email);
+        $this->assertSame($correoOriginal, $usuario->email);
         $this->assertSame('Coordinadora', $usuario->cargo);
 
         $this->assertTrue(
@@ -51,27 +52,36 @@ class PerfilPanelTest extends TestCase
         );
     }
 
-    public function test_no_permite_usar_un_correo_de_otra_cuenta(): void
+    public function test_no_permite_modificar_el_correo(): void
     {
         $otro = $this->usuario();
         $usuario = $this->usuario();
+        $correoOriginal = $usuario->email;
 
         $this->actingAs($usuario)
             ->post('/lorente-panel/perfil', [
                 'name' => $usuario->name,
                 'email' => $otro->email,
             ])
-            ->assertSessionHasErrors('email');
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $usuario->refresh();
+        $this->assertSame($correoOriginal, $usuario->email);
     }
 
     public function test_permite_conservar_su_propio_correo(): void
     {
         $usuario = $this->usuario();
+        $correoOriginal = $usuario->email;
 
         $this->actingAs($usuario)->post('/lorente-panel/perfil', [
             'name' => $usuario->name,
             'email' => $usuario->email,
         ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $usuario->refresh();
+        $this->assertSame($correoOriginal, $usuario->email);
     }
 
     public function test_cambia_la_contrasena_con_la_actual_correcta(): void

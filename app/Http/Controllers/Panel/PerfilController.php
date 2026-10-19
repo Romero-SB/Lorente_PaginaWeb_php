@@ -41,7 +41,6 @@ class PerfilController extends Controller
         $datos = $request->validated();
 
         $usuario->name = trim($datos['name']);
-        $usuario->email = $datos['email'];
         $usuario->cargo = trim((string) ($datos['cargo'] ?? '')) ?: null;
         $usuario->save();
 

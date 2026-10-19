@@ -7,10 +7,19 @@ import { Icono } from '../Components/Panel/Iconos';
 import { Toasts } from '../Components/Panel/Toasts';
 import { usePanelWindow } from '../hooks/usePanelWindow';
 import { guardarBorrador, limpiarBorrador, restaurarBorrador } from '../lib/draft';
+import { precargarSecciones } from '../lib/precargaPanel';
 import { fijarThemeColor, THEME_COLOR_PANEL, THEME_COLOR_SITIO } from '../lib/themeColor';
 import { toast } from '../lib/toast';
 
 const DIRECCIONES_RESIZE = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+
+const GRUPOS_PANEL = [
+    { titulo: 'General', claves: ['resumen'] },
+    { titulo: 'Contenido', claves: ['noticias', 'documentos', 'docentes'] },
+    { titulo: 'Comunicación', claves: ['mensajes'] },
+    { titulo: 'Administración', claves: ['historial', 'cuentas', 'configuracion'] },
+    { titulo: 'Cuenta', claves: ['perfil'] },
+];
 
 export default function PanelLayout({ children }) {
     const { auth, panel, flash } = usePage().props;
@@ -19,6 +28,17 @@ export default function PanelLayout({ children }) {
     const secciones = panel?.secciones ?? [];
     const rutaActual = window.location.pathname;
     const activa = secciones.find((s) => (s.exacta ? rutaActual === s.ruta : rutaActual.startsWith(s.ruta)));
+
+    const clavesAgrupadas = new Set(GRUPOS_PANEL.flatMap((g) => g.claves));
+    const grupos = GRUPOS_PANEL.map((g) => ({
+        ...g,
+        items: g.claves.map((clave) => secciones.find((s) => s.clave === clave)).filter(Boolean),
+    })).filter((g) => g.items.length > 0);
+
+    const seccionesSueltas = secciones.filter((s) => !clavesAgrupadas.has(s.clave));
+    if (seccionesSueltas.length > 0) {
+        grupos.push({ titulo: 'Más', items: seccionesSueltas });
+    }
 
     useEffect(() => {
         if (flash?.ok) toast(flash.ok, 'ok');
@@ -49,6 +69,7 @@ export default function PanelLayout({ children }) {
 
     useEffect(() => {
         fijarThemeColor(THEME_COLOR_PANEL);
+        precargarSecciones();
         return () => fijarThemeColor(THEME_COLOR_SITIO);
     }, []);
 
@@ -134,11 +155,11 @@ export default function PanelLayout({ children }) {
                 <div
                     className={`panel-titulo ${ventana.view === 'normal' && !ventana.isMobile ? 'pv-arrastrar' : ''}`}
                     onMouseDown={(e) => {
-                        if (e.target.closest('.pv-cmd')) return;
+                        if (e.target.closest('.pv-cmd, .pv-no-drag')) return;
                         dragTitle(e);
                     }}
                     onTouchStart={(e) => {
-                        if (e.target.closest('.pv-cmd')) return;
+                        if (e.target.closest('.pv-cmd, .pv-no-drag')) return;
                         const t = e.touches[0];
                         ventana.arrastrarInicio(t.clientX, t.clientY);
                     }}
@@ -152,17 +173,24 @@ export default function PanelLayout({ children }) {
                             <p className="panel-titulo-sec">{activa?.etiqueta ?? 'Resumen'}</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <button
-                            className="pv-cmd"
-                            title={ventana.view === 'maximizado' ? 'Restaurar tamaño' : 'Maximizar'}
-                            onClick={() => ventana.setView(ventana.view === 'maximizado' ? 'normal' : 'maximizado')}
-                        >
-                            <Icono nombre={ventana.view === 'maximizado' ? 'restaurar' : 'maximizar'} className="h-3.5 w-3.5" />
-                        </button>
-                        <button className="pv-cmd" title="Minimizar panel" onClick={() => ventana.setView('minimizado')}>
-                            <Icono nombre="minimizar" className="h-3.5 w-3.5" />
-                        </button>
+                    <div className="pv-barra-acciones">
+                        <span className="pv-sesion">
+                            <span className="pv-sesion-punto" aria-hidden="true" />
+                            Sesión activa
+                        </span>
+                        <div className="pv-controles">
+                            <button className="pv-cmd" title="Minimizar panel" aria-label="Minimizar panel" onClick={() => ventana.setView('minimizado')}>
+                                <Icono nombre="minimizar" className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                className="pv-cmd"
+                                title={ventana.view === 'maximizado' ? 'Restaurar tamaño' : 'Maximizar'}
+                                aria-label={ventana.view === 'maximizado' ? 'Restaurar tamaño' : 'Maximizar'}
+                                onClick={() => ventana.setView(ventana.view === 'maximizado' ? 'normal' : 'maximizado')}
+                            >
+                                <Icono nombre={ventana.view === 'maximizado' ? 'restaurar' : 'maximizar'} className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -177,43 +205,50 @@ export default function PanelLayout({ children }) {
                         </div>
 
                         <nav className="panel-nav">
-                            {secciones.map((s) => {
-                                const contenido = (
-                                    <>
-                                        <span className="panel-nav-barra" aria-hidden="true" />
-                                        <Icono nombre={s.icono} className="h-[18px] w-[18px] shrink-0" />
-                                        <span className="truncate">{s.etiqueta}</span>
-                                    </>
-                                );
+                            {grupos.map((grupo) => (
+                                <div key={grupo.titulo} className="panel-nav-grupo-bloque">
+                                    <p className="panel-nav-grupo">{grupo.titulo}</p>
+                                    {grupo.items.map((s) => {
+                                        const contenido = (
+                                            <>
+                                                <span className="panel-nav-barra" aria-hidden="true" />
+                                                <Icono nombre={s.icono} className="h-[18px] w-[18px] shrink-0" />
+                                                <span className="truncate">{s.etiqueta}</span>
+                                            </>
+                                        );
 
-                                return esActiva(s) ? (
-                                    <span key={s.clave} className="panel-nav-item panel-nav-item--activa" aria-current="page">
-                                        {contenido}
-                                    </span>
-                                ) : (
-                                    <Link
-                                        key={s.clave}
-                                        href={s.ruta}
-                                        preserveScroll
-                                        prefetch
-                                        except={['sitio']}
-                                        className="panel-nav-item"
-                                    >
-                                        {contenido}
-                                    </Link>
-                                );
-                            })}
+                                        return esActiva(s) ? (
+                                            <span key={s.clave} className="panel-nav-item panel-nav-item--activa" aria-current="page">
+                                                {contenido}
+                                            </span>
+                                        ) : (
+                                            <Link
+                                                key={s.clave}
+                                                href={s.ruta}
+                                                preserveScroll
+                                                prefetch={['mount', 'hover']}
+                                                cacheFor={[60_000, 5 * 60_000]}
+                                                className="panel-nav-item"
+                                            >
+                                                {contenido}
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            ))}
                         </nav>
 
-                        <div className="panel-usuario">
-                            <span className="panel-avatar">{iniciales}</span>
-                            <div className="min-w-0 leading-tight">
-                                <p className="panel-usuario-nom">{auth.user?.name}</p>
-                                <p className="panel-usuario-rol">{panel?.rol_etiqueta}</p>
+                        <div className="panel-sidebar-pie">
+                            <div className="panel-usuario">
+                                <span className="panel-avatar">{iniciales}</span>
+                                <div className="min-w-0 leading-tight">
+                                    <p className="panel-usuario-nom">{auth.user?.name}</p>
+                                    <p className="panel-usuario-rol">{panel?.rol_etiqueta}</p>
+                                </div>
+                                <button className="panel-salir" onClick={cerrarSesion} title="Cerrar sesión" aria-label="Cerrar sesión">
+                                    <Icono nombre="salir" className="h-[18px] w-[18px]" />
+                                </button>
                             </div>
-                            <button className="panel-salir" onClick={cerrarSesion} title="Cerrar sesión">
-                                <Icono nombre="salir" className="h-[18px] w-[18px]" />
-                            </button>
                         </div>
                     </aside>
 

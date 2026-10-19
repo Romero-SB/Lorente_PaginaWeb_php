@@ -190,6 +190,18 @@ const PATH = {
             <path d="M12 7v5l4 2" />
         </>
     ),
+    externo: (
+        <>
+            <path d="M7 17 17 7" />
+            <path d="M7 7h10v10" />
+        </>
+    ),
+    flecha: (
+        <>
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+        </>
+    ),
 };
 
 export function Icono({ nombre, className = 'h-5 w-5', strokeWidth = 2 }) {

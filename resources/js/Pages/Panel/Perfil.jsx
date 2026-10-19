@@ -63,15 +63,16 @@ export default function Perfil({ perfil = {} }) {
                         <Campo
                             etiqueta="Correo electrónico"
                             error={datos.errors.email}
-                            ayuda="Con este correo inicias sesión."
+                            ayuda="El correo de acceso no se puede modificar."
                             id="perfil-email"
                         >
                             <input
                                 id="perfil-email"
                                 type="email"
                                 value={datos.data.email}
-                                onChange={(e) => datos.setData('email', e.target.value)}
-                                className="panel-campo w-full"
+                                readOnly
+                                aria-readonly="true"
+                                className="panel-campo w-full cursor-not-allowed bg-slate-100 text-slate-500"
                             />
                         </Campo>
                         <Campo etiqueta="Cargo" error={datos.errors.cargo} id="perfil-cargo" className="panel-celda-2">

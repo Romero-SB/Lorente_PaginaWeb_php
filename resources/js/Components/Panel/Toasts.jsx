@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 
 import { subscribeToasts } from '../../lib/toast';
+import { Icono } from './Iconos';
 
-const ESTILOS = {
-    ok: 'border-emerald-300 bg-emerald-50 text-emerald-800',
-    error: 'border-red-300 bg-red-50 text-red-800',
-    info: 'border-sky-300 bg-sky-50 text-sky-800',
+const ICONOS = {
+    ok: 'check',
+    error: 'cerrar',
+    info: 'panel',
 };
 
 export function Toasts() {
@@ -16,11 +17,11 @@ export function Toasts() {
     return (
         <div role="status" aria-live="polite" className="pointer-events-none fixed right-4 bottom-4 z-[80] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2">
             {items.map((t) => (
-                <div
-                    key={t.id}
-                    className={`rounded-lg border px-4 py-3 text-sm font-medium shadow-lg ${ESTILOS[t.tipo] || ESTILOS.ok}`}
-                >
-                    {t.mensaje}
+                <div key={t.id} className={`panel-toast panel-toast--${t.tipo || 'ok'}`}>
+                    <span className="panel-toast-icono">
+                        <Icono nombre={ICONOS[t.tipo] || ICONOS.ok} className="h-4 w-4" />
+                    </span>
+                    <span>{t.mensaje}</span>
                 </div>
             ))}
         </div>
