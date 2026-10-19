@@ -17,6 +17,16 @@ class LoginTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_el_panel_sin_sesion_muestra_el_login_sin_redirigir(): void
+    {
+        $response = $this->get(route('panel.index'));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Auth/Login')
+            ->has('sitio'));
+    }
+
     public function test_usuario_puede_iniciar_sesion_por_email(): void
     {
         $user = User::factory()->create([

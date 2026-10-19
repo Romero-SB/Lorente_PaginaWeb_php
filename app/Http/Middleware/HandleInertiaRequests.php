@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->pull('error'),
                 'expired_draft' => $request->session()->pull('expired_draft'),
             ],
+            'status' => fn () => $request->session()->get('status'),
             'panel' => fn () => $request->user() ? [
                 'rol' => $request->user()->role,
                 'rol_etiqueta' => PanelSecciones::etiquetaRol($request->user()->role),

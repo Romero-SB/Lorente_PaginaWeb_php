@@ -19,6 +19,10 @@ class PasswordResetTest extends TestCase
         $response = $this->get(route('panel.password.request'));
 
         $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Auth/Login')
+            ->where('vista', 'recuperar')
+            ->has('sitio'));
     }
 
     public function test_se_envia_el_enlace_de_recuperacion(): void

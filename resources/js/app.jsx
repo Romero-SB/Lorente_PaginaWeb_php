@@ -13,9 +13,8 @@ createInertiaApp({
     resolve: (name) => pages[`./Pages/${name}.jsx`]().then((modulo) => modulo.default),
     layout: (name) =>
         name.startsWith('Panel/') ||
-        name.startsWith('Sitio/') ||
-        name === 'Auth/Login' ||
-        name === 'Auth/FirstPasswordChange'
+        (name.startsWith('Sitio/') && name !== 'Sitio/Recorrido') ||
+        ['Auth/Login', 'Auth/ForgotPassword', 'Auth/ResetPassword', 'Auth/FirstPasswordChange'].includes(name)
             ? SitioLayout
             : undefined,
     setup({ el, App, props }) {

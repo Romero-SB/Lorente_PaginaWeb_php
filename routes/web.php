@@ -20,6 +20,7 @@ use App\Http\Controllers\Sitio\InicioController;
 use App\Http\Controllers\Sitio\NoticiaController;
 use App\Http\Controllers\Sitio\RecorridoController;
 use App\Models\Noticia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('home');
@@ -63,6 +64,14 @@ Route::get('/sitemap.xml', function () {
         ->header('Content-Type', 'application/xml; charset=UTF-8');
 })->name('sitemap');
 
+Route::get('/lorente-panel', function (Request $request) {
+    if ($request->user()) {
+        return app(ResumenController::class)->index($request);
+    }
+
+    return app(LoginController::class)->show();
+})->name('panel.index');
+
 Route::middleware('guest')->prefix('lorente-panel')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('panel.login.show');
     Route::post('/login', [LoginController::class, 'login'])->name('panel.login.store');
@@ -85,8 +94,6 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         ->name('panel.password.first.show');
     Route::post('/primer-ingreso/cambiar-contrasena', [FirstPasswordChangeController::class, 'update'])
         ->name('panel.password.first.update');
-
-    Route::get('/', [ResumenController::class, 'index'])->name('panel.index');
 
     Route::middleware('debe.cambiar.password')->group(function () {
         Route::get('/noticias', [NoticiasController::class, 'index'])->name('panel.noticias.index');

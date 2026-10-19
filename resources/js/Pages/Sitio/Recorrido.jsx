@@ -1,6 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
+import '../../../css/recorrido.css';
+
 import { TourViewer } from '../../virtual-tour/components/TourViewer';
 import { useTour } from '../../virtual-tour/hooks/useTour';
 
@@ -15,19 +17,7 @@ export default function Recorrido() {
     }, [tour, activeSceneId]);
 
     return (
-        <div
-            className="recorrido-page-root"
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100vw',
-                height: '100dvh',
-                overflow: 'hidden',
-                backgroundColor: '#0a1026',
-                color: '#f6f4ef',
-                fontFamily: "'Inter', sans-serif",
-            }}
-        >
+        <div className="recorrido-page-root">
             <Head title="Recorrido Virtual 360°">
                 <meta
                     name="description"
@@ -43,40 +33,10 @@ export default function Recorrido() {
             </Head>
 
             {/* Barra Superior Institucional */}
-            <header
-                style={{
-                    height: '60px',
-                    minHeight: '60px',
-                    backgroundColor: '#0f1b42',
-                    borderBottom: '1px solid rgba(194, 154, 43, 0.35)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 18px',
-                    zIndex: 30,
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-                }}
-            >
+            <header className="recorrido-header">
                 {/* Lado izquierdo: Volver al sitio e insignia */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <Link
-                        href="/"
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '7px 14px',
-                            borderRadius: '9999px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                            border: '1px solid rgba(194, 154, 43, 0.4)',
-                            color: '#d9b45a',
-                            fontSize: '0.82rem',
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                            transition: 'all 0.2s ease',
-                        }}
-                        title="Regresar a la página principal"
-                    >
+                <div className="recorrido-header-izq">
+                    <Link href="/" className="recorrido-volver" title="Regresar a la página principal">
                         <svg
                             width="16"
                             height="16"
@@ -86,34 +46,21 @@ export default function Recorrido() {
                             strokeWidth="2.2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
+                            aria-hidden="true"
                         >
                             <path d="m15 18-6-6 6-6" />
                         </svg>
-                        <span>Volver al portal</span>
+                        <span className="recorrido-volver-texto">Volver al portal</span>
                     </Link>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f6f4ef', letterSpacing: '0.3px' }}>
-                            IE N° 31501
-                        </span>
-                        <span style={{ fontSize: '0.85rem', color: '#c29a2b', fontWeight: 600 }}>
-                            «Sebastián Lorente»
-                        </span>
+                    <div className="recorrido-marca">
+                        <span className="recorrido-marca-nombre">IE N° 31501</span>
+                        <span className="recorrido-marca-sub">«Sebastián Lorente»</span>
                     </div>
                 </div>
 
                 {/* Centro: Escena actual con icono de ubicación */}
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '6px 16px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        borderRadius: '9999px',
-                        border: '1px solid rgba(194, 154, 43, 0.25)',
-                    }}
-                >
+                <div className="recorrido-escena">
                     <svg
                         width="15"
                         height="15"
@@ -123,44 +70,22 @@ export default function Recorrido() {
                         strokeWidth="2.2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        aria-hidden="true"
                     >
                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                         <circle cx="12" cy="10" r="3" />
                     </svg>
-                    <span
-                        style={{
-                            fontSize: '0.88rem',
-                            fontWeight: 600,
-                            color: '#ffffff',
-                            maxWidth: '380px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            letterSpacing: '0.2px',
-                        }}
-                    >
-                        {currentScene?.name ?? 'Recorrido Virtual'}
-                    </span>
+                    <span className="recorrido-escena-texto">{currentScene?.name ?? 'Recorrido Virtual'}</span>
                 </div>
 
                 {/* Lado derecho: Botón de ayuda */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="recorrido-acciones">
                     <button
                         type="button"
+                        className="recorrido-ayuda-btn"
                         onClick={() => setMostrarAyuda(!mostrarAyuda)}
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '6px 12px',
-                            borderRadius: '8px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            color: '#f6f4ef',
-                            fontSize: '0.78rem',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                        }}
+                        aria-expanded={mostrarAyuda}
+                        aria-label="Cómo navegar por el recorrido"
                     >
                         <svg
                             width="15"
@@ -171,68 +96,32 @@ export default function Recorrido() {
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
+                            aria-hidden="true"
                         >
                             <circle cx="12" cy="12" r="10" />
                             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                             <path d="M12 17h.01" />
                         </svg>
-                        <span>Cómo navegar</span>
+                        <span className="recorrido-ayuda-btn-texto">Cómo navegar</span>
                     </button>
                 </div>
             </header>
 
             {/* Modal flotante de ayuda */}
             {mostrarAyuda && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: '70px',
-                        right: '18px',
-                        width: '320px',
-                        backgroundColor: '#0f1b42',
-                        border: '1px solid rgba(194, 154, 43, 0.45)',
-                        borderRadius: '12px',
-                        padding: '16px 18px',
-                        zIndex: 50,
-                        boxShadow: '0 12px 35px rgba(0, 0, 0, 0.6)',
-                        color: '#f6f4ef',
-                    }}
-                >
-                    <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: '10px',
-                        }}
-                    >
-                        <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#d9b45a' }}>
-                            Instrucciones 360°
-                        </h4>
+                <div className="recorrido-ayuda" role="dialog" aria-label="Instrucciones del recorrido 360°">
+                    <div className="recorrido-ayuda-cab">
+                        <h4>Instrucciones 360°</h4>
                         <button
                             type="button"
+                            className="recorrido-ayuda-cerrar"
                             onClick={() => setMostrarAyuda(false)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#94a3b8',
-                                fontSize: '18px',
-                                cursor: 'pointer',
-                                lineHeight: 1,
-                            }}
+                            aria-label="Cerrar instrucciones"
                         >
                             &times;
                         </button>
                     </div>
-                    <ul
-                        style={{
-                            margin: 0,
-                            paddingLeft: '18px',
-                            fontSize: '0.78rem',
-                            lineHeight: '1.6',
-                            color: '#cbd5e1',
-                        }}
-                    >
+                    <ul className="recorrido-ayuda-lista">
                         <li><strong>Girar:</strong> Haz clic y arrastra con el ratón o desliza el dedo.</li>
                         <li><strong>Avanzar:</strong> Haz clic en las flechas situadas en pasillos y accesos.</li>
                         <li><strong>Información:</strong> Toca los íconos dorados <strong>(i)</strong> para ver detalles.</li>
@@ -242,15 +131,7 @@ export default function Recorrido() {
             )}
 
             {/* Contenedor del visor principal */}
-            <main
-                style={{
-                    flex: 1,
-                    position: 'relative',
-                    width: '100%',
-                    height: 'calc(100dvh - 60px)',
-                    overflow: 'hidden',
-                }}
-            >
+            <main className="recorrido-main">
                 {status === 'loading' && <LoadingScreen />}
                 {status === 'error' && <ErrorScreen error={error} />}
                 {status === 'success' && tour && (

@@ -20,7 +20,8 @@ class PasswordResetController extends Controller
 {
     public function showForgot(): Response
     {
-        return Inertia::render('Auth/ForgotPassword', [
+        return Inertia::render('Auth/Login', [
+            'vista' => 'recuperar',
             'status' => session('status'),
         ]);
     }
