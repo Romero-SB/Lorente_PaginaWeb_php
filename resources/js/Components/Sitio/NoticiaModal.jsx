@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import NoticiaDetalle from './NoticiaDetalle';
 
 export default function NoticiaModal({ noticia, onClose }) {
-    const cerrarRef = useRef(null);
+    const dialogoRef = useRef(null);
 
     useEffect(() => {
         const alPresionar = (e) => {
@@ -14,7 +14,7 @@ export default function NoticiaModal({ noticia, onClose }) {
         document.addEventListener('keydown', alPresionar);
         const overflowPrevio = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
-        cerrarRef.current?.focus();
+        dialogoRef.current?.focus({ preventScroll: true });
 
         return () => {
             document.removeEventListener('keydown', alPresionar);
@@ -30,22 +30,13 @@ export default function NoticiaModal({ noticia, onClose }) {
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div
+                ref={dialogoRef}
                 className="noticia-modal"
                 role="dialog"
                 aria-modal="true"
                 aria-label={`Noticia: ${noticia.titulo}`}
+                tabIndex={-1}
             >
-                <button
-                    ref={cerrarRef}
-                    type="button"
-                    className="noticia-modal-cerrar"
-                    onClick={onClose}
-                    aria-label="Cerrar noticia"
-                    title="Cerrar (Esc)"
-                >
-                    <i className="fa-solid fa-xmark" aria-hidden="true" />
-                </button>
-
                 <NoticiaDetalle noticia={noticia} variante="modal" />
             </div>
         </div>,

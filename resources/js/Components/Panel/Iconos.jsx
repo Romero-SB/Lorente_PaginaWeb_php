@@ -202,6 +202,13 @@ const PATH = {
             <path d="m12 5 7 7-7 7" />
         </>
     ),
+    menu: (
+        <>
+            <path d="M3 6h18" />
+            <path d="M3 12h18" />
+            <path d="M3 18h14" />
+        </>
+    ),
 };
 
 export function Icono({ nombre, className = 'h-5 w-5', strokeWidth = 2 }) {

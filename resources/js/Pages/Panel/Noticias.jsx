@@ -7,6 +7,7 @@ import Campo from '../../Components/Shared/Campo';
 import EmptyState from '../../Components/Shared/EmptyState';
 import PageHeader from '../../Components/Shared/PageHeader';
 import Papelera from '../../Components/Shared/Papelera';
+import useReordenarArrastre from '../../hooks/useReordenarArrastre';
 import { EXTENSIONES, extensionDe } from '../../lib/archivos';
 import { registerDraftSaver, restaurarBorrador, limpiarBorrador } from '../../lib/draft';
 import { formatoFecha } from '../../lib/fecha';
@@ -382,7 +383,9 @@ function Formulario({
     onSubmit,
     onCancelar,
 }) {
-    const [origenImagen, setOrigenImagen] = useState(null);
+    const { origen, destino, iniciar } = useReordenarArrastre({
+        onSoltar: (desde, hasta) => reordenar(imagenes, setImagenes, desde, hasta),
+    });
 
     const error = (campo) => form.errors[campo];
 
@@ -488,22 +491,28 @@ function Formulario({
                         {imagenes.map((img, idx) => (
                             <div
                                 key={img.key}
-                                draggable
-                                onDragStart={() => setOrigenImagen(idx)}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={() => {
-                                    reordenar(imagenes, setImagenes, origenImagen, idx);
-                                    setOrigenImagen(null);
-                                }}
-                                className="group relative aspect-square cursor-grab overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                                data-reordenar-indice={idx}
+                                className={`group relative aspect-square overflow-hidden rounded-xl border bg-slate-100 transition ${
+                                    destino === idx && origen !== null && origen !== idx
+                                        ? 'border-blue-300 ring-2 ring-blue-100'
+                                        : 'border-slate-200'
+                                } ${origen === idx ? 'opacity-60' : ''}`}
                             >
-                                <img src={img.url} alt="" className="h-full w-full object-cover" />
+                                <button
+                                    type="button"
+                                    className="panel-agarre absolute inset-0 cursor-grab active:cursor-grabbing"
+                                    title="Arrastrar para reordenar"
+                                    aria-label={`Reordenar imagen ${idx + 1}`}
+                                    onPointerDown={(e) => iniciar(e, idx)}
+                                >
+                                    <img src={img.url} alt="" className="h-full w-full object-cover" draggable={false} />
+                                </button>
                                 {idx === 0 && (
-                                    <span className="absolute top-1 left-1 rounded bg-blue-950/85 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                    <span className="pointer-events-none absolute top-1 left-1 rounded bg-blue-950/85 px-1.5 py-0.5 text-[10px] font-semibold text-white">
                                         Portada
                                     </span>
                                 )}
-                                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/45 px-1.5 py-1 opacity-0 transition group-hover:opacity-100">
+                                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/45 px-1.5 py-1 opacity-100 transition md:opacity-0 md:group-hover:opacity-100">
                                     {idx !== 0 && (
                                         <button
                                             type="button"
@@ -574,7 +583,7 @@ function Formulario({
                 {error('adjuntos_nuevas') && <p className="mt-1 text-xs text-red-600">{error('adjuntos_nuevas')}</p>}
             </div>
 
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
                 <Boton type="button" onClick={onCancelar} className="px-4 py-2 text-sm hover:bg-slate-50">
                     Cancelar
                 </Boton>

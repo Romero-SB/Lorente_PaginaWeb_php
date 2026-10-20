@@ -33,7 +33,7 @@ export default function Papelera({ items, aviso, renderTitulo, thumb, onRestaura
                     {items.map((item) => (
                         <div
                             key={item.id}
-                            className="panel-tarjeta panel-tarjeta--lista flex items-center gap-4 p-4"
+                            className="panel-tarjeta panel-tarjeta--lista flex flex-wrap items-center gap-4 p-4"
                         >
                             {thumb?.(item)}
                             <div className="min-w-0 flex-1">
@@ -42,7 +42,7 @@ export default function Papelera({ items, aviso, renderTitulo, thumb, onRestaura
                                     Se elimina en {item.dias_restantes} día{item.dias_restantes === 1 ? '' : 's'}
                                 </span>
                             </div>
-                            <div className="flex shrink-0 items-center gap-2">
+                            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:ml-auto">
                                 {item.puede_restaurar !== false && (
                                     <Boton
                                         onClick={() => onRestaurar(item)}

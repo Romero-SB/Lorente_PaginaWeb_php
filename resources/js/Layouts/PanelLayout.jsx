@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import '../../css/panel.css';
 
@@ -7,7 +7,7 @@ import { Icono } from '../Components/Panel/Iconos';
 import { Toasts } from '../Components/Panel/Toasts';
 import { usePanelWindow } from '../hooks/usePanelWindow';
 import { guardarBorrador, limpiarBorrador, restaurarBorrador } from '../lib/draft';
-import { precargarSecciones } from '../lib/precargaPanel';
+import { precargarPanel } from '../lib/precargaPanel';
 import { fijarThemeColor, THEME_COLOR_PANEL, THEME_COLOR_SITIO } from '../lib/themeColor';
 import { toast } from '../lib/toast';
 
@@ -24,6 +24,7 @@ const GRUPOS_PANEL = [
 export default function PanelLayout({ children }) {
     const { auth, panel, flash } = usePage().props;
     const ventana = usePanelWindow();
+    const [menuAbierto, setMenuAbierto] = useState(false);
 
     const secciones = panel?.secciones ?? [];
     const rutaActual = window.location.pathname;
@@ -69,13 +70,25 @@ export default function PanelLayout({ children }) {
 
     useEffect(() => {
         fijarThemeColor(THEME_COLOR_PANEL);
-        precargarSecciones();
+        precargarPanel(secciones);
         return () => fijarThemeColor(THEME_COLOR_SITIO);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         ventana.panelRef.current?.focus?.({ preventScroll: true });
     }, []);
+
+    useEffect(() => {
+        const nodo = ventana.panelRef.current;
+        if (!nodo || typeof ResizeObserver === 'undefined') return;
+
+        const observador = new ResizeObserver(([entrada]) => {
+            if (entrada.contentRect.width >= 701) setMenuAbierto(false);
+        });
+        observador.observe(nodo);
+        return () => observador.disconnect();
+    }, [ventana.panelRef]);
 
     useEffect(() => {
         const onKey = (e) => {
@@ -86,12 +99,17 @@ export default function PanelLayout({ children }) {
                 return;
             }
 
+            if (menuAbierto) {
+                setMenuAbierto(false);
+                return;
+            }
+
             if (ventana.view !== 'minimizado') ventana.setView('minimizado');
         };
 
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [ventana.view]);
+    }, [ventana.view, menuAbierto]);
 
     function cerrarSesion() {
         router.post('/lorente-panel/logout');
@@ -165,6 +183,16 @@ export default function PanelLayout({ children }) {
                     }}
                 >
                     <div className="panel-titulo-marca">
+                        <button
+                            type="button"
+                            className="pv-cmd pv-menu pv-no-drag"
+                            aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+                            aria-expanded={menuAbierto}
+                            aria-controls="panel-sidebar"
+                            onClick={() => setMenuAbierto((v) => !v)}
+                        >
+                            <Icono nombre={menuAbierto ? 'cerrar' : 'menu'} className="h-4 w-4" />
+                        </button>
                         <span className="panel-marca-icono">
                             <Icono nombre="panel" className="h-4 w-4" />
                         </span>
@@ -195,7 +223,17 @@ export default function PanelLayout({ children }) {
                 </div>
 
                 <div className="panel-vista">
-                    <aside className="panel-sidebar">
+                    {menuAbierto && (
+                        <button
+                            type="button"
+                            className="panel-nav-fondo"
+                            aria-label="Cerrar menú"
+                            tabIndex={-1}
+                            onClick={() => setMenuAbierto(false)}
+                        />
+                    )}
+
+                    <aside id="panel-sidebar" className={`panel-sidebar${menuAbierto ? ' es-abierto' : ''}`}>
                         <div className="panel-marca">
                             <img src="/logo_lorente.webp" alt="Logo I.E. N.º 31501 Sebastián Lorente" className="panel-marca-logo" />
                             <div className="min-w-0 leading-tight">
@@ -226,8 +264,9 @@ export default function PanelLayout({ children }) {
                                                 key={s.clave}
                                                 href={s.ruta}
                                                 preserveScroll
-                                                prefetch={['mount', 'hover']}
+                                                prefetch={['hover', 'click']}
                                                 cacheFor={[60_000, 5 * 60_000]}
+                                                onClick={() => setMenuAbierto(false)}
                                                 className="panel-nav-item"
                                             >
                                                 {contenido}

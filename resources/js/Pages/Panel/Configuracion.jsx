@@ -141,7 +141,7 @@ export default function Configuracion({ config = {} }) {
                     </div>
                 </section>
 
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                     <span className="mr-auto text-[11px] text-slate-400">
                         Editando como {auth.user?.name}.
                     </span>

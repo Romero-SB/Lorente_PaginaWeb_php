@@ -124,6 +124,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        overscroll-behavior: contain;
         pointer-events: auto;
         border: 1px solid rgba(194, 154, 43, 0.55);
         border-radius: 18px;
@@ -223,6 +224,15 @@
         background: rgba(194, 154, 43, 0.28);
     }
 
+    .pv-menu {
+        display: none;
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(217, 180, 90, 0.35);
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.06);
+    }
+
     .pv-barra-acciones {
         display: flex;
         align-items: center;
@@ -260,19 +270,29 @@
         box-shadow: 0 0 0 3px rgba(92, 196, 143, 0.2);
     }
 
-    @container panel-barra (max-width: 620px) {
+    @container panel-barra (max-width: 700px) {
         .pv-sesion {
             display: none;
+        }
+
+        .pv-menu {
+            display: grid;
         }
     }
 
     /* ===== Cuerpo / vista ===== */
     .panel-vista {
+        position: relative;
         display: flex;
         flex: 1;
         min-height: 0;
         container-type: inline-size;
         container-name: panel-vista;
+    }
+
+    /* Fondo del menú deslizable (solo en ventanas angostas) */
+    .panel-nav-fondo {
+        display: none;
     }
 
     /* ===== Sidebar ===== */
@@ -327,6 +347,7 @@
         flex-direction: column;
         gap: 2px;
         overflow-y: auto;
+        overscroll-behavior: contain;
         padding: 8px 10px 14px;
     }
 
@@ -468,6 +489,7 @@
         flex: 1;
         min-width: 0;
         overflow-y: auto;
+        overscroll-behavior: contain;
         padding: 30px 34px 48px;
         color: var(--panel-ink);
         background:
@@ -1351,55 +1373,68 @@
     }
 }
 
-/* Ventana estrecha: barra lateral en modo icono */
-@container panel-vista (max-width: 640px) {
+/* Ventana angosta / móvil: barra lateral deslizable (drawer) */
+@container panel-vista (max-width: 700px) {
     .panel-sidebar {
-        width: 64px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 30;
+        width: min(286px, 84%);
+        transform: translateX(-104%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 20px 0 60px -34px rgba(4, 9, 24, 0.85);
+        will-change: transform;
     }
 
-    .panel-marca {
-        justify-content: center;
-        padding: 14px 8px;
+    .panel-sidebar.es-abierto {
+        transform: translateX(0);
     }
 
-    .panel-marca > div {
-        display: none;
+    .panel-nav-fondo {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        display: block;
+        border: 0;
+        padding: 0;
+        appearance: none;
+        background: rgba(8, 12, 28, 0.52);
+        backdrop-filter: blur(2px);
+        cursor: pointer;
+        touch-action: none;
+        animation: pvFade 0.2s ease-out;
     }
 
-    .panel-marca-logo {
-        height: 34px;
-        width: 34px;
+    .panel-cuerpo > div {
+        max-width: none;
     }
+}
 
-    .panel-nav {
-        padding: 8px 8px 12px;
+@media (prefers-reduced-motion: reduce) {
+    .panel-sidebar {
+        transition: none;
     }
+}
 
-    .panel-nav-grupo {
-        display: none;
-    }
+/* ===== Arrastre interno (mouse + táctil) =====
+   El asa usa touch-action:none para que el gesto no desplace la página,
+   y durante el arrastre se bloquea la selección y el scroll del fondo. */
+.panel-agarre {
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
 
-    .panel-nav-item {
-        justify-content: center;
-        gap: 0;
-        padding: 11px 8px;
-    }
+html.panel-arrastrando,
+html.panel-arrastrando body {
+    overscroll-behavior: none;
+}
 
-    .panel-nav-item .truncate {
-        display: none;
-    }
-
-    .panel-usuario {
-        flex-direction: column;
-        gap: 8px;
-        padding: 10px 8px;
-    }
-
-    .panel-usuario > div {
-        display: none;
-    }
-
-    .panel-salir {
-        margin-left: 0;
-    }
+html.panel-arrastrando * {
+    cursor: grabbing !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
 }

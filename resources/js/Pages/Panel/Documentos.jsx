@@ -420,7 +420,7 @@ function Formulario({ form, editingId, categorias, visibilidades, archivo, alSel
                 </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
                 <Boton type="button" onClick={onCancelar} className="px-4 py-2 text-sm hover:bg-slate-50">
                     Cancelar
                 </Boton>

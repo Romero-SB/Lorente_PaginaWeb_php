@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 import Modal from '../Shared/Modal';
+import useReordenarArrastre from '../../hooks/useReordenarArrastre';
 import { toast } from '../../lib/toast';
 import { reordenarLista } from '../../lib/reordenar';
 import EditorEstiloCategoria from './EditorEstiloCategoria';
@@ -24,8 +25,11 @@ export default function GestorCategorias({
     const [renombrando, setRenombrando] = useState(null);
     const [valorRenombre, setValorRenombre] = useState('');
     const [bloqueada, setBloqueada] = useState(null);
-    const [origen, setOrigen] = useState(null);
     const [estiloCategoria, setEstiloCategoria] = useState(null);
+
+    const { origen, destino, iniciar } = useReordenarArrastre({
+        onSoltar: (desde, hasta) => soltar(desde, hasta),
+    });
 
     useEffect(() => {
         setLista(categorias);
@@ -86,15 +90,16 @@ export default function GestorCategorias({
     return (
         <>
             <Modal onCerrar={onClose} ariaLabel={titulo}>
-                <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                    <h3 className="text-sm font-bold text-slate-800">{titulo}</h3>
-                    <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
-                        <Icono nombre="cerrar" className="h-4 w-4" />
-                    </button>
-                </div>
+                <div className="flex max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-2rem)] flex-col">
+                    <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-3">
+                        <h3 className="text-sm font-bold text-slate-800">{titulo}</h3>
+                        <button type="button" onClick={onClose} className="text-slate-400 transition hover:text-slate-700">
+                            <Icono nombre="cerrar" className="h-4 w-4" />
+                        </button>
+                    </div>
 
-                <div className="px-4 py-4">
-                    <div className="flex items-center gap-2">
+                    <div className="shrink-0 px-4 pt-4">
+                        <div className="flex items-center gap-2">
                         <input
                             value={nuevo}
                             onChange={(e) => setNuevo(e.target.value)}
@@ -110,10 +115,12 @@ export default function GestorCategorias({
                         >
                             Crear
                         </button>
+                        </div>
                     </div>
 
-                    {bloqueada && (
-                        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-3 pb-4">
+                        {bloqueada && (
+                            <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
                             <p className="font-semibold">
                                 No se puede eliminar “{bloqueada.nombre}” porque tiene {bloqueoEtiqueta} asociados.
                             </p>
@@ -127,21 +134,25 @@ export default function GestorCategorias({
                         </div>
                     )}
 
-                    <div className="mt-3 space-y-2">
-                        {lista.length === 0 && <p className="py-6 text-center text-xs text-slate-400">No hay categorías guardadas.</p>}
+                        <div className="space-y-2">
+                            {lista.length === 0 && <p className="py-6 text-center text-xs text-slate-400">No hay categorías guardadas.</p>}
                         {lista.map((cat, idx) => (
                             <div
                                 key={cat.id}
-                                draggable={renombrando !== cat.id}
-                                onDragStart={() => setOrigen(idx)}
-                                onDragOver={(e) => e.preventDefault()}
-                                onDrop={() => {
-                                    soltar(origen, idx);
-                                    setOrigen(null);
-                                }}
-                                className="flex items-center gap-2 rounded-lg border border-slate-200 px-2 py-1.5"
+                                data-reordenar-indice={idx}
+                                className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 transition ${
+                                    destino === idx && origen !== null && origen !== idx
+                                        ? 'border-blue-300 ring-2 ring-blue-100'
+                                        : 'border-slate-200'
+                                } ${origen === idx ? 'opacity-50' : ''}`}
                             >
-                                <button type="button" className="cursor-grab text-slate-300 active:cursor-grabbing" title="Arrastrar para reordenar">
+                                <button
+                                    type="button"
+                                    className="panel-agarre -m-1 shrink-0 cursor-grab rounded p-1 text-slate-300 transition hover:text-slate-500 active:cursor-grabbing"
+                                    title="Arrastrar para reordenar"
+                                    aria-label={`Reordenar categoría ${cat.nombre}`}
+                                    onPointerDown={(e) => iniciar(e, idx)}
+                                >
                                     <Icono nombre="grip" className="h-4 w-4" />
                                 </button>
                                 {renombrando === cat.id ? (
@@ -194,6 +205,7 @@ export default function GestorCategorias({
                                 )}
                             </div>
                         ))}
+                        </div>
                     </div>
                 </div>
             </Modal>

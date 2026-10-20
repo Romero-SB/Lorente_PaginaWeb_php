@@ -92,13 +92,13 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                     </button>
                 ))}
 
-                <form onSubmit={buscar} className="ml-auto flex items-center gap-2">
+                <form onSubmit={buscar} className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
                     <input
                         type="text"
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder="Buscar nombre, correo o asunto"
-                        className="panel-campo w-64"
+                        className="panel-campo min-w-0 flex-1 sm:w-64 sm:flex-none"
                     />
                     <Boton variante="primario" type="submit" className="px-3 py-2 text-sm">
                         <Icono nombre="buscar" className="h-4 w-4" />
@@ -108,7 +108,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
 
             <div className="panel-rejilla-detalle mt-5 grid gap-4">
                 <div className="panel-tarjeta flex max-h-[70vh] flex-col overflow-hidden">
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto overscroll-contain">
                         {items.length === 0 ? (
                             <p className="px-4 py-10 text-center text-sm text-slate-500">
                                 No hay mensajes que coincidan.
@@ -170,7 +170,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                     <h2 className="panel-titulo-seccion">{actual.asunto}</h2>
                                     <p className="mt-1 text-sm text-slate-500">
                                         De <strong className="text-slate-700">{actual.nombre}</strong> ·{' '}
-                                        <a href={`mailto:${actual.email}`} className="text-blue-600 hover:underline">
+                                        <a href={`mailto:${actual.email}`} className="break-words text-blue-600 hover:underline">
                                             {actual.email}
                                         </a>
                                         {actual.telefono && <> · {actual.telefono}</>}
@@ -181,7 +181,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                         {actual.respondido && <> · Respondido el {formatearFecha(actual.respondido_at)}</>}
                                     </p>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                                     <Boton
                                         onClick={() => accion(`/lorente-panel/mensajes/${actual.id}/leido`)}
                                         className="px-3 py-1.5 text-xs border-slate-300 hover:bg-slate-50"
@@ -206,7 +206,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                 </div>
                             </div>
 
-                            <div className="mt-5 border-t border-slate-100 pt-5 text-sm leading-relaxed whitespace-pre-wrap text-slate-700">
+                            <div className="mt-5 border-t border-slate-100 pt-5 text-sm leading-relaxed break-words whitespace-pre-wrap text-slate-700">
                                 {actual.mensaje}
                             </div>
 

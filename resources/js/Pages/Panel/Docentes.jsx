@@ -10,6 +10,7 @@ import EmptyState from '../../Components/Shared/EmptyState';
 import FileDropzone from '../../Components/Shared/FileDropzone';
 import PageHeader from '../../Components/Shared/PageHeader';
 import Papelera from '../../Components/Shared/Papelera';
+import useReordenarArrastre from '../../hooks/useReordenarArrastre';
 import { reordenarLista } from '../../lib/reordenar';
 import { toast } from '../../lib/toast';
 
@@ -309,8 +310,9 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
 }
 
 function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onEliminar, onSoltarDocente }) {
-    const [origen, setOrigen] = useState(null);
-    const [destino, setDestino] = useState(null);
+    const { origen, destino, iniciar } = useReordenarArrastre({
+        onSoltar: (desde, hasta, grupo) => onSoltarDocente(grupo, desde, hasta),
+    });
 
     const grupos = categorias
         .map((c) => ({
@@ -350,28 +352,30 @@ function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onElimin
                                 {items.map((doc, idx) => (
                                     <div
                                         key={doc.id}
-                                        draggable
-                                        onDragStart={() => setOrigen(idx)}
-                                        onDragOver={(e) => {
-                                            e.preventDefault();
-                                            setDestino(idx);
-                                        }}
-                                        onDrop={() => {
-                                            onSoltarDocente(categoria.nombre, origen, idx);
-                                            setOrigen(null);
-                                            setDestino(null);
-                                        }}
-                                        onDragEnd={() => {
-                                            setOrigen(null);
-                                            setDestino(null);
-                                        }}
-                                        className={`flex items-center gap-3 rounded-xl border bg-white p-3 transition ${
+                                        data-reordenar-indice={idx}
+                                        data-reordenar-grupo={categoria.nombre}
+                                        className={`flex flex-wrap items-center gap-3 rounded-xl border bg-white p-3 transition ${
                                             destino === idx && origen !== null && origen !== idx
                                                 ? 'border-blue-300 ring-2 ring-blue-100'
                                                 : 'border-slate-200'
-                                        }`}
+                                        } ${origen === idx ? 'opacity-60' : ''}`}
                                     >
-                                        <button type="button" className="cursor-grab text-slate-300 active:cursor-grabbing" title="Arrastrar para reordenar">
+                                        <button
+                                            type="button"
+                                            className={`panel-agarre -m-1 shrink-0 rounded p-1 text-slate-300 transition active:cursor-grabbing ${
+                                                categoria.nombre === 'Sin categoría'
+                                                    ? 'cursor-not-allowed opacity-40'
+                                                    : 'cursor-grab hover:text-slate-500'
+                                            }`}
+                                            title={categoria.nombre === 'Sin categoría' ? 'Asigna una categoría para reordenar' : 'Arrastrar para reordenar'}
+                                            aria-label={`Reordenar a ${doc.nombre}`}
+                                            disabled={categoria.nombre === 'Sin categoría'}
+                                            onPointerDown={
+                                                categoria.nombre === 'Sin categoría'
+                                                    ? undefined
+                                                    : (e) => iniciar(e, idx, categoria.nombre)
+                                            }
+                                        >
                                             <Icono nombre="grip" className="h-4 w-4" />
                                         </button>
                                         <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
@@ -387,7 +391,7 @@ function Lista({ categorias, docentes, busqueda, setBusqueda, onEditar, onElimin
                                             <p className="truncate text-sm font-bold text-slate-900">{doc.nombre}</p>
                                             <p className="truncate text-xs text-slate-500">{doc.cargo}</p>
                                         </div>
-                                        <div className="flex shrink-0 items-center gap-2">
+                                        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                                             <Boton onClick={() => onEditar(doc)} className="px-3 py-1.5 text-xs border-slate-200 hover:bg-slate-50">
                                                 <Icono nombre="editar" className="h-3.5 w-3.5" /> Editar
                                             </Boton>
@@ -479,7 +483,7 @@ function Formulario({ form, editingId, categorias, fotoPreview, alSeleccionarFot
                 </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
                 <Boton type="button" onClick={onCancelar} className="px-4 py-2 text-sm hover:bg-slate-50">
                     Cancelar
                 </Boton>

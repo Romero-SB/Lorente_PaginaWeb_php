@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * Diálogo modal accesible: cierra con Escape o al pulsar el fondo, y atrapa el
@@ -46,18 +47,28 @@ export default function Modal({ onCerrar, ariaLabel = 'Ventana', ancho = 'max-w-
         return () => document.removeEventListener('keydown', onKey, true);
     }, [onCerrar]);
 
-    return (
-        <div className={`fixed inset-0 ${z} grid place-items-center bg-slate-900/70 p-4`} onClick={onCerrar}>
-            <div
-                ref={ref}
-                role="dialog"
-                aria-modal="true"
-                aria-label={ariaLabel}
-                className={`w-full ${ancho} overflow-hidden rounded-2xl bg-white shadow-xl`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                {children}
+    const contenido = (
+        <div
+            className={`pointer-events-auto fixed inset-0 ${z} overflow-y-auto overscroll-contain`}
+            onClick={onCerrar}
+        >
+            <div className="flex min-h-full items-center justify-center bg-slate-900/70 p-4">
+                <div
+                    ref={ref}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={ariaLabel}
+                    className={`w-full ${ancho} overflow-hidden rounded-2xl bg-white shadow-xl`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {children}
+                </div>
             </div>
         </div>
     );
+
+    if (typeof document === 'undefined') return contenido;
+
+    const contenedor = document.querySelector('.panel-capa');
+    return contenedor ? createPortal(contenido, contenedor) : contenido;
 }

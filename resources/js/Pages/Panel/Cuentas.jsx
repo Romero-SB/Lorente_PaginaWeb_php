@@ -162,7 +162,7 @@ export default function Cuentas({ cuentas = { data: [], links: [], meta: {} }, r
                             />
                         </Campo>
                     </div>
-                    <div className="mt-4 flex items-center justify-end gap-2">
+                    <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
                         <Boton type="button" onClick={cerrarAlta} className="px-3 py-2 text-sm hover:bg-slate-50">
                             Cancelar
                         </Boton>
@@ -207,7 +207,7 @@ export default function Cuentas({ cuentas = { data: [], links: [], meta: {} }, r
                                 {cuenta.cargo && <p className="mt-0.5 text-xs text-slate-400">{cuenta.cargo}</p>}
                             </div>
 
-                            <div className="flex shrink-0 items-center gap-2">
+                            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
                                 {cuenta.puede_gestionar && (
                                     <Boton onClick={() => abrirReset(cuenta)} className="px-3 py-1.5 text-xs border-slate-200 hover:bg-slate-50">
                                         <Icono nombre="editar" className="h-3.5 w-3.5" /> Restablecer contraseña
@@ -251,7 +251,7 @@ export default function Cuentas({ cuentas = { data: [], links: [], meta: {} }, r
                                         autoComplete="new-password"
                                     />
                                 </Campo>
-                                <div className="panel-celda-2 flex items-center justify-end gap-2">
+                                <div className="panel-celda-2 flex flex-wrap items-center justify-end gap-2">
                                     <Boton
                                         type="button"
                                         onClick={() => {

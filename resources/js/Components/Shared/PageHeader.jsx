@@ -13,7 +13,11 @@ export default function PageHeader({ titulo, descripcion, children }) {
                 <h1 className="panel-titulo-pagina">{titulo}</h1>
                 {descripcion && <p className="mt-1 text-sm text-slate-500">{descripcion}</p>}
             </div>
-            {children && <div className="flex items-center gap-2">{children}</div>}
+            {children && (
+                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+                    {children}
+                </div>
+            )}
         </div>
     );
 }

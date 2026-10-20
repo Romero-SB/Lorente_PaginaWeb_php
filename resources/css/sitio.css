@@ -1477,16 +1477,27 @@
     to { opacity: 1; }
 }
 
+@keyframes nmPop {
+    from { opacity: 0; transform: translateY(18px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes nmSheet {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* El fondo es el propio sitio, atenuado y desenfocado (sin tinte azul) */
 .sitio-root .noticia-modal-capa {
     position: fixed;
     inset: 0;
     z-index: 600;
     display: flex;
-    padding: 28px 16px;
+    padding: 40px 20px;
     overflow-y: auto;
-    background: rgba(15, 27, 66, 0.72);
-    backdrop-filter: blur(4px);
-    animation: nmFade 0.22s ease-out;
+    background: rgba(16, 17, 20, 0.4);
+    backdrop-filter: blur(12px) saturate(115%);
+    animation: nmFade 0.24s ease-out;
 }
 
 .sitio-root .noticia-modal {
@@ -1496,18 +1507,32 @@
     margin: auto;
 }
 
+.sitio-root .noticia-modal:focus,
+.sitio-root .noticia-modal:focus-visible {
+    outline: none;
+}
+
 .sitio-root .noticia-modal .nd-card {
     margin: 0;
 }
 
-/* Modal a pantalla completa: imagen a la izquierda, contenido a la derecha */
+/* Modal: imagen a la izquierda, contenido a la derecha */
 .sitio-root .nd-card--modal {
+    position: relative;
     display: flex;
-    width: min(1080px, 95vw);
+    width: min(1100px, 95vw);
     max-width: none;
-    height: min(86vh, 720px);
-    padding: 0;
+    height: min(88vh, 740px);
+    padding: 10px;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 28px;
+    background: #fff;
+    box-shadow:
+        0 70px 140px -50px rgba(0, 0, 0, 0.65),
+        0 30px 60px -34px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(15, 27, 66, 0.05);
+    animation: nmPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .sitio-root .nd-card--solo {
@@ -1519,7 +1544,8 @@
     flex: 0 0 46%;
     min-width: 0;
     overflow: hidden;
-    background: var(--az900);
+    border-radius: 20px;
+    background: #12151d;
 }
 
 .sitio-root .nd-card--modal .nd-carousel-wrap {
@@ -1528,39 +1554,118 @@
     margin-bottom: 0;
     border-radius: 0;
     aspect-ratio: auto;
+    background: transparent;
 }
 
 .sitio-root .nd-media .nd-dots {
     position: absolute;
     right: 0;
-    bottom: 10px;
+    bottom: 14px;
     left: 0;
     z-index: 3;
     padding: 0;
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6));
 }
 
 .sitio-root .nd-media .nd-dot {
     border-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 0 1px rgba(15, 27, 66, 0.35);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
 .sitio-root .nd-body {
+    position: relative;
     flex: 1;
     min-width: 0;
-    padding: clamp(22px, 3vw, 38px);
+    padding: clamp(24px, 3.2vw, 46px);
     overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #fff;
+}
+
+.sitio-root .nd-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.sitio-root .nd-body::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: content-box;
+    background-color: rgba(22, 38, 94, 0.22);
+}
+
+.sitio-root .nd-body::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(22, 38, 94, 0.4);
+}
+
+.sitio-root .nd-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Encabezado y lectura dentro del modal */
+.sitio-root .nd-card--modal .n-cat-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 13px;
+    border: 1px solid rgba(194, 154, 43, 0.32);
+    border-radius: 9999px;
+    color: var(--oro);
+    font-size: 0.63rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    background: rgba(194, 154, 43, 0.1);
 }
 
 .sitio-root .nd-card--modal .n-title-detail {
-    padding-right: 44px;
+    margin: 16px 0 12px;
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    line-height: 1.16;
+    letter-spacing: -0.015em;
 }
 
+.sitio-root .nd-card--modal .n-meta-detail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--bo);
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--gr);
+}
+
+.sitio-root .nd-card--modal .n-contenido {
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--tinta);
+}
+
+.sitio-root .nd-card--modal .n-attachments {
+    margin-top: 28px;
+    padding-top: 20px;
+}
+
+.sitio-root .nd-card--modal .n-file-card {
+    background: #fff;
+    border-color: var(--bo);
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.sitio-root .nd-card--modal .n-file-card:hover {
+    border-color: var(--az);
+    box-shadow: 0 10px 24px rgba(15, 27, 66, 0.1);
+}
+
+/* Tablets: tarjeta en columna centrada */
 @media (max-width: 820px) {
     .sitio-root .nd-card--modal {
         flex-direction: column;
         width: min(560px, 95vw);
         height: auto;
         max-height: none;
+        border-radius: 24px;
     }
 
     .sitio-root .nd-media {
@@ -1573,42 +1678,46 @@
     }
 }
 
-.sitio-root .noticia-modal-cerrar {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 4;
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border: 1px solid var(--bo);
-    border-radius: 50%;
-    color: var(--az);
-    font-size: 15px;
-    line-height: 1;
-    background: #fff;
-    box-shadow: 0 6px 18px rgba(15, 27, 66, 0.2);
-    cursor: pointer;
-    transition: color 0.25s var(--trans-suave), background 0.25s var(--trans-suave),
-        border-color 0.25s var(--trans-suave), transform 0.25s var(--trans-suave);
-}
-
-.sitio-root .noticia-modal-cerrar:hover {
-    color: #fff;
-    background: var(--ro);
-    border-color: var(--ro);
-    transform: rotate(90deg);
-}
-
-.sitio-root .noticia-modal-cerrar:focus-visible {
-    outline: 2px solid var(--do);
-    outline-offset: 2px;
-}
-
+/* Móvil: hoja inferior a pantalla completa */
 @media (max-width: 640px) {
     .sitio-root .noticia-modal-capa {
-        padding: 14px 10px;
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .sitio-root .noticia-modal {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .sitio-root .nd-card--modal {
+        width: 100%;
+        max-height: 92vh;
+        padding: 0;
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: 26px 26px 0 0;
+        animation: nmSheet 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .sitio-root .nd-media {
+        height: 208px;
+        border-radius: 26px 26px 0 0;
+    }
+
+    .sitio-root .nd-body {
+        min-height: 0;
+        padding: clamp(22px, 6vw, 32px);
+        overflow-y: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sitio-root .noticia-modal-capa,
+    .sitio-root .nd-card--modal {
+        animation: none !important;
     }
 }
 
