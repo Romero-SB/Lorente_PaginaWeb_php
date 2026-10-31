@@ -35,7 +35,7 @@ function cargarImagen(url) {
     });
 }
 
-export async function recortarImagenWebp(imageSrc, areaPixels, anchoSalida = 400, calidad = 0.85) {
+export async function recortarImagenWebp(imageSrc, areaPixels, anchoSalida = 400, calidad = 0.85, nombre = 'docente.webp') {
     const imagen = await cargarImagen(imageSrc);
     const altoSalida = Math.max(1, Math.round(anchoSalida * (areaPixels.height / areaPixels.width)));
 
@@ -58,7 +58,7 @@ export async function recortarImagenWebp(imageSrc, areaPixels, anchoSalida = 400
     const blob = await new Promise((res) => lienzo.toBlob(res, 'image/webp', calidad));
     if (!blob) throw new Error('No se pudo procesar la imagen');
 
-    return new File([blob], 'docente.webp', { type: 'image/webp' });
+    return new File([blob], nombre, { type: 'image/webp' });
 }
 
 export function formatoPeso(bytes) {

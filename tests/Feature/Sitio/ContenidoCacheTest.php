@@ -7,6 +7,8 @@ use App\Models\Docente;
 use App\Models\DocenteCategoria;
 use App\Models\Documento;
 use App\Models\DocumentoCategoria;
+use App\Models\HistoriaHito;
+use App\Models\NosotrosImagen;
 use App\Models\Noticia;
 use App\Support\ContenidoSitio;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -68,6 +70,37 @@ class ContenidoCacheTest extends TestCase
         $ids = collect(ContenidoSitio::para()['documentos'])->pluck('id');
 
         $this->assertTrue($ids->contains($documento->id));
+    }
+
+    public function test_crear_un_hito_invalida_la_historia_cacheada(): void
+    {
+        ContenidoSitio::para();
+
+        $hito = HistoriaHito::create([
+            'anio' => '2026',
+            'titulo' => 'Hito cache',
+            'texto' => 'Texto del hito.',
+            'orden' => 10,
+        ]);
+
+        $ids = collect(ContenidoSitio::para()['historia'])->pluck('id');
+
+        $this->assertTrue($ids->contains($hito->id));
+    }
+
+    public function test_crear_una_imagen_de_nosotros_invalida_el_contenido_cacheado(): void
+    {
+        ContenidoSitio::para();
+
+        $imagen = NosotrosImagen::create([
+            'ruta' => 'config/nosotros/cache.webp',
+            'alt' => 'Imagen cache',
+            'orden' => 10,
+        ]);
+
+        $ids = collect(ContenidoSitio::para()['nosotros_imagenes'])->pluck('id');
+
+        $this->assertTrue($ids->contains($imagen->id));
     }
 
     public function test_crear_un_docente_invalida_las_categorias_cacheadas(): void

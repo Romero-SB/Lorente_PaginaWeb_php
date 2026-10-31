@@ -5,6 +5,7 @@ namespace Tests\Feature\Sitio;
 use App\Mail\ContactoRecibido;
 use App\Models\Config;
 use App\Models\Documento;
+use App\Models\HistoriaHito;
 use App\Models\Noticia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,7 +53,41 @@ class SitioPublicoTest extends TestCase
                 ->has('docentes')
                 ->has('categorias_docentes')
                 ->has('noticias')
-                ->has('documentos'));
+                ->has('documentos')
+                ->has('historia')
+                ->has('nosotros_imagenes'));
+    }
+
+    public function test_la_pagina_de_inicio_expone_las_imagenes_de_nosotros(): void
+    {
+        $imagen = \App\Models\NosotrosImagen::create([
+            'ruta' => 'config/nosotros/fachada.webp',
+            'alt' => 'Fachada de la institución',
+            'orden' => 10,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('nosotros_imagenes', fn ($lista) => collect($lista)->pluck('id')->contains($imagen->id)));
+    }
+
+    public function test_la_pagina_de_inicio_muestra_la_historia_y_su_cierre(): void
+    {
+        $hito = HistoriaHito::create([
+            'anio' => '2026',
+            'titulo' => 'Hito publicado',
+            'texto' => 'Descripción del hito publicado.',
+            'orden' => 999,
+        ]);
+
+        Config::actual()->update(['historia_cierre' => 'Cierre editado desde el panel.']);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('config.historia_cierre', 'Cierre editado desde el panel.')
+                ->where('historia', fn ($lista) => collect($lista)->pluck('id')->contains($hito->id)));
     }
 
     public function test_la_pagina_de_inicio_muestra_solo_noticias_publicadas(): void

@@ -1,6 +1,6 @@
 export default function WhatsAppButton() {
     return (
-        <a className="wa" href="https://wa.me/51919585463" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
+        <a className="wa" href="https://wa.me/955686852" target="_blank" rel="noopener noreferrer" aria-label="Escríbenos por WhatsApp">
             <svg viewBox="0 0 32 32" fill="none">
                 <path
                     fill="#fff"

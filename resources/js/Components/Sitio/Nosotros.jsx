@@ -1,6 +1,7 @@
 import Reveal from './Reveal';
 import SectionHeader from './SectionHeader';
 import Imagen from './Imagen';
+import GaleriaNosotros from './GaleriaNosotros';
 import { estiloCategoria } from '../../lib/fuentes';
 
 const HISTORIA = [
@@ -36,15 +37,23 @@ const HISTORIA = [
     },
 ];
 
+const CIERRE =
+    'Hoy la comunidad educativa lorentina goza de una infraestructura moderna —incluyendo un campo deportivo ' +
+    'multifuncional techado, sala de aeróbicos y cafetín/comedor— sin dejar de ser la I.E. 31501, con el legado ' +
+    'de labor proficua de nuestros antecesores: ejemplo de trabajo, dedicación y cariño por la niñez lorentina.';
+
 const VALORES = ['Respeto', 'Responsabilidad', 'Solidaridad', 'Identidad cultural', 'Innovación', 'Excelencia'];
 
-export default function Nosotros({ docentes = [], categoriasDocentes = [], config = {} }) {
+export default function Nosotros({ docentes = [], categoriasDocentes = [], config = {}, historia = [], nosotros_imagenes = [] }) {
+    const hitos = historia.length > 0 ? historia : HISTORIA;
+    const cierre = config.historia_cierre || CIERRE;
+
     return (
         <>
             <div className="nosg">
                 <Reveal>
                     <div className="nosv">
-                        <Imagen src="/referencial.jpg" alt="Instalaciones de la IE Sebastián Lorente" loading="lazy" decoding="async" />
+                        <GaleriaNosotros imagenes={nosotros_imagenes} />
                     </div>
                 </Reveal>
                 <Reveal delay={120}>
@@ -97,8 +106,8 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
                     </div>
                 </Reveal>
                 <div className="htg">
-                    {HISTORIA.map((h) => (
-                        <Reveal key={h.anio} className="rev-fill">
+                    {hitos.map((h) => (
+                        <Reveal key={h.id ?? h.anio} className="rev-fill">
                             <div className="htc">
                                 <div className="htc-anio">{h.anio}</div>
                                 <h3>{h.titulo}</h3>
@@ -107,14 +116,11 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
                         </Reveal>
                     ))}
                 </div>
-                <Reveal delay={120}>
-                    <p className="ht-extra">
-                        Hoy la comunidad educativa lorentina goza de una infraestructura moderna —incluyendo un campo
-                        deportivo multifuncional techado, sala de aeróbicos y cafetín/comedor— sin dejar de ser la I.E.
-                        31501, con el legado de labor proficua de nuestros antecesores: ejemplo de trabajo, dedicación y
-                        cariño por la niñez lorentina.
-                    </p>
-                </Reveal>
+                {cierre && (
+                    <Reveal delay={120}>
+                        <p className="ht-extra">{cierre}</p>
+                    </Reveal>
+                )}
             </section>
 
             {categoriasDocentes.length > 0 && (

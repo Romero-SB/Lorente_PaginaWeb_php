@@ -48,6 +48,7 @@ class ConfiguracionPanelTest extends TestCase
             'estudiantes' => 850,
             'docentes_count' => 42,
             'anio_fundacion' => 1965,
+            'historia_cierre' => 'Un legado que continúa creciendo.',
             'niveles' => 'Inicial, Primaria, Secundaria',
             'mision' => 'Formar estudiantes íntegros.',
             'vision' => 'Ser referentes en la región.',
@@ -62,6 +63,7 @@ class ConfiguracionPanelTest extends TestCase
         $this->assertSame(42, $config->docentes_count);
         $this->assertSame(1965, $config->anio_fundacion);
         $this->assertSame('Inicial, Primaria, Secundaria', $config->niveles);
+        $this->assertSame('Un legado que continúa creciendo.', $config->historia_cierre);
         $this->assertSame($admin->id, $config->updated_by);
 
         $this->assertTrue(

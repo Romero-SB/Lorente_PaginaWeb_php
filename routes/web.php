@@ -10,7 +10,9 @@ use App\Http\Controllers\Panel\DocentesController;
 use App\Http\Controllers\Panel\DocumentoCategoriasController;
 use App\Http\Controllers\Panel\DocumentosController;
 use App\Http\Controllers\Panel\HistorialController;
+use App\Http\Controllers\Panel\HistoriaController;
 use App\Http\Controllers\Panel\MensajesController;
+use App\Http\Controllers\Panel\NosotrosImagenesController;
 use App\Http\Controllers\Panel\NoticiasController;
 use App\Http\Controllers\Panel\PerfilController;
 use App\Http\Controllers\Panel\ResumenController;
@@ -178,6 +180,33 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::post('/configuracion', [ConfiguracionController::class, 'update'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.update');
+        Route::post('/configuracion/hero', [ConfiguracionController::class, 'actualizarHero'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.hero');
+        Route::post('/configuracion/nosotros-imagenes', [NosotrosImagenesController::class, 'store'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.nosotros-imagenes.store');
+        Route::post('/configuracion/nosotros-imagenes/reordenar', [NosotrosImagenesController::class, 'reordenar'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.nosotros-imagenes.reordenar');
+        Route::post('/configuracion/nosotros-imagenes/{imagen}', [NosotrosImagenesController::class, 'update'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.nosotros-imagenes.update');
+        Route::post('/configuracion/nosotros-imagenes/{imagen}/eliminar', [NosotrosImagenesController::class, 'destroy'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.nosotros-imagenes.destroy');
+        Route::post('/configuracion/historia', [HistoriaController::class, 'store'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.historia.store');
+        Route::post('/configuracion/historia/reordenar', [HistoriaController::class, 'reordenar'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.historia.reordenar');
+        Route::post('/configuracion/historia/{hito}', [HistoriaController::class, 'update'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.historia.update');
+        Route::post('/configuracion/historia/{hito}/eliminar', [HistoriaController::class, 'destroy'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.historia.destroy');
         Route::get('/perfil', [PerfilController::class, 'index'])->name('panel.perfil.index');
         Route::post('/perfil', [PerfilController::class, 'update'])->name('panel.perfil.update');
         Route::post('/perfil/password', [PerfilController::class, 'updatePassword'])->name('panel.perfil.password');

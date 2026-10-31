@@ -6,6 +6,8 @@ use App\Models\Adjunto;
 use App\Models\Config;
 use App\Models\Docente;
 use App\Models\Documento;
+use App\Models\HistoriaHito;
+use App\Models\NosotrosImagen;
 use App\Models\Noticia;
 use App\Models\NoticiaImagen;
 
@@ -26,7 +28,44 @@ class SitioDatos
             'niveles' => $config->niveles,
             'mision' => $config->mision,
             'vision' => $config->vision,
+            'hero_imagen' => $config->hero_imagen ? Almacenamiento::url($config->hero_imagen) : null,
+            'historia_cierre' => $config->historia_cierre,
         ];
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public static function historia(): array
+    {
+        return HistoriaHito::query()
+            ->select(['id', 'anio', 'titulo', 'texto', 'orden'])
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (HistoriaHito $hito) => [
+                'id' => $hito->id,
+                'anio' => $hito->anio,
+                'titulo' => $hito->titulo,
+                'texto' => $hito->texto,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    public static function nosotrosImagenes(): array
+    {
+        return NosotrosImagen::query()
+            ->select(['id', 'ruta', 'alt', 'orden'])
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (NosotrosImagen $imagen) => [
+                'id' => $imagen->id,
+                'url' => Almacenamiento::url($imagen->ruta),
+                'alt' => $imagen->alt,
+            ])
+            ->values()
+            ->all();
     }
 
     /** @return array<int, array<string, mixed>> */

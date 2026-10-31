@@ -1,117 +1,265 @@
-# PLAN — Web Institucional I.E. N° 31501 «Sebastián Lorente»
+# PLAN — Administración de contenido del sitio
 
-## Cómo usar este plan
-- Leyenda: `[ ]` pendiente · `[~]` en progreso · `[x]` terminado.
-- Se marca una fase `[x]` SOLO cuando el usuario confirma que se terminó.
-- Al retomar el trabajo, consultar este archivo primero.
+## Decisiones
 
-## Contexto
-- Migración de `D:\PHP_Lorente` (Laravel 11 API + React SPA) a Laravel 13 + Inertia 3 + React 19.
-- Referencia de patrones: `D:\aula-virtual-postgrado`.
-- `D:\PHP_Lorente` permanece INTACTO: solo se copian piezas (CSS, componentes, assets).
-- Hosting cPanel (PHP 8.3, MySQL), sin terminal y sin websockets. Dev en SQLite.
+- Nuestra Historia: hitos (año/título/texto) + párrafo final editable.
+- Nosotros: carrusel de imágenes (fallback `/referencial.jpg`).
+- Logo 3D: "Glorioso Lorente" arriba, "Modelo de Progreso" abajo y
+  "IE N° 31501 · Sebastián Lorente" como línea pequeña.
+- Administración: pestañas dentro de Configuración (Super Usuario y Administrador).
 
-## Decisiones confirmadas
-- Auth por email + password; Turnstile integrado con `TURNSTILE_ENABLED=false` por ahora.
-- Login del panel en `/lorente-panel`.
-- Roles: `super-usuario`, `administrador`, `docente`.
-- Un Docente publica noticias directamente (autor visible con su `cargo`).
-- Panel = ventana flotante arrastrable/redimensionable + sidebar interno por rol; refetch AJAX tras cada acción. Superpuesta al sitio público (el home queda de fondo).
-- Noticias del sitio público con rutas reales `/noticias/{slug}`.
-- Contacto: guarda en BD + email + bandeja (admin/super) + captcha.
-- Documentos publico/privado; privados accesibles con sesión (cualquier rol).
-- Storage: disco `public` + disco `local` (root `storage/app/private`).
-- Seeds: solo cuentas (superusuario) + config institucional; el resto manual.
-- Super resetea cualquier contraseña; Admin solo de docentes.
+## Migraciones (3, nuevas)
 
-## Fase 0 — Setup del proyecto
-- [x] Andamiar Laravel 13 en la raíz del repo (respetar `.git`)
-- [x] Instalar Inertia 3 + React 19 + Vite + Tailwind
-- [x] `.env` (SQLite, APP_URL, APP_LOCALE=es, APP_TIMEZONE=America/Lima, Turnstile off)
-- [x] Configurar discos `public` y `local`/privado (default Laravel 13 = `storage/app/private`)
-- [x] Copiar assets desde `PHP_Lorente` (LOGASO.glb, referencial.jpg, lorentefrontis.jpg, logo)
-- [x] Optimizar `LOGASO.glb` (Draco+Meshopt+textures 512 → **19.8 MB → 1.5 MB**) y logo (PNG 5.8 MB → WebP 94 KB); favicon.png generado (el original estaba vacío)
-- [x] Poster de LOGASO + carga diferida (se integra al portar el Sidebar 3D en Fase 9)
-- [x] Verificado: migraciones base, build Vite, primera página Inertia (HTTP 200)
+- [x] `add_hero_imagen_and_historia_cierre_to_config_table` (2 columnas nullable)
+- [x] `create_nosotros_imagenes_table` (id, ruta, alt, orden, timestamps)
+- [x] `create_historia_hitos_table` (id, anio, titulo, texto, orden, timestamps) + seed 6 hitos
 
-## Fase 1 — Modelo de datos
-- [x] Migraciones: users(mod role/cargo/must_change_password), config, noticias, noticia_imagenes, adjuntos, docente_categorias, docentes, documento_categorias, documentos(visibilidad), actividad, contacto_mensajes
-- [x] Modelos + relaciones + casts (Noticia con `slug` autogenerado y borrado en cascada de imágenes/adjuntos)
-- [x] Seeders: superusuario, administrador y docente (clave `lorente2026`) + config institucional
+Todas reversibles; no alteran datos existentes (salvo el seed de historia).
 
-## Fase 2 — Autenticación
-- [x] Rutas `/lorente-panel` (login/logout/recuperar/restablecer)
-- [x] Login por email normalizado (mayúsculas → minúsculas), remember me, rate limiting (3 fallos → bloqueo 1h), Turnstile condicional (`TURNSTILE_ENABLED` + site key)
-- [x] Reset por Gmail SMTP (config comentada en `.env`, pendiente credenciales) + `ResetPasswordNotification` + expiración 60 min
-- [x] Cambio de contraseña obligatorio en cuentas nuevas (`must_change_password`)
-- [x] Vistas Inertia de auth con estética institucional (`AuthLayout` + componente `Turnstile`)
-- [x] Panel placeholder (`/lorente-panel`) para que login/redirect funcionen hasta la Fase 3
-- [x] Tests de flujo: 20/20 (login, rate limit, reset, cambio obligatorio, Turnstile)
+## Bloque 0 — Seguridad
 
-## Fase 3 — RBAC + panel flotante
-- [x] Middleware `rol:` (+ `debe.cambiar.password` en el panel)
-- [x] Layout ventana flotante (drag/resize/min/max + posición persistente en localStorage + pill al minimizar)
-- [x] Sidebar interno por rol (`config/panel.php` + props compartidas `panel.*`)
-- [x] Refetch AJAX + toasts (tienda `lib/toast` + flash; `lib/draft` para restore del borrador)
-- [x] Secciones: Resumen (con contadores por rol) + placeholders Noticias/Docentes/Documentos/Mensajes/Cuentas/Configuración/Perfil
-- [x] Tests RBAC: 7/7 (guest→login, acceso por rol, 403, password pendiente)
+- [ ] Actualizar PHP local y hosting 8.3.35 → 8.3.36
+      (CVE-2026-109618 / CVE-2026-109619, RCE sin autenticación).
+- [x] Mitigación temporal: `session.upload_progress.enabled=0` (no necesaria; producción ya está en 8.3.36).
+- [x] `composer update symfony/mime` a ≥ 7.4.22 (CVE-2026-45070). → v7.4.22
+- [x] `composer audit` sin avisos y documentar chequeo pre-despliegue.
+- [x] Documentar en el MD los pasos manuales en cPanel (versión PHP).
 
-## Fase 4 — Módulo Noticias
-- [x] CRUD por rol (Docente solo propias; Admin/Super todas)
-- [x] Imágenes (máx 10, portada, drag&drop, WebP)
-- [x] Adjuntos validados (MIME real)
-- [x] Estados publicado/borrador (Docente publica directo)
-- [x] Autor + cargo + `updated_by` (badge "modificado por")
-- [x] Papelera jerárquica por autoría (Docente solo propias; Admin propias + de docentes; Super todas) + restaurar + purga 7 días (lazy + `noticias:purgar-papelera` programado)
-- [x] Registro en Historial
+## Bloque A — Nuestra Historia
 
-## Fase 5 — Módulo Docentes (Admin/Super)
-- [x] CRUD + foto con cropper (`react-easy-crop`, 4:5) + WebP (400px)
-- [x] Categorías (crear/renombrar/eliminar + guarda de bloqueo)
-- [x] Reorden drag&drop (`orden *10`, docentes y categorías)
-- [x] Papelera jerárquica (Admin solo propias; Super todas) + restaurar + permanente (solo Super) + purga 7 días (lazy + `docentes:purgar-papelera`) + Historial
+- [x] Modelo `HistoriaHito` + eventos de invalidación de caché.
+- [x] Controlador: listar, crear, editar, eliminar, reordenar.
+- [x] FormRequest con validación (año, título, texto, orden).
+- [x] Pestaña "Nuestra Historia" en `Panel/Configuracion.jsx`:
+      lista, formulario, orden y eliminar.
+- [x] Campo `config.historia_cierre` editable en la pestaña.
+- [x] `Nosotros.jsx` consume `historia` desde props; fallback a los textos actuales.
+- [x] `ContenidoSitio` incluye `historia` y `historia_cierre`.
+- [x] Tests: permisos (docente 403), CRUD, reorden, render público, caché.
 
-## Fase 6 — Módulo Documentos
-- [x] CRUD (todos crean; Admin/Super gestionan todas)
-- [x] Validación de cabeceras (`file` + `mimes:pdf,doc,docx,xls,xlsx,ppt,pptx` + `isValid`)
-- [x] Público/Privado (disco privado + ruta con `auth`)
-- [x] Categorías con reorden/renombre/guarda
-- [x] Papelera + Historial
+## Bloque B — Imagen principal del Inicio
 
-## Fase 7 — Papelera + Historial
-- [x] Vistas de papelera por rol (propia vs general)
-- [x] Historial (solo Super) con filtros
-- [x] "Modificado por" en noticias
-- [x] Purga a los 7 días con aviso de días restantes
+- [x] Extender `Recortador.jsx` y `recortarImagenWebp()` (ancho de salida y nombre;
+      400/`docente.webp` como default para docentes).
+- [x] Recorte 16:9, 1920px, WebP; entrada máx. 5 MB; carpeta `config/hero`.
+- [x] Subida/reemplazo/eliminación con borrado del archivo anterior.
+- [x] Pestaña "Imágenes" en Configuración con vista previa.
+- [x] Fondo dinámico del hero en `SitioHome` (fallback `/lorentefrontis.jpg`).
+- [x] `og:image` dinámico en `Inicio.jsx`.
+- [x] Tests de subida, reemplazo y render público.
 
-## Fase 8 — Configuración + cuentas
-- [x] Datos institucionales (Admin/Super)
-- [x] Datos de contacto (teléfono/correo/dirección)
-- [x] Perfil personal
-- [x] Cambio de contraseña
-- [x] Gestión de cuentas: Super (admin+docente, reset pass), Admin (solo docente)
+## Bloque C — Imágenes de Nosotros
 
-## Fase 9 — Sitio público
-- [x] Portar Hero/Nosotros/Noticias/Documentos/Contacto/Sidebar 3D/WhatsApp/Footer (CSS original)
-- [x] Rutas reales `/noticias`, `/noticias/{slug}` + SEO meta/OG por ruta
-- [x] Contacto real + bandeja (Admin/Super)
-- [x] Acceso a documentos privados con sesión
-- [x] Animaciones, skeletons y reveal
-- [x] Recorrido Virtual 360° (/recorrido) integrado con Photo Sphere Viewer (17 escenas 360°, indicador de pisos, validación Zod y botón flotante 3D conectado)
+- [x] Modelo `NosotrosImagen` + CRUD + orden (máx. 6).
+- [x] Recorte 3:2, 1200px, WebP; entrada máx. 4 MB; carpeta `config/nosotros`.
+- [x] UI de miniaturas en Configuración.
+- [x] `GaleriaNosotros.jsx` accesible (flechas, puntos, teclado, lazy).
+- [x] `ContenidoSitio` incluye `nosotros_imagenes`; fallback `/referencial.jpg`.
+- [x] Tests de CRUD, orden y render público.
 
-## Fase 9.1 — Login y panel superpuestos al sitio
-- [x] Login como modal sobre el home público (`/lorente-panel/login` renderiza el sitio + modal)
-- [x] Panel como ventana flotante sobre el home (datos públicos compartidos vía `ContenidoSitio`)
-- [x] Reestilo institucional (navy + oro + crema, Playfair/Inter) del panel y del login
-- [x] Disparador de acceso al panel en el sidebar público
-- [x] Reflejo en vivo de acciones sin perder la posición de scroll (layout persistente + `preserveScroll` + `<Link prefetch>`, nav con `except: ['sitio']`)
+## Bloque D — Logo 3D
 
-## Fase 10 — Pulido y despliegue
-- [x] SEO (sitemap, robots, meta), favicon
-- [x] Accesibilidad + responsive
-- [x] Optimización (GLB, imágenes, cache)
+- [x] `Sidebar.jsx`: "Glorioso Lorente" arriba, "Modelo de Progreso" debajo.
+- [x] Conservar línea pequeña "IE N° 31501 · Sebastián Lorente".
+- [x] Ajustes en `sitio.css` (Playfair + dorado, responsive). Sin migración.
 
-## Pendientes del usuario
-- [ ] `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
-- [ ] Cuenta Gmail + App Password (reset y contacto)
-- [ ] Dominio final
+## Bloque E — Cierre
+
+- [x] `php artisan test`
+- [x] `npm run build`
+- [x] `composer audit`
+- [ ] Prueba manual escritorio y móvil de los 3 flujos.
+
+## Rutas nuevas (bajo `rol:super-usuario,administrador`)
+
+- POST `/lorente-panel/configuracion/hero` (guardar / quitar)
+- POST `/lorente-panel/configuracion/nosotros-imagenes`
+- POST `/lorente-panel/configuracion/nosotros-imagenes/{imagen}`
+- POST `/lorente-panel/configuracion/nosotros-imagenes/{imagen}/eliminar`
+- POST `/lorente-panel/configuracion/nosotros-imagenes/reordenar`
+- POST `/lorente-panel/configuracion/historia`
+- POST `/lorente-panel/configuracion/historia/{hito}`
+- POST `/lorente-panel/configuracion/historia/{hito}/eliminar`
+- POST `/lorente-panel/configuracion/historia/reordenar`
+
+## Despliegue
+
+`php artisan migrate` → `php artisan config:clear` → `npm run build` y
+cambiar la versión de PHP a 8.3.36 en cPanel.
+
+---
+
+# Actualización de PHP (pasos manuales)
+
+> **Por qué:** PHP 8.3.35 está afectado por CVE-2026-109618 y CVE-2026-109619
+> ("php2shell"): ejecución remota de código sin autenticación, CVSS 9.2, con
+> explotación activa. La única corrección completa es actualizar a **8.3.36**
+> (o superior dentro de 8.3).
+
+## 1. Hosting / producción (cPanel)
+
+1. Entrar a **cPanel → Software → Select PHP Version** (o "MultiPHP Manager").
+2. Seleccionar el dominio/subdominio del sitio.
+3. Elegir **PHP 8.3.36** (si el proveedor aún no la lista, abrir ticket pidiendo
+   la actualización; es un parche de seguridad crítico).
+4. Guardar y verificar con un `phpinfo()` temporal o con
+   **cPanel → PHP → Version** que reporte `8.3.36`.
+5. Eliminar el `phpinfo()` de prueba.
+
+### Nota sobre `alt-php83` (CloudLinux)
+
+Elegir `alt-php83` selecciona la rama 8.3, pero **no garantiza el parche**:
+hay que confirmar la versión exacta. En cPanel → Terminal:
+
+```sh
+php -v
+/opt/alt/php83/usr/bin/php -v
+```
+
+Ambos deben reportar `8.3.36` o superior. Si el CLI sigue mostrando otra
+versión, el sitio web puede estar correcto; verifícalo con un `phpinfo()`
+temporal (paso 4). Si `alt-php83` está por debajo de 8.3.36, abre ticket al
+proveedor: CloudLinux publica los parches de seguridad en esa rama.
+
+### `composer.json`
+
+**No requiere cambios.** `"php": "^8.3"` ya acepta 8.3.36 y versiones
+posteriores de la rama. No conviene fijar `8.3.36` en `composer.json`: eso
+solo afecta la resolución de dependencias, no obliga al servidor a usar esa
+versión. El cambio real se hace en cPanel y se confirma con `php -v`.
+
+### Extensiones y caché tras el cambio
+
+En **MultiPHP INI Editor** (o `php.ini` de `alt-php83`) confirma que estén
+activas: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `tokenizer`, `xml`,
+`ctype`, `json`, `bcmath`, `curl`, `gd`. Si usas OPcache, reinícialo. Luego
+reinicia PHP-FPM/LiteSpeed desde cPanel.
+
+Verificación por SSH (si está disponible):
+
+```sh
+php -v
+```
+
+Debe mostrar `PHP 8.3.36` o superior.
+
+### Sin Terminal/SSH (hosting compartido)
+
+Todo se puede hacer desde cPanel:
+
+**1. Verificar la versión real**
+
+- Crear `public/phpinfo.php` desde **File Manager** con:
+
+  ```php
+  <?php phpinfo();
+  ```
+
+- Abrir `https://tudominio.com/phpinfo.php` y buscar **PHP Version**.
+- Debe ser `8.3.36` o superior. **Borrar el archivo después.**
+
+**2. Dependencias (vendor)**
+
+Si no hay Terminal, revisa si cPanel trae **Software → Setup PHP Composer**
+(o un icono "Composer"). Si existe, ejecuta `install --no-dev
+--optimize-autoloader` desde ahí.
+
+Si no existe:
+
+- En tu PC, con el proyecto actualizado:
+
+  ```powershell
+  composer install --no-dev --optimize-autoloader
+  Compress-Archive -Path vendor -DestinationPath vendor.zip -Force
+  ```
+
+- Subir `vendor.zip` con **File Manager**, extraerlo en la raíz del proyecto
+  (debe quedar `vendor/autoload.php`) y borrar el zip.
+- Subir también el `composer.lock` actualizado.
+
+**3. Migraciones y cachés sin Terminal**
+
+Usa **Cron Jobs** con una ejecución programada (luego se elimina):
+
+```sh
+/opt/alt/php83/usr/bin/php /home/USUARIO/ruta-del-proyecto/artisan migrate --force
+```
+
+- Crear el cron con la frecuencia "una vez al día" o "cada 5 minutos".
+- Esperar a que corra, revisar que no haya errores y **eliminar el cron**.
+- Si la ruta `/opt/alt/php83/usr/bin/php` no existe, probar con `php` a secas
+  o consultar al proveedor el binario de `alt-php83`.
+
+Para limpiar cachés, borra por File Manager:
+
+- `bootstrap/cache/config.php`
+- `bootstrap/cache/routes-*.php`
+- `storage/framework/views/*.php`
+
+Laravel las regenera solo. También puedes programar por cron
+`php artisan optimize:clear`.
+
+**4. Mitigación temporal sin Terminal**
+
+Si la versión todavía no llega a 8.3.36, crea `public/.user.ini`:
+
+```ini
+session.upload_progress.enabled = Off
+```
+
+También puedes usar **MultiPHP INI Editor** del dominio. Es temporal: no
+reemplaza la actualización.
+
+## 2. Local (Windows)
+
+- Opción A: reinstalar PHP 8.3 con el instalador usado en el equipo
+  (`https://windows.php.net/download/`, build VS16 x64 NTS) y reemplazar
+  `C:\php-8.3.35` por la carpeta de 8.3.36.
+- Opción B: si se usa Laravel Herd, actualizar Herd y seleccionar PHP 8.3.36.
+- Verificar:
+
+```powershell
+php -v
+```
+
+## 3. Mitigación temporal (si no se puede actualizar de inmediato)
+
+En `php.ini`:
+
+```ini
+session.upload_progress.enabled = 0
+```
+
+No sustituye la actualización; solo reduce una de las vías de explotación.
+
+## 4. Dependencias PHP
+
+```sh
+composer update symfony/mime
+composer audit
+```
+
+`symfony/mime` debe quedar en **7.4.22 o superior** (CVE-2026-45070).
+
+### Pasos en el servidor tras cambiar a 8.3
+
+```sh
+composer install --no-dev --optimize-autoloader
+composer check-platform-reqs
+composer audit
+php artisan migrate --force
+php artisan optimize:clear
+php artisan config:cache
+```
+
+`composer install` usa el `composer.lock` ya actualizado (no ejecutes
+`composer update` en producción). `check-platform-reqs` confirma que el PHP
+del servidor cumple lo que exige el lock.
+
+## 5. Checklist posterior
+
+- [ ] `php -v` reporta 8.3.36+ en local.
+- [x] Dominio en producción reporta PHP 8.3.36 (verificado en cPanel).
+- [x] Mitigación temporal no necesaria: producción ya está en 8.3.36.
+- [ ] `composer audit` sin avisos.
+- [ ] Sitio y panel funcionando tras reiniciar PHP-FPM/Apache.

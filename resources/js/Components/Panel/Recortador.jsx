@@ -7,7 +7,17 @@ import { recortarImagenWebp } from '../../lib/image';
 import { toast } from '../../lib/toast';
 import { Icono } from './Iconos';
 
-export default function Recortador({ imagen, aspect = 4 / 5, onCancelar, onConfirmar }) {
+export default function Recortador({
+    imagen,
+    aspect = 4 / 5,
+    anchoSalida = 400,
+    calidad = 0.85,
+    nombreSalida = 'docente.webp',
+    titulo = 'Recortar fotografía',
+    textoConfirmar = 'Usar foto',
+    onCancelar,
+    onConfirmar,
+}) {
     const [recorte, setRecorte] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [areaPixeles, setAreaPixeles] = useState(null);
@@ -21,7 +31,7 @@ export default function Recortador({ imagen, aspect = 4 / 5, onCancelar, onConfi
         if (!areaPixeles) return;
         setProcesando(true);
         try {
-            const archivo = await recortarImagenWebp(imagen, areaPixeles, 400, 0.85);
+            const archivo = await recortarImagenWebp(imagen, areaPixeles, anchoSalida, calidad, nombreSalida);
             onConfirmar(archivo);
         } catch {
             toast('No se pudo procesar la imagen', 'error');
@@ -31,9 +41,9 @@ export default function Recortador({ imagen, aspect = 4 / 5, onCancelar, onConfi
     }
 
     return (
-        <Modal onCerrar={onCancelar} ariaLabel="Recortar fotografía">
+        <Modal onCerrar={onCancelar} ariaLabel={titulo}>
             <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                <h3 className="text-sm font-bold text-slate-800">Recortar fotografía</h3>
+                <h3 className="text-sm font-bold text-slate-800">{titulo}</h3>
                 <button type="button" onClick={onCancelar} className="text-slate-400 transition hover:text-slate-700">
                     <Icono nombre="cerrar" className="h-4 w-4" />
                 </button>
@@ -76,7 +86,7 @@ export default function Recortador({ imagen, aspect = 4 / 5, onCancelar, onConfi
                         className="px-4 py-2 text-sm disabled:opacity-60"
                     >
                         <Icono nombre="guardar" className="h-4 w-4" />
-                        {procesando ? 'Procesando…' : 'Usar foto'}
+                        {procesando ? 'Procesando…' : textoConfirmar}
                     </Boton>
                 </div>
             </div>

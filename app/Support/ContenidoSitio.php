@@ -45,6 +45,8 @@ class ContenidoSitio
     {
         return [
             'config' => SitioDatos::config(),
+            'historia' => SitioDatos::historia(),
+            'nosotros_imagenes' => SitioDatos::nosotrosImagenes(),
             'docentes' => SitioDatos::docentes(),
             'categorias_docentes' => self::categoriasDocentes(),
             'noticias' => self::ultimasNoticias(),

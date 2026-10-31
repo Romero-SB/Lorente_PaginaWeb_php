@@ -240,11 +240,12 @@ export default function Sidebar() {
                     ✕
                 </button>
                 <div className="sidebar-logo-container">
+                    <div className="nt-glorioso">Glorioso Lorente</div>
                     <div className="ne" ref={logoRef}>
                         <model-viewer
                             ref={modelRef}
                             src="/LOGASO.glb"
-                            alt="Logo 3D"
+                            alt="Logo 3D de la IE Sebastián Lorente"
                             loading="lazy"
                             camera-orbit="0deg 90deg 2.5m"
                             interaction-prompt="none"
@@ -254,10 +255,8 @@ export default function Sidebar() {
                             style={{ width: '100%', height: '100%', touchAction: 'none' }}
                         />
                     </div>
-                    <div className="nt-dorado">
-                        IE N° 31501
-                        <span>Sebastián Lorente</span>
-                    </div>
+                    <div className="nt-progreso">Modelo de Progreso</div>
+                    <div className="nt-dorado">IE N° 31501 · Sebastián Lorente</div>
                 </div>
 
                 <ul className="sidebar-menu">

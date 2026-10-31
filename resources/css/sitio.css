@@ -196,6 +196,17 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.sitio-root .nt-glorioso {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--do);
+    text-align: center;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 12px rgba(194, 154, 43, 0.25);
+}
+
 .sitio-root .ne {
     display: flex;
     flex-shrink: 0;
@@ -203,7 +214,7 @@
     justify-content: center;
     width: 130px;
     height: 130px;
-    margin-bottom: 8px;
+    margin: 4px 0;
 }
 
 .sitio-root .ne model-viewer {
@@ -212,22 +223,27 @@
     --poster-color: transparent;
 }
 
-.sitio-root .nt-dorado {
+.sitio-root .nt-progreso {
     font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    line-height: 1.3;
-    color: var(--do);
-    letter-spacing: 0.03em;
+    font-size: 0.82rem;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--do2);
+    text-align: center;
+    letter-spacing: 0.08em;
 }
 
-.sitio-root .nt-dorado span {
-    display: block;
-    margin-top: 2px;
+.sitio-root .nt-dorado {
+    margin-top: 8px;
     font-family: 'Inter', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.62rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .sitio-root .sidebar-menu {
@@ -716,6 +732,99 @@
 
 .sitio-root .nosv:hover img {
     transform: scale(1.04);
+}
+
+.sitio-root .galeria-nosotros {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+.sitio-root .galeria-nosotros:focus-visible {
+    outline: 2px solid var(--do);
+    outline-offset: -2px;
+}
+
+.sitio-root .gn-viewport,
+.sitio-root .gn-slide {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.sitio-root .gn-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s var(--trans-suave);
+}
+
+.sitio-root .galeria-nosotros:hover .gn-slide img {
+    transform: scale(1.04);
+}
+
+.sitio-root .gn-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    color: #fff;
+    cursor: pointer;
+    background: rgba(10, 20, 50, 0.55);
+    border: none;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    transition: background 0.25s var(--trans-suave), transform 0.25s var(--trans-suave);
+}
+
+.sitio-root .gn-nav:hover {
+    background: var(--do);
+    transform: translateY(-50%) scale(1.06);
+}
+
+.sitio-root .gn-prev {
+    left: 12px;
+}
+
+.sitio-root .gn-next {
+    right: 12px;
+}
+
+.sitio-root .gn-puntos {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    z-index: 3;
+    display: flex;
+    gap: 6px;
+    transform: translateX(-50%);
+}
+
+.sitio-root .gn-punto {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.55);
+    border: none;
+    border-radius: 50%;
+    transition: background 0.25s var(--trans-suave), transform 0.25s var(--trans-suave);
+}
+
+.sitio-root .gn-punto.activo {
+    background: var(--do);
+    transform: scale(1.25);
+}
+
+.sitio-root .gn-punto:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
 }
 
 .sitio-root .sd {

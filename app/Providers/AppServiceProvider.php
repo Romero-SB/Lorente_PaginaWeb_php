@@ -9,6 +9,8 @@ use App\Models\ContactoMensaje;
 use App\Models\Docente;
 use App\Models\DocenteCategoria;
 use App\Models\Documento;
+use App\Models\HistoriaHito;
+use App\Models\NosotrosImagen;
 use App\Models\Noticia;
 use App\Models\NoticiaImagen;
 use App\Support\ContenidoSitio;
@@ -28,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
         Docente::class,
         DocenteCategoria::class,
         Documento::class,
+        HistoriaHito::class,
+        NosotrosImagen::class,
         Noticia::class,
         NoticiaImagen::class,
         Adjunto::class,
