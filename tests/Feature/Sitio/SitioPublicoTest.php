@@ -6,6 +6,7 @@ use App\Mail\ContactoRecibido;
 use App\Models\Config;
 use App\Models\Documento;
 use App\Models\HistoriaHito;
+use App\Models\NosotrosImagen;
 use App\Models\Noticia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,9 +59,21 @@ class SitioPublicoTest extends TestCase
                 ->has('nosotros_imagenes'));
     }
 
+    public function test_el_panel_para_invitados_se_muestra_sobre_el_inicio(): void
+    {
+        $this->get('/lorente-panel')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Sitio/Inicio')
+                ->where('abrir_panel', true)
+                ->has('config')
+                ->has('noticias')
+                ->has('documentos'));
+    }
+
     public function test_la_pagina_de_inicio_expone_las_imagenes_de_nosotros(): void
     {
-        $imagen = \App\Models\NosotrosImagen::create([
+        $imagen = NosotrosImagen::create([
             'ruta' => 'config/nosotros/fachada.webp',
             'alt' => 'Fachada de la institución',
             'orden' => 10,

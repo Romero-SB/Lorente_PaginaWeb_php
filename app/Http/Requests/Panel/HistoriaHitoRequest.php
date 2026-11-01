@@ -18,7 +18,6 @@ class HistoriaHitoRequest extends FormRequest
             'anio' => ['required', 'string', 'max:20'],
             'titulo' => ['required', 'string', 'max:150'],
             'texto' => ['required', 'string', 'max:1000'],
-            'orden' => ['nullable', 'integer', 'min:0', 'max:100000'],
         ];
     }
 

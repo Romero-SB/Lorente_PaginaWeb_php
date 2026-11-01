@@ -8,18 +8,19 @@
   "IE N° 31501 · Sebastián Lorente" como línea pequeña.
 - Administración: pestañas dentro de Configuración (Super Usuario y Administrador).
 
-## Migraciones (3, nuevas)
+## Migraciones (4, nuevas)
 
 - [x] `add_hero_imagen_and_historia_cierre_to_config_table` (2 columnas nullable)
 - [x] `create_nosotros_imagenes_table` (id, ruta, alt, orden, timestamps)
 - [x] `create_historia_hitos_table` (id, anio, titulo, texto, orden, timestamps) + seed 6 hitos
+- [x] `add_nosotros_texts_and_hito_style` (`nosotros_intro`, `nosotros_valores`, `historia_hitos.estilo`)
 
 Todas reversibles; no alteran datos existentes (salvo el seed de historia).
 
 ## Bloque 0 — Seguridad
 
-- [ ] Actualizar PHP local y hosting 8.3.35 → 8.3.36
-      (CVE-2026-109618 / CVE-2026-109619, RCE sin autenticación).
+- [ ] Actualizar PHP local 8.3.35 → 8.3.36
+      (CVE-2026-109618 / CVE-2026-109619, RCE sin autenticación; producción ya está en 8.3.36).
 - [x] Mitigación temporal: `session.upload_progress.enabled=0` (no necesaria; producción ya está en 8.3.36).
 - [x] `composer update symfony/mime` a ≥ 7.4.22 (CVE-2026-45070). → v7.4.22
 - [x] `composer audit` sin avisos y documentar chequeo pre-despliegue.
@@ -28,14 +29,14 @@ Todas reversibles; no alteran datos existentes (salvo el seed de historia).
 ## Bloque A — Nuestra Historia
 
 - [x] Modelo `HistoriaHito` + eventos de invalidación de caché.
-- [x] Controlador: listar, crear, editar, eliminar, reordenar.
-- [x] FormRequest con validación (año, título, texto, orden).
+- [x] Controlador: listar, crear, editar y eliminar (orden automático por año).
+- [x] FormRequest con validación (año, título, texto).
 - [x] Pestaña "Nuestra Historia" en `Panel/Configuracion.jsx`:
-      lista, formulario, orden y eliminar.
+      lista, formulario modal, estilos y eliminar.
 - [x] Campo `config.historia_cierre` editable en la pestaña.
 - [x] `Nosotros.jsx` consume `historia` desde props; fallback a los textos actuales.
 - [x] `ContenidoSitio` incluye `historia` y `historia_cierre`.
-- [x] Tests: permisos (docente 403), CRUD, reorden, render público, caché.
+- [x] Tests: permisos (docente 403), CRUD, orden cronológico, render público, caché.
 
 ## Bloque B — Imagen principal del Inicio
 
@@ -65,10 +66,40 @@ Todas reversibles; no alteran datos existentes (salvo el seed de historia).
 
 ## Bloque E — Cierre
 
-- [x] `php artisan test`
+- [x] `php artisan test` — 229 pruebas / 1357 aserciones.
+- [x] `npm test` — 15 pruebas.
+- [x] `pint --test` — sin errores.
 - [x] `npm run build`
-- [x] `composer audit`
+- [x] `composer audit` — sin avisos.
 - [ ] Prueba manual escritorio y móvil de los 3 flujos.
+
+## Bloque F — Acceso al panel y rendimiento
+
+- [x] `/lorente-panel` sin sesión renderiza el Inicio con el modal de acceso
+      superpuesto (sin página de login independiente ni recarga completa).
+- [x] El modal se abre desde el primer render (sin parpadeo ni recarga posterior).
+- [x] Al cerrar con la X, `Esc` o clic fuera, se limpia la URL (`/lorente-panel` → `/`).
+- [x] Eliminado el botón "Volver al sitio" del modal de acceso.
+- [x] El hash `#lorente-panel` sigue abriendo el modal sobre la sección actual.
+- [x] Seeder reducido a **solo** `super@lorente.edu.pe`; las demás cuentas se
+      crean desde el panel.
+- [x] Precarga de la imagen principal (`<link rel="preload">`) para mejorar el LCP.
+- [x] Revisión de caché (contenido 1 h, estadísticas 5 min), `Inertia::defer`,
+      precarga escalonada del panel y carga diferida del logo 3D/recorrido 360°.
+
+## Bloque G — Ajustes del panel (noviembre 2026)
+
+- [x] Historia ordenada automáticamente por año; se eliminaron las acciones
+      de subir/bajar y el endpoint de reordenamiento manual.
+- [x] El formulario de hito se abre en una ventana modal desde "Nuevo hito".
+- [x] Tooltips en los campos de historia y estilos.
+- [x] Editor de estilo por hito (fuente/color de año, título y descripción),
+      con vista previa y variables CSS en el sitio público.
+- [x] `config.nosotros_intro` y `config.nosotros_valores` editables; los textos
+      actuales quedan como fallback.
+- [x] La imagen predeterminada de Nosotros aparece siempre primero en el panel
+      y en el carrusel público; las adicionales se agregan después.
+- [x] Mejora de maquetación de la imagen principal y de la galería en el panel.
 
 ## Rutas nuevas (bajo `rol:super-usuario,administrador`)
 
@@ -79,8 +110,8 @@ Todas reversibles; no alteran datos existentes (salvo el seed de historia).
 - POST `/lorente-panel/configuracion/nosotros-imagenes/reordenar`
 - POST `/lorente-panel/configuracion/historia`
 - POST `/lorente-panel/configuracion/historia/{hito}`
+- POST `/lorente-panel/configuracion/historia/{hito}/estilo`
 - POST `/lorente-panel/configuracion/historia/{hito}/eliminar`
-- POST `/lorente-panel/configuracion/historia/reordenar`
 
 ## Despliegue
 

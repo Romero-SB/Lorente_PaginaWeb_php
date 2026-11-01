@@ -348,11 +348,6 @@ export default function AuthModal({ vistaInicial = 'login', token = '', email = 
                     )}
 
                     <p className="login-pie">
-                        {vista === 'login' && (
-                            <button type="button" className="login-enlace login-enlace--boton" onClick={cerrar}>
-                                ← Volver al sitio
-                            </button>
-                        )}
                         {vista === 'recuperar' && (
                             <button type="button" className="login-enlace login-enlace--boton" onClick={volverALogin}>
                                 ← Volver a iniciar sesión

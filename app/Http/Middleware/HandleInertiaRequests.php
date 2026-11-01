@@ -63,6 +63,7 @@ class HandleInertiaRequests extends Middleware
                 'secciones' => PanelSecciones::paraRol($request->user()->role),
             ] : null,
             'sitio' => fn () => $request->routeIs('panel.*')
+                && ! ($request->routeIs('panel.index') && ! $request->user())
                 ? ContenidoSitio::para($request->user())
                 : null,
         ];

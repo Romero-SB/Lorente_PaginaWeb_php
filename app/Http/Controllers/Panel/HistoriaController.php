@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\EstiloHistoriaHitoRequest;
 use App\Http\Requests\Panel\HistoriaHitoRequest;
-use App\Http\Requests\Panel\ReordenarHistoriaRequest;
 use App\Models\HistoriaHito;
 use App\Support\Historial;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class HistoriaController extends Controller
 {
@@ -18,13 +17,10 @@ class HistoriaController extends Controller
         $usuario = $request->user();
         $datos = $request->validated();
 
-        $maxOrden = (int) HistoriaHito::query()->max('orden');
-
         $hito = HistoriaHito::create([
             'anio' => trim($datos['anio']),
             'titulo' => trim($datos['titulo']),
             'texto' => trim($datos['texto']),
-            'orden' => $datos['orden'] ?? $maxOrden + 10,
         ]);
 
         $historial->registrar($usuario, 'crear', $hito, $hito->titulo);
@@ -43,10 +39,6 @@ class HistoriaController extends Controller
             'texto' => trim($datos['texto']),
         ]);
 
-        if (array_key_exists('orden', $datos) && $datos['orden'] !== null) {
-            $hito->orden = $datos['orden'];
-        }
-
         $hito->save();
 
         $historial->registrar($usuario, 'editar', $hito, $hito->titulo);
@@ -63,19 +55,20 @@ class HistoriaController extends Controller
         return back()->with('ok', 'Hito eliminado de Nuestra Historia.');
     }
 
-    public function reordenar(ReordenarHistoriaRequest $request): RedirectResponse
+    public function estilo(EstiloHistoriaHitoRequest $request, HistoriaHito $hito, Historial $historial): RedirectResponse
     {
-        /** @var array<int, array{id: int, orden: int}> $items */
-        $items = $request->validated('items');
+        $datos = $request->validated();
 
-        DB::transaction(function () use ($items): void {
-            foreach ($items as $item) {
-                HistoriaHito::query()
-                    ->find($item['id'])
-                    ?->update(['orden' => $item['orden']]);
-            }
-        });
+        $estilo = collect($datos)
+            ->map(fn ($valor) => is_string($valor) ? trim($valor) : $valor)
+            ->filter(fn ($valor) => $valor !== null && $valor !== '')
+            ->map(fn ($valor) => str_starts_with($valor, '#') ? strtolower($valor) : $valor)
+            ->all();
 
-        return back()->with('ok', 'Orden actualizado.');
+        $hito->update(['estilo' => $estilo === [] ? null : $estilo]);
+
+        $historial->registrar($request->user(), 'editar', $hito, 'Estilo: '.$hito->titulo);
+
+        return back()->with('ok', 'Estilo del hito actualizado.');
     }
 }

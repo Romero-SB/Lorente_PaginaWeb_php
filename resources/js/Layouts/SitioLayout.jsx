@@ -29,7 +29,7 @@ export default function SitioLayout({ children }) {
     const esPanel = typeof component === 'string' && component.startsWith('Panel/');
     const esAuth = COMPONENTES_AUTH.has(component);
     const esOverlay = esPanel || esAuth;
-    const [loginAbierto, setLoginAbierto] = useState(false);
+    const [loginAbierto, setLoginAbierto] = useState(() => props.abrir_panel === true && !usuario);
 
     const limpiarHash = useCallback(() => {
         if (window.location.hash === HASH_LOGIN) {
@@ -39,6 +39,13 @@ export default function SitioLayout({ children }) {
 
     const cerrarLogin = useCallback(() => {
         setLoginAbierto(false);
+
+        if (window.location.pathname === '/lorente-panel') {
+            window.history.replaceState(null, '', '/');
+
+            return;
+        }
+
         limpiarHash();
     }, [limpiarHash]);
 
@@ -77,6 +84,12 @@ export default function SitioLayout({ children }) {
             setLoginAbierto(false);
         }
     }, [esOverlay]);
+
+    useEffect(() => {
+        if (props.abrir_panel === true && !usuario) {
+            setLoginAbierto(true);
+        }
+    }, [props.abrir_panel, usuario]);
 
     return (
         <div className="sitio-root">

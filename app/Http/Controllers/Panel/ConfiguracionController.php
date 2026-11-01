@@ -10,7 +10,6 @@ use App\Support\Almacenamiento;
 use App\Support\Historial;
 use App\Support\SitioDatos;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,6 +31,8 @@ class ConfiguracionController extends Controller
                 'niveles' => $config->niveles ?? '',
                 'mision' => $config->mision ?? '',
                 'vision' => $config->vision ?? '',
+                'nosotros_intro' => $config->nosotros_intro ?? '',
+                'nosotros_valores' => $config->nosotros_valores ?? '',
                 'historia_cierre' => $config->historia_cierre ?? '',
                 'hero_imagen' => $config->hero_imagen ? Almacenamiento::url($config->hero_imagen) : null,
                 'actualizado_por' => $config->updatedBy?->name,
@@ -61,6 +62,8 @@ class ConfiguracionController extends Controller
             'niveles' => $texto($datos['niveles'] ?? null),
             'mision' => $texto($datos['mision'] ?? null),
             'vision' => $texto($datos['vision'] ?? null),
+            'nosotros_intro' => $texto($datos['nosotros_intro'] ?? null),
+            'nosotros_valores' => $texto($datos['nosotros_valores'] ?? null),
             'historia_cierre' => $texto($datos['historia_cierre'] ?? null),
             'updated_by' => $usuario->id,
         ]);

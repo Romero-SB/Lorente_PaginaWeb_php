@@ -70,3 +70,27 @@ export function estiloCategoria(estilo) {
 
     return Object.keys(css).length > 0 ? css : undefined;
 }
+
+export function estiloHito(estilo) {
+    if (!estilo) return undefined;
+
+    const css = {};
+
+    if (estilo.anio_font) {
+        const fuente = fuenteCss(estilo.anio_font);
+        if (fuente) css['--htc-anio-font'] = fuente;
+    }
+    if (estilo.anio_color) css['--htc-anio-color'] = estilo.anio_color;
+    if (estilo.titulo_font) {
+        const fuente = fuenteCss(estilo.titulo_font);
+        if (fuente) css['--htc-titulo-font'] = fuente;
+    }
+    if (estilo.titulo_color) css['--htc-titulo-color'] = estilo.titulo_color;
+    if (estilo.texto_font) {
+        const fuente = fuenteCss(estilo.texto_font);
+        if (fuente) css['--htc-texto-font'] = fuente;
+    }
+    if (estilo.texto_color) css['--htc-texto-color'] = estilo.texto_color;
+
+    return Object.keys(css).length > 0 ? css : undefined;
+}

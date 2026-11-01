@@ -11,6 +11,7 @@ export default function Inicio(props) {
     return (
         <>
             <Head title="Inicio">
+                <link rel="preload" as="image" href={imagenSocial} fetchPriority="high" />
                 <meta name="description" content={descripcion} />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="IE N° 31501 Sebastián Lorente · Huancayo" />

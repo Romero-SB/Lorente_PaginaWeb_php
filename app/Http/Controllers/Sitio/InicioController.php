@@ -10,8 +10,11 @@ use Inertia\Response;
 
 class InicioController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, bool $abrirPanel = false): Response
     {
-        return Inertia::render('Sitio/Inicio', ContenidoSitio::para($request->user()));
+        return Inertia::render('Sitio/Inicio', [
+            ...ContenidoSitio::para($request->user()),
+            'abrir_panel' => $abrirPanel,
+        ]);
     }
 }

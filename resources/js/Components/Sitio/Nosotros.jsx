@@ -2,7 +2,7 @@ import Reveal from './Reveal';
 import SectionHeader from './SectionHeader';
 import Imagen from './Imagen';
 import GaleriaNosotros from './GaleriaNosotros';
-import { estiloCategoria } from '../../lib/fuentes';
+import { estiloCategoria, estiloHito } from '../../lib/fuentes';
 
 const HISTORIA = [
     {
@@ -44,9 +44,17 @@ const CIERRE =
 
 const VALORES = ['Respeto', 'Responsabilidad', 'Solidaridad', 'Identidad cultural', 'Innovación', 'Excelencia'];
 
+const INTRO =
+    'La I.E. N.º 31501 Sebastián Lorente es una institución pública ubicada en Huancayo, Junín. ' +
+    'Formamos ciudadanos íntegros comprometidos con su comunidad y el Perú.';
+
 export default function Nosotros({ docentes = [], categoriasDocentes = [], config = {}, historia = [], nosotros_imagenes = [] }) {
     const hitos = historia.length > 0 ? historia : HISTORIA;
     const cierre = config.historia_cierre || CIERRE;
+    const intro = config.nosotros_intro || INTRO;
+    const valores = Array.isArray(config.nosotros_valores) && config.nosotros_valores.length > 0
+        ? config.nosotros_valores
+        : VALORES;
 
     return (
         <>
@@ -59,17 +67,14 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
                 <Reveal delay={120}>
                     <div>
                         <SectionHeader numeral="01" label="Quiénes somos" title="Una institución con historia y compromiso" />
-                        <p className="sd">
-                            La I.E. N° 31501 Sebastián Lorente es una institución pública ubicada en Huancayo, Junín.
-                            Formamos ciudadanos íntegros comprometidos con su comunidad y el Perú.
-                        </p>
+                        <p className="sd">{intro}</p>
 
                         <Reveal delay={140}>
                             <div>
                                 <SectionHeader label="Valores" />
                                 <ul className="vls">
-                                    {VALORES.map((v) => (
-                                        <li key={v}>{v}</li>
+                                    {valores.map((v, indice) => (
+                                        <li key={`${v}-${indice}`}>{v}</li>
                                     ))}
                                 </ul>
                             </div>
@@ -108,7 +113,7 @@ export default function Nosotros({ docentes = [], categoriasDocentes = [], confi
                 <div className="htg">
                     {hitos.map((h) => (
                         <Reveal key={h.id ?? h.anio} className="rev-fill">
-                            <div className="htc">
+                            <div className="htc" style={estiloHito(h.estilo)}>
                                 <div className="htc-anio">{h.anio}</div>
                                 <h3>{h.titulo}</h3>
                                 <p>{h.texto}</p>

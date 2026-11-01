@@ -24,6 +24,8 @@ class ConfiguracionRequest extends FormRequest
             'niveles' => ['nullable', 'string', 'max:255'],
             'mision' => ['nullable', 'string', 'max:2000'],
             'vision' => ['nullable', 'string', 'max:2000'],
+            'nosotros_intro' => ['nullable', 'string', 'max:2000'],
+            'nosotros_valores' => ['nullable', 'string', 'max:1000'],
             'historia_cierre' => ['nullable', 'string', 'max:2000'],
         ];
     }

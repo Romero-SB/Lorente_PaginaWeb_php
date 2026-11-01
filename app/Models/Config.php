@@ -18,6 +18,8 @@ class Config extends Model
         'niveles',
         'mision',
         'vision',
+        'nosotros_intro',
+        'nosotros_valores',
         'hero_imagen',
         'historia_cierre',
         'updated_by',

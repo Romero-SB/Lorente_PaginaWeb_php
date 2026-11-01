@@ -9,8 +9,8 @@ use App\Http\Controllers\Panel\DocenteCategoriasController;
 use App\Http\Controllers\Panel\DocentesController;
 use App\Http\Controllers\Panel\DocumentoCategoriasController;
 use App\Http\Controllers\Panel\DocumentosController;
-use App\Http\Controllers\Panel\HistorialController;
 use App\Http\Controllers\Panel\HistoriaController;
+use App\Http\Controllers\Panel\HistorialController;
 use App\Http\Controllers\Panel\MensajesController;
 use App\Http\Controllers\Panel\NosotrosImagenesController;
 use App\Http\Controllers\Panel\NoticiasController;
@@ -71,7 +71,7 @@ Route::get('/lorente-panel', function (Request $request) {
         return app(ResumenController::class)->index($request);
     }
 
-    return app(LoginController::class)->show();
+    return app(InicioController::class)->index($request, abrirPanel: true);
 })->name('panel.index');
 
 Route::middleware('guest')->prefix('lorente-panel')->group(function () {
@@ -198,12 +198,12 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::post('/configuracion/historia', [HistoriaController::class, 'store'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.historia.store');
-        Route::post('/configuracion/historia/reordenar', [HistoriaController::class, 'reordenar'])
-            ->middleware('rol:super-usuario,administrador')
-            ->name('panel.configuracion.historia.reordenar');
         Route::post('/configuracion/historia/{hito}', [HistoriaController::class, 'update'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.historia.update');
+        Route::post('/configuracion/historia/{hito}/estilo', [HistoriaController::class, 'estilo'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.configuracion.historia.estilo');
         Route::post('/configuracion/historia/{hito}/eliminar', [HistoriaController::class, 'destroy'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.historia.destroy');

@@ -6,15 +6,25 @@
  * @param {import('react').ReactNode} props.children Control del formulario.
  * @param {string} [props.error] Mensaje de error mostrado con `role="alert"`.
  * @param {string} [props.ayuda] Texto de ayuda bajo el control.
+ * @param {string} [props.tooltip] Texto que aparece al pasar el cursor sobre la etiqueta.
  * @param {string} [props.id] `id` del control para asociar la etiqueta (`htmlFor`).
  * @param {string} [props.className] Clases extra del contenedor.
  */
-export default function Campo({ etiqueta, children, error, ayuda, id, className = '' }) {
+export default function Campo({ etiqueta, children, error, ayuda, tooltip, id, className = '' }) {
     return (
         <div className={className}>
             {etiqueta !== undefined && (
                 <label htmlFor={id} className="mb-1 block text-xs font-semibold text-slate-600">
                     {etiqueta}
+                    {tooltip && (
+                        <span
+                            title={tooltip}
+                            aria-label={tooltip}
+                            className="ml-1 inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-500"
+                        >
+                            ?
+                        </span>
+                    )}
                 </label>
             )}
             {children}

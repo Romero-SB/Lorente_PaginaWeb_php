@@ -9,7 +9,7 @@ const PREDETERMINADA = {
 };
 
 export default function GaleriaNosotros({ imagenes = [] }) {
-    const lista = imagenes.length > 0 ? imagenes : [PREDETERMINADA];
+    const lista = [PREDETERMINADA, ...imagenes];
     const total = lista.length;
     const [indice, setIndice] = useState(0);
 

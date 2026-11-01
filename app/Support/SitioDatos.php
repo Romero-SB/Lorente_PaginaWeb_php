@@ -28,24 +28,40 @@ class SitioDatos
             'niveles' => $config->niveles,
             'mision' => $config->mision,
             'vision' => $config->vision,
+            'nosotros_intro' => $config->nosotros_intro,
+            'nosotros_valores' => self::valores($config->nosotros_valores),
             'hero_imagen' => $config->hero_imagen ? Almacenamiento::url($config->hero_imagen) : null,
             'historia_cierre' => $config->historia_cierre,
         ];
+    }
+
+    /** @return array<int, string> */
+    private static function valores(?string $texto): array
+    {
+        if ($texto === null || trim($texto) === '') {
+            return [];
+        }
+
+        return collect(preg_split('/\R/', $texto) ?: [])
+            ->map(fn (string $valor) => trim($valor))
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /** @return array<int, array<string, mixed>> */
     public static function historia(): array
     {
         return HistoriaHito::query()
-            ->select(['id', 'anio', 'titulo', 'texto', 'orden'])
-            ->orderBy('orden')
-            ->orderBy('id')
+            ->select(['id', 'anio', 'titulo', 'texto', 'orden', 'estilo'])
             ->get()
+            ->sortBy(fn (HistoriaHito $hito) => $hito->claveAnio())
             ->map(fn (HistoriaHito $hito) => [
                 'id' => $hito->id,
                 'anio' => $hito->anio,
                 'titulo' => $hito->titulo,
                 'texto' => $hito->texto,
+                'estilo' => $hito->estilo,
             ])
             ->values()
             ->all();

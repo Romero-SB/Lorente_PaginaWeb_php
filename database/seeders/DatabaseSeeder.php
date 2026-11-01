@@ -7,8 +7,8 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Siembra las cuentas base (Super Usuario, Administrador y Docente)
-     * y la configuración institucional.
+     * Siembra la cuenta Super Usuario y la configuración institucional.
+     * Las demás cuentas se crean desde el panel.
      */
     public function run(): void
     {

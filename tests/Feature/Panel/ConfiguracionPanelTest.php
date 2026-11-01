@@ -5,6 +5,7 @@ namespace Tests\Feature\Panel;
 use App\Models\Actividad;
 use App\Models\Config;
 use App\Models\User;
+use App\Support\SitioDatos;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -52,6 +53,8 @@ class ConfiguracionPanelTest extends TestCase
             'niveles' => 'Inicial, Primaria, Secundaria',
             'mision' => 'Formar estudiantes íntegros.',
             'vision' => 'Ser referentes en la región.',
+            'nosotros_intro' => 'Presentación editada desde el panel.',
+            'nosotros_valores' => "Respeto\nResponsabilidad\nSolidaridad",
         ]);
 
         $response->assertRedirect();
@@ -63,6 +66,8 @@ class ConfiguracionPanelTest extends TestCase
         $this->assertSame(42, $config->docentes_count);
         $this->assertSame(1965, $config->anio_fundacion);
         $this->assertSame('Inicial, Primaria, Secundaria', $config->niveles);
+        $this->assertSame('Presentación editada desde el panel.', $config->nosotros_intro);
+        $this->assertSame("Respeto\nResponsabilidad\nSolidaridad", $config->nosotros_valores);
         $this->assertSame('Un legado que continúa creciendo.', $config->historia_cierre);
         $this->assertSame($admin->id, $config->updated_by);
 
@@ -100,6 +105,19 @@ class ConfiguracionPanelTest extends TestCase
         $this->actingAs($super)
             ->post('/lorente-panel/configuracion', ['email' => 'no-es-un-correo'])
             ->assertSessionHasErrors('email');
+    }
+
+    public function test_los_textos_de_nosotros_se_exponen_como_lista(): void
+    {
+        Config::actual()->update([
+            'nosotros_intro' => 'Presentación pública.',
+            'nosotros_valores' => "Respeto\nSolidaridad\n\nExcelencia",
+        ]);
+
+        $config = SitioDatos::config();
+
+        $this->assertSame('Presentación pública.', $config['nosotros_intro']);
+        $this->assertSame(['Respeto', 'Solidaridad', 'Excelencia'], $config['nosotros_valores']);
     }
 
     public function test_guest_es_redirigido_al_login(): void
