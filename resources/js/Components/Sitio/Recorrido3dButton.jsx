@@ -12,7 +12,7 @@ export default function Recorrido3dButton() {
         <div className="recorrido-3d-wrap">
             <Link
                 href="/recorrido"
-                prefetch
+                prefetch="hover"
                 className="recorrido-3d"
                 aria-label="Ver recorrido virtual 360° del colegio"
             >

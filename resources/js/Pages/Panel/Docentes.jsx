@@ -95,6 +95,10 @@ export default function Docentes({ docentes = [], categorias = [], papelera }) {
     }
 
     function abrirPapelera() {
+        if (vista === 'papelera') {
+            abrirLista();
+            return;
+        }
         setVista('papelera');
         router.reload({ only: ['papelera'] });
     }

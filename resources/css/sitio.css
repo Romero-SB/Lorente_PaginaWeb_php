@@ -942,10 +942,12 @@
 }
 
 @media (max-width: 480px) {
+    /* Docentes de 2 en 2 en celulares */
     .sitio-root .pdg-dynamic .pdc,
     .sitio-root .pdg-dynamic .rev {
-        flex: 0 1 100%;
-        max-width: 100%;
+        flex: 0 1 calc(50% - 8px);
+        max-width: calc(50% - 8px);
+        min-width: 0;
     }
 }
 

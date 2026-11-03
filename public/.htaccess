@@ -32,6 +32,10 @@
 </IfModule>
 
 # Caché de imágenes y modelos del sitio
+<IfModule mod_mime.c>
+    AddType model/gltf-binary .glb
+</IfModule>
+
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresByType image/webp "access plus 30 days"

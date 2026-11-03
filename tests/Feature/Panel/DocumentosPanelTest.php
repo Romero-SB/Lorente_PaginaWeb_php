@@ -70,7 +70,7 @@ class DocumentosPanelTest extends TestCase
                 ->assertOk()
                 ->assertInertia(fn ($page) => $page
                     ->component('Panel/Documentos')
-                    ->has('documentos')
+                    ->has('documentos.data')
                     ->has('categorias', 1)
                     ->has('visibilidades', 2)
                     ->missing('papelera'));
@@ -87,14 +87,14 @@ class DocumentosPanelTest extends TestCase
             ->get('/lorente-panel/documentos')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->has('documentos', 1)
-                ->where('documentos.0.id', $propio->id)
-                ->where('documentos.0.puede_editar', true));
+                ->has('documentos.data', 1)
+                ->where('documentos.data.0.id', $propio->id)
+                ->where('documentos.data.0.puede_editar', true));
 
         $this->actingAs($this->usuario(User::ROLE_ADMIN))
             ->get('/lorente-panel/documentos')
             ->assertOk()
-            ->assertInertia(fn ($page) => $page->has('documentos', 2));
+            ->assertInertia(fn ($page) => $page->has('documentos.data', 2));
     }
 
     public function test_crea_documento_publico_en_el_disco_publico(): void
@@ -447,7 +447,7 @@ class DocumentosPanelTest extends TestCase
             ->get('/lorente-panel/documentos')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->where('documentos', function ($list) use ($privado, $publico) {
+                ->where('documentos.data', function ($list) use ($privado, $publico) {
                     $urls = collect($list)->keyBy('id')->map(fn ($d) => $d['archivo']['url']);
 
                     return ! str_contains($urls[$publico->id], 'descargar')

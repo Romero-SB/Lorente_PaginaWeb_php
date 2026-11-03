@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Comunicado;
 use App\Support\ContenidoSitio;
 use App\Support\PanelSecciones;
 use Illuminate\Http\Request;
@@ -57,13 +58,26 @@ class HandleInertiaRequests extends Middleware
                 'expired_draft' => $request->session()->pull('expired_draft'),
             ],
             'status' => fn () => $request->session()->get('status'),
+            // Comunicado emergente: solo para visitantes sin sesión y fuera del panel.
+            'comunicado' => function () use ($request) {
+                if ($request->user() || $request->routeIs('panel.*')) {
+                    return null;
+                }
+
+                $c = Comunicado::vigente();
+
+                return $c ? ['id' => $c->id, 'imagen_url' => $c->imagen_url, 'enlace' => $c->enlace] : null;
+            },
             'panel' => fn () => $request->user() ? [
                 'rol' => $request->user()->role,
                 'rol_etiqueta' => PanelSecciones::etiquetaRol($request->user()->role),
                 'secciones' => PanelSecciones::paraRol($request->user()->role),
             ] : null,
+            // El sitio solo se envía donde se muestra de fondo: login (invitados)
+            // y cambio de contraseña inicial. Las secciones del panel usan un fondo estático.
             'sitio' => fn () => $request->routeIs('panel.*')
                 && ! ($request->routeIs('panel.index') && ! $request->user())
+                && (! $request->user() || $request->routeIs('panel.password.first.*'))
                 ? ContenidoSitio::para($request->user())
                 : null,
         ];

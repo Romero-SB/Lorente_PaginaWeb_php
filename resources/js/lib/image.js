@@ -67,3 +67,35 @@ export function formatoPeso(bytes) {
     if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+/** Detecta si la imagen es horizontal o vertical y devuelve la proporción sugerida. */
+export async function analizarOrientacion(url) {
+    const imagen = await cargarImagen(url);
+    const ancho = imagen.naturalWidth;
+    const alto = imagen.naturalHeight;
+    const horizontal = ancho >= alto;
+
+    return {
+        ancho,
+        alto,
+        orientacion: horizontal ? 'horizontal' : 'vertical',
+        aspect: horizontal ? 16 / 9 : 4 / 5,
+        anchoSalida: horizontal ? 1200 : 960,
+    };
+}
+
+/** Recorte automático centrado con la proporción indicada. Devuelve un File WebP. */
+export async function recorteCentradoWebp(url, aspect, anchoSalida, nombre, calidad = 0.85) {
+    const imagen = await cargarImagen(url);
+    const w = imagen.naturalWidth;
+    const h = imagen.naturalHeight;
+
+    let ancho = w;
+    let alto = w / aspect;
+    if (alto > h) {
+        alto = h;
+        ancho = h * aspect;
+    }
+    const area = { x: (w - ancho) / 2, y: (h - alto) / 2, width: ancho, height: alto };
+
+    return recortarImagenWebp(url, area, anchoSalida, calidad, nombre);
+}

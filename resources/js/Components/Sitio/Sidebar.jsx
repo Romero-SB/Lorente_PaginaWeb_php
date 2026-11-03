@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 import { irASeccion } from '../../lib/sitio';
@@ -191,6 +192,9 @@ export default function Sidebar() {
         };
     }, [mvListo]);
 
+    // Depende de la URL: el sidebar sigue montado entre visitas de Inertia, así que debe re-evaluar la sección activa al cambiar de página.
+    const { url } = usePage();
+
     useEffect(() => {
         const esInicio = window.location.pathname === '/';
 
@@ -214,7 +218,7 @@ export default function Sidebar() {
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+    }, [url]);
 
     const navegar = (item) => {
         setShowMobileMenu(false);
@@ -244,7 +248,8 @@ export default function Sidebar() {
                     <div className="ne" ref={logoRef}>
                         <model-viewer
                             ref={modelRef}
-                            src="/LOGASO.glb"
+                            src="/LOGASO.v2.glb"
+                            poster="/logo_lorente.webp"
                             alt="Logo 3D de la IE Sebastián Lorente"
                             loading="lazy"
                             camera-orbit="0deg 90deg 2.5m"

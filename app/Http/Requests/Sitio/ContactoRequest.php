@@ -17,8 +17,8 @@ class ContactoRequest extends FormRequest
     {
         $reglas = [
             'nombre' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'email', 'max:150'],
-            'telefono' => ['nullable', 'string', 'max:40'],
+            'telefono' => ['required', 'string', 'regex:/^\+?[0-9\s\-()]{6,20}$/'],
+            'email' => ['nullable', 'email', 'max:150'],
             'asunto' => ['nullable', 'string', 'max:150'],
             'mensaje' => ['required', 'string', 'min:10', 'max:4000'],
         ];
@@ -35,7 +35,8 @@ class ContactoRequest extends FormRequest
     {
         return [
             'nombre.required' => 'Ingresa tu nombre.',
-            'email.required' => 'Ingresa tu correo electrónico.',
+            'telefono.required' => 'Ingresa tu número de teléfono para poder responderte.',
+            'telefono.regex' => 'Ingresa un número de teléfono válido.',
             'email.email' => 'Ingresa un correo electrónico válido.',
             'mensaje.required' => 'Escribe tu mensaje.',
             'mensaje.min' => 'El mensaje debe tener al menos 10 caracteres.',

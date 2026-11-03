@@ -6,12 +6,15 @@ import Boton from '../../Components/Shared/Boton';
 import Campo from '../../Components/Shared/Campo';
 import EmptyState from '../../Components/Shared/EmptyState';
 import PageHeader from '../../Components/Shared/PageHeader';
+import Paginacion from '../../Components/Shared/Paginacion';
 import Papelera from '../../Components/Shared/Papelera';
 import useReordenarArrastre from '../../hooks/useReordenarArrastre';
 import { EXTENSIONES, extensionDe } from '../../lib/archivos';
 import { registerDraftSaver, restaurarBorrador, limpiarBorrador } from '../../lib/draft';
 import { formatoFecha } from '../../lib/fecha';
-import { comprimirAWebp, formatoPeso } from '../../lib/image';
+import { analizarOrientacion, formatoPeso, recorteCentradoWebp } from '../../lib/image';
+import ColaRecorte from '../../Components/Panel/ColaRecorte';
+import Recortador from '../../Components/Panel/Recortador';
 import { reordenar } from '../../lib/reordenar';
 import { toast } from '../../lib/toast';
 
@@ -19,13 +22,37 @@ const LIMITE_IMAGENES = 10;
 const PESO_IMAGEN = 3 * 1024 * 1024;
 const PESO_ADJUNTO = 15 * 1024 * 1024;
 
-export default function Noticias({ noticias = [], categorias = {}, papelera }) {
+export default function Noticias({ noticias = { data: [], links: [], meta: {} }, filtros = {}, categorias = {}, papelera }) {
     const { auth } = usePage().props;
     const [vista, setVista] = useState('lista');
     const [editingId, setEditingId] = useState(null);
-    const [busqueda, setBusqueda] = useState('');
+    const [busqueda, setBusqueda] = useState(filtros.q ?? '');
+
+    // La búsqueda se hace en el servidor (con retardo) para no cargar todas las noticias.
+    useEffect(() => {
+        const q = busqueda.trim();
+        if (q === (filtros.q ?? '')) return;
+
+        const t = setTimeout(() => {
+            router.get('/lorente-panel/noticias', q ? { q } : {}, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['noticias', 'filtros'],
+            });
+        }, 350);
+
+        return () => clearTimeout(t);
+    }, [busqueda, filtros.q]);
+
+    function irAPagina(url) {
+        router.visit(url, { preserveScroll: true, preserveState: true, only: ['noticias', 'filtros'] });
+    }
     const [imagenes, setImagenes] = useState([]);
     const [adjuntos, setAdjuntos] = useState([]);
+    const [cola, setCola] = useState([]);
+    const [ajusteIdx, setAjusteIdx] = useState(null);
+    const [procesandoCola, setProcesandoCola] = useState(false);
 
     const form = useForm({
         titulo: '',
@@ -92,6 +119,10 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
     }
 
     function abrirPapelera() {
+        if (vista === 'papelera') {
+            abrirLista();
+            return;
+        }
         setVista('papelera');
         router.reload({ only: ['papelera'] });
     }
@@ -160,15 +191,78 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
                 toast(`${archivo.name} supera los 3 MB`, 'error');
                 continue;
             }
-            const comprimida = await comprimirAWebp(archivo);
+            const url = URL.createObjectURL(archivo);
+            const info = await analizarOrientacion(url).catch(() => null);
             nuevas.push({
-                tipo: 'nueva',
-                key: `n-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-                file: comprimida,
-                url: URL.createObjectURL(comprimida),
+                key: `c-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                url,
+                nombre: archivo.name,
+                orientacion: info?.orientacion ?? 'horizontal',
+                aspect: info?.aspect ?? 16 / 9,
+                anchoSalida: info?.anchoSalida ?? 1200,
             });
         }
-        if (nuevas.length) setImagenes((prev) => [...prev, ...nuevas]);
+        if (nuevas.length) setCola((prev) => [...prev, ...nuevas]);
+    }
+
+    function liberarCola(items) {
+        items.forEach((it) => URL.revokeObjectURL(it.url));
+    }
+
+    // Recorte automático centrado para todas las imágenes en cola.
+    async function aplicarRecorteTodas() {
+        setProcesandoCola(true);
+        try {
+            const resultados = [];
+            for (let i = 0; i < cola.length; i++) {
+                const it = cola[i];
+                const file = await recorteCentradoWebp(it.url, it.aspect, it.anchoSalida, `noticia-${Date.now()}-${i}.webp`);
+                resultados.push({
+                    tipo: 'nueva',
+                    key: `n-${Date.now()}-${i}-${Math.random().toString(36).slice(2)}`,
+                    file,
+                    url: URL.createObjectURL(file),
+                });
+            }
+            setImagenes((prev) => [...prev, ...resultados]);
+            liberarCola(cola);
+            setCola([]);
+        } catch {
+            toast('No se pudieron recortar las imágenes', 'error');
+        } finally {
+            setProcesandoCola(false);
+        }
+    }
+
+    // Avanza a la siguiente imagen del ajuste manual. `file` es null si se omite.
+    function siguienteAjuste(file) {
+        const actual = cola[ajusteIdx];
+        if (file) {
+            setImagenes((prev) => [
+                ...prev,
+                {
+                    tipo: 'nueva',
+                    key: `n-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                    file,
+                    url: URL.createObjectURL(file),
+                },
+            ]);
+        }
+        if (actual) URL.revokeObjectURL(actual.url);
+
+        const siguiente = ajusteIdx + 1;
+        if (siguiente >= cola.length) {
+            setCola([]);
+            setAjusteIdx(null);
+        } else {
+            setAjusteIdx(siguiente);
+        }
+    }
+
+    function cancelarCola() {
+        liberarCola(cola);
+        setCola([]);
+        setAjusteIdx(null);
     }
 
     function alSeleccionarAdjuntos(e) {
@@ -208,10 +302,6 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
         });
     }
 
-    const filtradas = noticias.filter((n) =>
-        n.titulo?.toLowerCase().includes(busqueda.trim().toLowerCase()),
-    );
-
     const chipEst = (est) =>
         est === 'publicado'
             ? 'bg-emerald-50 text-emerald-700 ring-emerald-200'
@@ -239,9 +329,35 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
                 </Boton>
             </PageHeader>
 
+            {cola.length > 0 && ajusteIdx === null && (
+                <ColaRecorte
+                    items={cola}
+                    procesando={procesandoCola}
+                    onAplicarTodas={aplicarRecorteTodas}
+                    onAjustarUna={() => setAjusteIdx(0)}
+                    onCancelar={cancelarCola}
+                />
+            )}
+
+            {ajusteIdx !== null && cola[ajusteIdx] && (
+                <Recortador
+                    key={cola[ajusteIdx].key}
+                    imagen={cola[ajusteIdx].url}
+                    aspect={cola[ajusteIdx].aspect}
+                    anchoSalida={cola[ajusteIdx].anchoSalida}
+                    nombreSalida={`noticia-${ajusteIdx}.webp`}
+                    titulo={`Recortar imagen ${ajusteIdx + 1} de ${cola.length} (${cola[ajusteIdx].orientacion})`}
+                    textoConfirmar="Usar y seguir"
+                    onCancelar={() => siguienteAjuste(null)}
+                    onConfirmar={(file) => siguienteAjuste(file)}
+                />
+            )}
+
             {vista === 'lista' && (
                 <Lista
-                    noticias={filtradas}
+                    noticias={noticias.data ?? []}
+                    links={noticias.links ?? []}
+                    onNavegar={irAPagina}
                     categorias={categorias}
                     busqueda={busqueda}
                     setBusqueda={setBusqueda}
@@ -288,11 +404,7 @@ export default function Noticias({ noticias = [], categorias = {}, papelera }) {
     );
 }
 
-function Lista({ noticias, categorias, busqueda, setBusqueda, chipEst, onEditar, onEliminar }) {
-    if (!noticias.length) {
-        return <EmptyState icono="noticias" mensaje="No hay noticias para mostrar." />;
-    }
-
+function Lista({ noticias, links, onNavegar, categorias, busqueda, setBusqueda, chipEst, onEditar, onEliminar }) {
     return (
         <div className="mt-4">
             <div className="relative mb-3">
@@ -304,6 +416,8 @@ function Lista({ noticias, categorias, busqueda, setBusqueda, chipEst, onEditar,
                     className="panel-campo w-full pl-9"
                 />
             </div>
+
+            {!noticias.length && <EmptyState icono="noticias" mensaje="No hay noticias para mostrar." />}
 
             <div className="panel-tarjeta--lista space-y-3">
                 {noticias.map((n) => {
@@ -365,6 +479,8 @@ function Lista({ noticias, categorias, busqueda, setBusqueda, chipEst, onEditar,
                     );
                 })}
             </div>
+
+            <Paginacion links={links} onNavegar={onNavegar} className="mt-4" />
         </div>
     );
 }

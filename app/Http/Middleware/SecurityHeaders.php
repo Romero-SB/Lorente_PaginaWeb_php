@@ -55,8 +55,8 @@ class SecurityHeaders
             "media-src 'self' data: blob:",
             "font-src 'self' data: https://cdnjs.cloudflare.com",
             "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
-            "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
-            "connect-src 'self' https://challenges.cloudflare.com",
+            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://challenges.cloudflare.com",
+            "connect-src 'self' blob: https://challenges.cloudflare.com",
             'frame-src https://challenges.cloudflare.com',
             "worker-src 'self' blob:",
         ]);

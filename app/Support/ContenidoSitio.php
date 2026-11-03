@@ -31,6 +31,8 @@ class ContenidoSitio
         return Cache::remember($clave, now()->addHour(), fn () => self::construir($usuario !== null));
     }
 
+    private static bool $precalentarPendiente = false;
+
     /**
      * Invalida el contenido cacheado del sitio.
      */
@@ -38,6 +40,35 @@ class ContenidoSitio
     {
         Cache::forget(self::CLAVE_INVITADO);
         Cache::forget(self::CLAVE_AUTENTICADO);
+    }
+
+    /**
+     * Invalida la caché y la reconstruye una sola vez al terminar la respuesta,
+     * para que la siguiente visita no pague el costo del cálculo en frío.
+     */
+    public static function invalidarYPrecalentarTrasRespuesta(): void
+    {
+        self::olvidar();
+
+        if (self::$precalentarPendiente || app()->runningUnitTests()) {
+            return;
+        }
+
+        self::$precalentarPendiente = true;
+
+        app()->terminating(function () {
+            self::$precalentarPendiente = false;
+            self::precalentar();
+        });
+    }
+
+    /**
+     * Construye ambas variantes (invitado y autenticado) y las guarda en caché.
+     */
+    public static function precalentar(): void
+    {
+        Cache::put(self::CLAVE_INVITADO, self::construir(false), now()->addHour());
+        Cache::put(self::CLAVE_AUTENTICADO, self::construir(true), now()->addHour());
     }
 
     /** @return array<string, mixed> */

@@ -36,6 +36,8 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
         q: filtros.q ?? '',
     });
 
+    const [borrado, setBorrado] = useState({ desde: '', hasta: '' });
+
     const actualizar = (campo) => (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value }));
 
     function aplicar(e) {
@@ -166,6 +168,46 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                 </div>
             </form>
 
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!borrado.desde || !borrado.hasta) return;
+                    const texto = `¿Eliminar del historial los registros del ${borrado.desde} al ${borrado.hasta}? Esta acción no se puede deshacer.`;
+                    if (!window.confirm(texto)) return;
+                    router.post('/lorente-panel/historial/eliminar-rango', borrado, { preserveScroll: true });
+                }}
+                className="panel-tarjeta mt-4 flex flex-wrap items-end gap-3 p-4"
+            >
+                <span className="w-full text-xs font-semibold text-slate-600 sm:w-auto">Eliminar registros por rango (solo Super Usuario)</span>
+                <label className="block">
+                    <span className="mb-1 block text-xs text-slate-500">Desde</span>
+                    <input
+                        type="date"
+                        required
+                        value={borrado.desde}
+                        onChange={(e) => setBorrado((p) => ({ ...p, desde: e.target.value }))}
+                        className="panel-campo"
+                    />
+                </label>
+                <label className="block">
+                    <span className="mb-1 block text-xs text-slate-500">Hasta</span>
+                    <input
+                        type="date"
+                        required
+                        value={borrado.hasta}
+                        onChange={(e) => setBorrado((p) => ({ ...p, hasta: e.target.value }))}
+                        className="panel-campo"
+                    />
+                </label>
+                <button
+                    type="submit"
+                    className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                >
+                    <Icono nombre="basura" className="h-4 w-4" />
+                    Eliminar rango
+                </button>
+            </form>
+
             <div className="panel-tarjeta mt-5 overflow-hidden">
                 {items.length === 0 ? (
                     <p className="px-4 py-10 text-center text-sm text-slate-500">
@@ -178,10 +220,8 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                                 <tr>
                                     <th className="px-4 py-3">Fecha</th>
                                     <th className="px-4 py-3">Usuario</th>
-                                    <th className="px-4 py-3">Acción</th>
-                                    <th className="px-4 py-3">Módulo</th>
-                                    <th className="px-4 py-3">Título</th>
-                                    <th className="px-4 py-3">IP</th>
+                                    <th className="px-4 py-3">Dónde</th>
+                                    <th className="px-4 py-3">Qué hizo</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -204,21 +244,10 @@ export default function Historial({ registros, usuarios = [], acciones = [], mod
                                                     ESTILOS_ACCION[r.accion] ?? 'bg-slate-50 text-slate-600 ring-slate-200'
                                                 }`}
                                             >
-                                                {r.accion}
+                                                {r.modulo}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-slate-600">{r.modelo_etiqueta ?? '—'}</td>
-                                        <td className="px-4 py-3 text-slate-700">
-                                            <div className="max-w-xs truncate" title={r.titulo}>
-                                                {r.titulo || '—'}
-                                            </div>
-                                            {r.descripcion && (
-                                                <div className="mt-0.5 max-w-xs truncate text-xs text-slate-400">
-                                                    {r.descripcion}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-slate-500">{r.ip || '—'}</td>
+                                        <td className="px-4 py-3 text-slate-700">{r.detalle}</td>
                                     </tr>
                                 ))}
                             </tbody>

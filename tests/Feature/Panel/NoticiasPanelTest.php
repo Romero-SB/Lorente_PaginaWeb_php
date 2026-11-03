@@ -53,9 +53,9 @@ class NoticiasPanelTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->component('Panel/Noticias')
-                ->where('noticias', fn ($list) => collect($list)->pluck('id')->doesntContain($otra->id))
-                ->has('noticias', 1)
-                ->where('noticias.0.id', $propia->id));
+                ->where('noticias.data', fn ($list) => collect($list)->pluck('id')->doesntContain($otra->id))
+                ->has('noticias.data', 1)
+                ->where('noticias.data.0.id', $propia->id));
     }
 
     public function test_administrador_ve_todas_las_noticias(): void
@@ -67,7 +67,7 @@ class NoticiasPanelTest extends TestCase
         $this->actingAs($admin)
             ->get('/lorente-panel/noticias')
             ->assertOk()
-            ->assertInertia(fn ($page) => $page->has('noticias', 2));
+            ->assertInertia(fn ($page) => $page->has('noticias.data', 2));
     }
 
     public function test_docente_crea_noticia_con_imagen_y_adjunto(): void
@@ -223,7 +223,7 @@ class NoticiasPanelTest extends TestCase
             ->get('/lorente-panel/noticias')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->where('noticias.0.modificado_por.name', $admin->name));
+                ->where('noticias.data.0.modificado_por.name', $admin->name));
     }
 
     public function test_docente_mueve_a_papelera_restaura_y_elimina_permanentemente(): void

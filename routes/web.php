@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\FirstPasswordChangeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Panel\ComunicadosController;
 use App\Http\Controllers\Panel\ConfiguracionController;
 use App\Http\Controllers\Panel\CuentasController;
 use App\Http\Controllers\Panel\DocenteCategoriasController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Panel\HistorialController;
 use App\Http\Controllers\Panel\MensajesController;
 use App\Http\Controllers\Panel\NosotrosImagenesController;
 use App\Http\Controllers\Panel\NoticiasController;
+use App\Http\Controllers\Panel\PanelIndexController;
 use App\Http\Controllers\Panel\PerfilController;
 use App\Http\Controllers\Panel\ResumenController;
 use App\Http\Controllers\Sitio\ContactoController;
@@ -21,8 +23,8 @@ use App\Http\Controllers\Sitio\DocumentoController;
 use App\Http\Controllers\Sitio\InicioController;
 use App\Http\Controllers\Sitio\NoticiaController;
 use App\Http\Controllers\Sitio\RecorridoController;
-use App\Models\Noticia;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Sitio\RobotsController;
+use App\Http\Controllers\Sitio\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [InicioController::class, 'index'])->name('home');
@@ -36,43 +38,9 @@ Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'de
     ->middleware('auth')
     ->name('sitio.documentos.descargar');
 
-Route::get('/robots.txt', function () {
-    $contenido = "User-agent: *\n"
-        ."Disallow: /lorente-panel/\n"
-        ."\n"
-        .'Sitemap: '.url('/sitemap.xml')."\n";
-
-    return response($contenido, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
-})->name('robots');
-
-Route::get('/sitemap.xml', function () {
-    $urls = [
-        ['loc' => url('/'), 'changefreq' => 'weekly', 'priority' => '1.0'],
-        ['loc' => url('/noticias'), 'changefreq' => 'daily', 'priority' => '0.8'],
-        ['loc' => url('/recorrido'), 'changefreq' => 'monthly', 'priority' => '0.7'],
-    ];
-
-    foreach (Noticia::query()->where('est', Noticia::EST_PUBLICADO)->select(['id', 'slug', 'updated_at'])->orderByDesc('fiso')->get() as $noticia) {
-        $urls[] = [
-            'loc' => route('sitio.noticias.show', $noticia),
-            'lastmod' => $noticia->updated_at?->toAtomString(),
-            'changefreq' => 'monthly',
-            'priority' => '0.6',
-        ];
-    }
-
-    return response()
-        ->view('sitemap', ['urls' => $urls])
-        ->header('Content-Type', 'application/xml; charset=UTF-8');
-})->name('sitemap');
-
-Route::get('/lorente-panel', function (Request $request) {
-    if ($request->user()) {
-        return app(ResumenController::class)->index($request);
-    }
-
-    return app(InicioController::class)->index($request, abrirPanel: true);
-})->name('panel.index');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/lorente-panel', PanelIndexController::class)->name('panel.index');
 
 Route::middleware('guest')->prefix('lorente-panel')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('panel.login.show');
@@ -174,6 +142,15 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::get('/historial', [HistorialController::class, 'index'])
             ->middleware('rol:super-usuario')
             ->name('panel.historial.index');
+        Route::middleware('rol:super-usuario,administrador')->group(function () {
+            Route::get('/comunicados', [ComunicadosController::class, 'index'])->name('panel.comunicados.index');
+            Route::post('/comunicados', [ComunicadosController::class, 'store'])->name('panel.comunicados.store');
+            Route::post('/comunicados/{comunicado}/activo', [ComunicadosController::class, 'activo'])->name('panel.comunicados.activo');
+            Route::post('/comunicados/{comunicado}/eliminar', [ComunicadosController::class, 'destroy'])->name('panel.comunicados.destroy');
+        });
+        Route::post('/historial/eliminar-rango', [HistorialController::class, 'eliminarRango'])
+            ->middleware('rol:super-usuario')
+            ->name('panel.historial.eliminar-rango');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.configuracion.index');

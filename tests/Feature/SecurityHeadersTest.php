@@ -19,6 +19,11 @@ class SecurityHeadersTest extends TestCase
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
         $response->assertHeader('Content-Security-Policy');
+
+        $csp = $response->headers->get('Content-Security-Policy');
+
+        $this->assertStringContainsString("'wasm-unsafe-eval'", $csp);
+        $this->assertStringContainsString("connect-src 'self' blob:", $csp);
     }
 
     public function test_no_aplica_hsts_sin_https(): void

@@ -7,6 +7,36 @@ import PageHeader from '../../Components/Shared/PageHeader';
 import Paginacion from '../../Components/Shared/Paginacion';
 import { formatearFecha } from '../../lib/fecha';
 
+const NOMBRE_INSTITUCION = 'I.E. N.º 31501 «Sebastián Lorente»';
+
+// Convierte el teléfono a formato internacional de wa.me (Perú: prefijo 51).
+function numeroWhatsapp(telefono) {
+    const digitos = (telefono || '').replace(/\D/g, '');
+    if (!digitos) return '';
+    if (digitos.length === 9) return `51${digitos}`;
+    return digitos;
+}
+
+function textoRespuesta(m) {
+    const asunto = m.asunto ? ` sobre "${m.asunto}"` : '';
+    return `Hola ${m.nombre}, recibimos tu mensaje${asunto}. Te responderemos a la brevedad.\n\nSaludos cordiales,\n${NOMBRE_INSTITUCION}`;
+}
+
+function urlWhatsapp(m) {
+    return `https://wa.me/${numeroWhatsapp(m.telefono)}?text=${encodeURIComponent(textoRespuesta(m))}`;
+}
+
+function urlGmail(m) {
+    const params = new URLSearchParams({
+        view: 'cm',
+        fs: '1',
+        to: m.email,
+        su: `Re: ${m.asunto || 'Su mensaje'}`,
+        body: textoRespuesta(m),
+    });
+    return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
 export default function Mensajes({ mensajes = { data: [], links: [], meta: {} }, filtros = {}, stats = {} }) {
     const items = mensajes?.data ?? [];
     const meta = mensajes?.meta ?? {};
@@ -170,9 +200,7 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                     <h2 className="panel-titulo-seccion">{actual.asunto}</h2>
                                     <p className="mt-1 text-sm text-slate-500">
                                         De <strong className="text-slate-700">{actual.nombre}</strong> ·{' '}
-                                        <a href={`mailto:${actual.email}`} className="break-words text-blue-600 hover:underline">
-                                            {actual.email}
-                                        </a>
+                                        {actual.email ? (<a href={`mailto:${actual.email}`} className="break-words text-blue-600 hover:underline">{actual.email}</a>) : <span className="text-slate-400">Sin correo</span>}
                                         {actual.telefono && <> · {actual.telefono}</>}
                                     </p>
                                     <p className="mt-0.5 text-xs text-slate-400">
@@ -210,14 +238,29 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                 {actual.mensaje}
                             </div>
 
-                            <div className="mt-5">
-                                <a
-                                    href={`mailto:${actual.email}?subject=${encodeURIComponent(`Re: ${actual.asunto}`)}`}
-                                    className="panel-boton--primario inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
-                                >
-                                    <Icono nombre="publicar" className="h-4 w-4" />
-                                    Responder por correo
-                                </a>
+                            <div className="mt-5 flex flex-wrap gap-2">
+                                {numeroWhatsapp(actual.telefono) && (
+                                    <a
+                                        href={urlWhatsapp(actual)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                                    >
+                                        <Icono nombre="publicar" className="h-4 w-4" />
+                                        Responder por WhatsApp
+                                    </a>
+                                )}
+                                {actual.email && (
+                                    <a
+                                        href={urlGmail(actual)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="panel-boton--primario inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
+                                    >
+                                        <Icono nombre="publicar" className="h-4 w-4" />
+                                        Responder por Gmail
+                                    </a>
+                                )}
                             </div>
                         </div>
                     )}

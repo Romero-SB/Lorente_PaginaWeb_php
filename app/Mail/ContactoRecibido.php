@@ -22,7 +22,7 @@ class ContactoRecibido extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: 'Nuevo mensaje de contacto: '.($this->mensaje->asunto ?: 'Sin asunto'),
-            replyTo: [$this->mensaje->email],
+            replyTo: $this->mensaje->email ? [$this->mensaje->email] : [],
         );
     }
 

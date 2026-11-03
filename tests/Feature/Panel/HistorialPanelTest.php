@@ -111,7 +111,7 @@ class HistorialPanelTest extends TestCase
             ->get('/lorente-panel/historial?modelo='.urlencode(Docente::class))
             ->assertInertia(fn ($page) => $page
                 ->has('registros.data', 1)
-                ->where('registros.data.0.modelo_etiqueta', 'Docente')
+                ->where('registros.data.0.modelo_etiqueta', 'Docentes')
                 ->where('registros.data.0.titulo', 'Docente X'));
     }
 

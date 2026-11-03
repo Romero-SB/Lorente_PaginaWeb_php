@@ -1,5 +1,5 @@
 import { router, useForm, usePage } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import GestorCategorias from '../../Components/Panel/GestorCategorias';
 import { Icono } from '../../Components/Panel/Iconos';
@@ -8,18 +8,45 @@ import Campo from '../../Components/Shared/Campo';
 import EmptyState from '../../Components/Shared/EmptyState';
 import FileDropzone from '../../Components/Shared/FileDropzone';
 import PageHeader from '../../Components/Shared/PageHeader';
+import Paginacion from '../../Components/Shared/Paginacion';
 import Papelera from '../../Components/Shared/Papelera';
 import { EXTENSIONES, colorExtension, extensionDe } from '../../lib/archivos';
 import { toast } from '../../lib/toast';
 
 const PESO_ARCHIVO = 20 * 1024 * 1024;
 
-export default function Documentos({ documentos = [], categorias = [], visibilidades = {}, papelera }) {
+export default function Documentos({ documentos = { data: [], links: [], meta: {} }, filtros = {}, categorias = [], visibilidades = {}, papelera }) {
     const { auth } = usePage().props;
     const [vista, setVista] = useState('lista');
     const [editingId, setEditingId] = useState(null);
-    const [busqueda, setBusqueda] = useState('');
-    const [filtroCategoria, setFiltroCategoria] = useState('');
+    const [busqueda, setBusqueda] = useState(filtros.q ?? '');
+    const [filtroCategoria, setFiltroCategoria] = useState(filtros.categoria ?? '');
+
+    // Búsqueda y categoría se resuelven en el servidor, con paginación.
+    useEffect(() => {
+        const q = busqueda.trim();
+        const cat = filtroCategoria;
+        if (q === (filtros.q ?? '') && cat === (filtros.categoria ?? '')) return;
+
+        const t = setTimeout(() => {
+            const params = {};
+            if (q) params.q = q;
+            if (cat) params.categoria = cat;
+
+            router.get('/lorente-panel/documentos', params, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['documentos', 'filtros'],
+            });
+        }, 350);
+
+        return () => clearTimeout(t);
+    }, [busqueda, filtroCategoria, filtros.q, filtros.categoria]);
+
+    function irAPagina(url) {
+        router.visit(url, { preserveScroll: true, preserveState: true, only: ['documentos', 'filtros'] });
+    }
     const [gestorAbierto, setGestorAbierto] = useState(false);
     const [archivo, setArchivo] = useState(null);
 
@@ -63,6 +90,10 @@ export default function Documentos({ documentos = [], categorias = [], visibilid
     }
 
     function abrirPapelera() {
+        if (vista === 'papelera') {
+            abrirLista();
+            return;
+        }
         setVista('papelera');
         router.reload({ only: ['papelera'] });
     }
@@ -119,15 +150,6 @@ export default function Documentos({ documentos = [], categorias = [], visibilid
         });
     }
 
-    const filtrados = useMemo(() => {
-        const q = busqueda.trim().toLowerCase();
-        return documentos.filter((d) => {
-            if (filtroCategoria && d.categoria !== filtroCategoria) return false;
-            if (!q) return true;
-            return d.titulo.toLowerCase().includes(q) || (d.archivo?.nombre || '').toLowerCase().includes(q);
-        });
-    }, [documentos, busqueda, filtroCategoria]);
-
     return (
         <div>
             <PageHeader
@@ -161,7 +183,9 @@ export default function Documentos({ documentos = [], categorias = [], visibilid
 
             {vista === 'lista' && (
                 <Lista
-                    documentos={filtrados}
+                    documentos={documentos.data ?? []}
+                    links={documentos.links ?? []}
+                    onNavegar={irAPagina}
                     categorias={categorias}
                     visibilidades={visibilidades}
                     busqueda={busqueda}
@@ -233,7 +257,7 @@ function ChipVisibilidad({ visibilidad, visibilidades }) {
     );
 }
 
-function Lista({ documentos, categorias, visibilidades, busqueda, setBusqueda, filtroCategoria, setFiltroCategoria, onEditar, onEliminar }) {
+function Lista({ documentos, links, onNavegar, categorias, visibilidades, busqueda, setBusqueda, filtroCategoria, setFiltroCategoria, onEditar, onEliminar }) {
     return (
         <div className="mt-4">
             <div className="mb-3 flex flex-col gap-2 sm:flex-row">
@@ -318,6 +342,8 @@ function Lista({ documentos, categorias, visibilidades, busqueda, setBusqueda, f
                     })}
                 </div>
             )}
+
+            <Paginacion links={links} onNavegar={onNavegar} className="mt-4" />
         </div>
     );
 }

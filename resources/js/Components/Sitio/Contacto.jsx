@@ -82,7 +82,7 @@ export default function Contacto({ config = {} }) {
                         {errors.nombre && <span className="cfr-error">{errors.nombre}</span>}
                     </div>
                     <div className="cfr">
-                        <label htmlFor="c-email">Correo</label>
+                        <label htmlFor="c-email">Correo (opcional)</label>
                         <input
                             id="c-email"
                             type="email"
@@ -93,11 +93,11 @@ export default function Contacto({ config = {} }) {
                         {errors.email && <span className="cfr-error">{errors.email}</span>}
                     </div>
                     <div className="cfr">
-                        <label htmlFor="c-telefono">Teléfono (opcional)</label>
+                        <label htmlFor="c-telefono">Teléfono (WhatsApp)</label>
                         <input
                             id="c-telefono"
                             type="text"
-                            placeholder="+51 900 000 000"
+                            placeholder="+51 900 000 000" required
                             value={data.telefono}
                             onChange={(e) => setData('telefono', e.target.value)}
                         />

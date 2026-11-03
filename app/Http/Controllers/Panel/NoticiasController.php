@@ -18,23 +18,51 @@ use Inertia\Response;
 
 class NoticiasController extends Controller
 {
+    private const POR_PAGINA = 15;
+
+    /** @return array<int, array<string, mixed>> */
+    private function enlaces(\Illuminate\Pagination\LengthAwarePaginator $paginado): array
+    {
+        return collect($paginado->linkCollection())
+            ->map(fn (array $link) => [
+                'url' => $link['url'],
+                'label' => str_replace(['&laquo;', '&raquo;', '&hellip;'], ['«', '»', '…'], $link['label']),
+                'active' => $link['active'],
+            ])
+            ->values()
+            ->all();
+    }
+
     public function index(Request $request): Response
     {
         $usuario = $request->user();
         PapeleraNoticias::purgarVencidasSiCorresponde();
+        $busqueda = trim((string) $request->query('q', ''));
 
-        $noticias = Noticia::query()
+        $paginado = Noticia::query()
             ->with(['author:id,name,cargo', 'updatedBy:id,name', 'imagenes', 'adjuntos'])
             ->when($usuario->isDocente(), fn ($q) => $q->where('author_id', $usuario->id))
+            ->when($busqueda !== '', fn ($q) => $q->where('titulo', 'like', "%{$busqueda}%"))
             ->orderByDesc('fiso')
             ->orderByDesc('id')
-            ->get()
-            ->map(fn (Noticia $n) => (new NoticiaResource($n))->resolve($request))
-            ->values()
-            ->all();
+            ->paginate(self::POR_PAGINA)
+            ->onEachSide(1)
+            ->withQueryString();
 
         return Inertia::render('Panel/Noticias', [
-            'noticias' => $noticias,
+            'noticias' => [
+                'data' => collect($paginado->items())
+                    ->map(fn (Noticia $n) => (new NoticiaResource($n))->resolve($request))
+                    ->values()
+                    ->all(),
+                'links' => $this->enlaces($paginado),
+                'meta' => [
+                    'total' => $paginado->total(),
+                    'pagina' => $paginado->currentPage(),
+                    'ultima' => $paginado->lastPage(),
+                ],
+            ],
+            'filtros' => ['q' => $busqueda],
             'categorias' => config('panel.categorias_noticias'),
             'papelera' => Inertia::defer(fn () => $this->papelera($usuario)),
         ]);

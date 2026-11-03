@@ -92,7 +92,7 @@ export default function Resumen({ stats }) {
                                 </span>
                                 <Icono nombre="externo" className="resumen-stat-flecha h-4 w-4" />
                             </span>
-                            <span className="resumen-stat-num">{t.dato ?? 0}</span>
+                            <span className="resumen-stat-num">{stats[t.clave] ?? 0}</span>
                             <span className="resumen-stat-label">{t.etiqueta}</span>
                             <span className="resumen-stat-desc">{t.desc}</span>
                         </button>

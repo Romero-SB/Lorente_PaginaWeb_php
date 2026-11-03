@@ -69,6 +69,12 @@ return [
             'ruta' => '/lorente-panel/cuentas',
             'roles' => ['super-usuario', 'administrador'],
         ],
+        'comunicados' => [
+            'etiqueta' => 'Comunicados',
+            'icono' => 'publicar',
+            'ruta' => '/lorente-panel/comunicados',
+            'roles' => ['super-usuario', 'administrador'],
+        ],
         'configuracion' => [
             'etiqueta' => 'Configuración',
             'icono' => 'configuracion',

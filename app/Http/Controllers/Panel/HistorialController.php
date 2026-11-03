@@ -7,6 +7,8 @@ use App\Http\Requests\Panel\HistorialFiltrosRequest;
 use App\Models\Actividad;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,13 +16,38 @@ class HistorialController extends Controller
 {
     private const POR_PAGINA = 25;
 
-    /** @var array<string, string> */
-    private const ETIQUETAS_MODELO = [
-        'App\Models\Noticia' => 'Noticia',
-        'App\Models\Docente' => 'Docente',
-        'App\Models\Documento' => 'Documento',
-        'App\Models\Config' => 'Configuración',
-        'App\Models\User' => 'Cuenta',
+    /** Sección del panel donde ocurrió la acción. */
+    private const MODULOS = [
+        'App\Models\Noticia' => 'Noticias',
+        'App\Models\Docente' => 'Docentes',
+        'App\Models\Documento' => 'Documentos',
+        'App\Models\Config' => 'Configuración del sitio',
+        'App\Models\HistoriaHito' => 'Historia del colegio',
+        'App\Models\NosotrosImagen' => 'Nosotros (galería)',
+        'App\Models\User' => 'Cuentas',
+    ];
+
+    /** Verbo en pasado para cada acción registrada. */
+    private const VERBOS = [
+        'crear' => 'Creó',
+        'editar' => 'Editó',
+        'eliminar' => 'Eliminó',
+        'papelera' => 'Movió a la papelera',
+        'restaurar' => 'Restauró',
+        'eliminar permanente' => 'Eliminó definitivamente',
+        'crear cuenta' => 'Creó la cuenta de',
+        'resetear contraseña' => 'Restableció la contraseña de',
+        'eliminar cuenta' => 'Eliminó la cuenta de',
+        'cambiar contraseña' => 'Cambió su contraseña',
+    ];
+
+    /** Objeto gramatical para cada módulo. */
+    private const OBJETOS = [
+        'App\Models\Noticia' => 'la noticia',
+        'App\Models\Docente' => 'al docente',
+        'App\Models\Documento' => 'el documento',
+        'App\Models\HistoriaHito' => 'el hito',
+        'App\Models\NosotrosImagen' => 'una imagen de Nosotros',
     ];
 
     public function index(HistorialFiltrosRequest $request): Response
@@ -51,11 +78,10 @@ class HistorialController extends Controller
                     'usuario' => $a->user?->name ?? 'Sistema',
                     'rol' => $a->user?->role,
                     'accion' => $a->accion,
-                    'modelo' => $a->modelo,
-                    'modelo_etiqueta' => self::ETIQUETAS_MODELO[$a->modelo] ?? $a->modelo,
+                    'modulo' => $this->modulo($a),
+                    'modelo_etiqueta' => $this->modulo($a),
                     'titulo' => $a->titulo,
-                    'descripcion' => $a->descripcion,
-                    'ip' => $a->ip,
+                    'detalle' => $this->detalle($a),
                     'fecha' => $a->created_at?->toIso8601String(),
                 ])->all(),
                 'links' => collect($registros->linkCollection())
@@ -89,7 +115,7 @@ class HistorialController extends Controller
                 ->distinct()
                 ->orderBy('modelo')
                 ->pluck('modelo')
-                ->map(fn (string $m) => ['valor' => $m, 'etiqueta' => self::ETIQUETAS_MODELO[$m] ?? $m])
+                ->map(fn (string $m) => ['valor' => $m, 'etiqueta' => self::MODULOS[$m] ?? $m])
                 ->values()
                 ->all(),
             'filtros' => [
@@ -101,5 +127,62 @@ class HistorialController extends Controller
                 'q' => $filtros['q'] ?? null,
             ],
         ]);
+    }
+
+    /**
+     * Elimina del historial los registros comprendidos entre dos fechas (inclusive).
+     * Solo accesible para super-usuario (ver rutas).
+     */
+    public function eliminarRango(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'desde' => ['required', 'date'],
+            'hasta' => ['required', 'date', 'after_or_equal:desde'],
+        ]);
+
+        $cantidad = Actividad::query()
+            ->whereDate('created_at', '>=', $datos['desde'])
+            ->whereDate('created_at', '<=', $datos['hasta'])
+            ->delete();
+
+        return back()->with('ok', $cantidad === 1 ? 'Se eliminó 1 registro del historial.' : "Se eliminaron {$cantidad} registros del historial.");
+    }
+    /** Sección del panel donde se hizo el cambio. */
+    private function modulo(Actividad $a): string
+    {
+        if ($a->modelo === 'App\Models\User' && str_starts_with((string) $a->titulo, 'Perfil:')) {
+            return 'Mi perfil';
+        }
+
+        return self::MODULOS[$a->modelo] ?? 'Otro';
+    }
+
+    /** Frase legible de lo que se hizo, sin rutas ni IP. */
+    private function detalle(Actividad $a): string
+    {
+        $titulo = (string) $a->titulo;
+
+        if ($a->modelo === 'App\Models\Config') {
+            return "Editó la configuración: {$titulo}.";
+        }
+
+        if ($a->modelo === 'App\Models\User' && $a->accion === 'editar') {
+            return 'Editó sus datos personales.';
+        }
+
+        $verbo = self::VERBOS[$a->accion] ?? ucfirst((string) $a->accion);
+        $objeto = self::OBJETOS[$a->modelo] ?? '';
+
+        if ($a->modelo === 'App\Models\User') {
+            return "{$verbo} {$titulo}.";
+        }
+
+        if ($a->accion === 'cambiar contraseña') {
+            return "{$verbo}.";
+        }
+
+        $partes = array_filter([$verbo, $objeto, $titulo !== '' ? "«{$titulo}»" : null]);
+
+        return implode(' ', $partes).'.';
     }
 }

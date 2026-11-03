@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         foreach ($this->modelosDelSitio as $modelo) {
-            $invalidar = static fn () => ContenidoSitio::olvidar();
+            $invalidar = static fn () => ContenidoSitio::invalidarYPrecalentarTrasRespuesta();
             $modelo::saved($invalidar);
             $modelo::deleted($invalidar);
         }

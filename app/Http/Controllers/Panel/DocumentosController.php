@@ -20,20 +20,51 @@ use Inertia\Response;
 
 class DocumentosController extends Controller
 {
+    private const POR_PAGINA = 15;
+
     public function index(Request $request): Response
     {
         $usuario = $request->user();
         PapeleraDocumentos::purgarVencidasSiCorresponde();
 
-        $documentos = Documento::query()
+        $busqueda = trim((string) $request->query('q', ''));
+        $categoria = trim((string) $request->query('categoria', ''));
+
+        $paginado = Documento::query()
             ->select(['id', 'titulo', 'categoria', 'visibilidad', 'descripcion', 'instrucciones', 'archivo_url', 'archivo_nombre', 'author_id'])
             ->with(['author:id,name,cargo'])
             ->when($usuario->isDocente(), fn ($q) => $q->where('author_id', $usuario->id))
+            ->when($categoria !== '', fn ($q) => $q->where('categoria', $categoria))
+            ->when($busqueda !== '', function ($q) use ($busqueda) {
+                $q->where(function ($sub) use ($busqueda) {
+                    $sub->where('titulo', 'like', "%{$busqueda}%")
+                        ->orWhere('archivo_nombre', 'like', "%{$busqueda}%");
+                });
+            })
             ->orderByDesc('id')
-            ->get()
-            ->map(fn (Documento $d) => (new DocumentoResource($d))->resolve($request))
-            ->values()
-            ->all();
+            ->paginate(self::POR_PAGINA)
+            ->onEachSide(1)
+            ->withQueryString();
+
+        $documentos = [
+            'data' => collect($paginado->items())
+                ->map(fn (Documento $d) => (new DocumentoResource($d))->resolve($request))
+                ->values()
+                ->all(),
+            'links' => collect($paginado->linkCollection())
+                ->map(fn (array $link) => [
+                    'url' => $link['url'],
+                    'label' => str_replace(['&laquo;', '&raquo;', '&hellip;'], ['«', '»', '…'], $link['label']),
+                    'active' => $link['active'],
+                ])
+                ->values()
+                ->all(),
+            'meta' => [
+                'total' => $paginado->total(),
+                'pagina' => $paginado->currentPage(),
+                'ultima' => $paginado->lastPage(),
+            ],
+        ];
 
         $conteos = Documento::query()
             ->selectRaw('categoria, count(*) as total')
@@ -54,6 +85,7 @@ class DocumentosController extends Controller
 
         return Inertia::render('Panel/Documentos', [
             'documentos' => $documentos,
+            'filtros' => ['q' => $busqueda, 'categoria' => $categoria],
             'categorias' => $categorias,
             'visibilidades' => config('panel.visibilidades_documentos'),
             'papelera' => Inertia::defer(fn () => $this->papelera($usuario)),

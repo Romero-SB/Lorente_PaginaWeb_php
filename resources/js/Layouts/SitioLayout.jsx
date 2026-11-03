@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import '../../css/sitio.css';
 
 import AuthModal from '../Components/Auth/AuthModal';
+import ComunicadoEmergente from '../Components/Sitio/ComunicadoEmergente';
 import Footer from '../Components/Sitio/Footer';
 import Recorrido3dButton from '../Components/Sitio/Recorrido3dButton';
 import Sidebar from '../Components/Sitio/Sidebar';
@@ -21,6 +22,25 @@ const COMPONENTES_AUTH = new Set([
     'Auth/ResetPassword',
     'Auth/FirstPasswordChange',
 ]);
+
+// Fondo estático que reemplaza al sitio público detrás del panel.
+// Evita renderizar todo el sitio (Hero, Nosotros, Noticias, Documentos, Contacto)
+// en cada cambio de sección.
+function FondoPanel() {
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 0,
+                backgroundImage: "linear-gradient(rgba(10, 25, 60, 0.55), rgba(10, 25, 60, 0.7)), url('/lorentefrontis.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        />
+    );
+}
 
 export default function SitioLayout({ children }) {
     const { component, props } = usePage();
@@ -100,6 +120,7 @@ export default function SitioLayout({ children }) {
             <Sidebar />
 
             <main id="contenido-principal" className="main-content" tabIndex={-1}>
+                {esPanel && <FondoPanel />}
                 {esOverlay ? sitio && <SitioHome {...sitio} /> : children}
                 <Footer />
             </main>
@@ -114,6 +135,8 @@ export default function SitioLayout({ children }) {
                 )
             )}
             {!esOverlay && loginAbierto && createPortal(<AuthModal actualizarUrl={false} onClose={cerrarLogin} />, document.body)}
+
+            {!esOverlay && <ComunicadoEmergente comunicado={props.comunicado} />}
 
             <Recorrido3dButton />
             <WhatsAppButton />
