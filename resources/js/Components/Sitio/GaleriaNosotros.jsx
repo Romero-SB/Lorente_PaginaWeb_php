@@ -4,7 +4,7 @@ import Imagen from './Imagen';
 
 const PREDETERMINADA = {
     id: 'predeterminada',
-    url: '/referencial.jpg',
+    url: '/referencial.webp',
     alt: 'Instalaciones de la IE Sebastián Lorente',
 };
 

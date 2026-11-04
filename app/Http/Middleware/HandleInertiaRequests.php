@@ -66,18 +66,16 @@ class HandleInertiaRequests extends Middleware
 
                 $c = Comunicado::vigente();
 
-                return $c ? ['id' => $c->id, 'imagen_url' => $c->imagen_url, 'enlace' => $c->enlace] : null;
+                return $c ? ['id' => $c->id, 'imagen_url' => $c->imagen_url] : null;
             },
             'panel' => fn () => $request->user() ? [
                 'rol' => $request->user()->role,
                 'rol_etiqueta' => PanelSecciones::etiquetaRol($request->user()->role),
                 'secciones' => PanelSecciones::paraRol($request->user()->role),
             ] : null,
-            // El sitio solo se envía donde se muestra de fondo: login (invitados)
-            // y cambio de contraseña inicial. Las secciones del panel usan un fondo estático.
+            // Contenido público que se muestra detrás del panel administrativo.
             'sitio' => fn () => $request->routeIs('panel.*')
                 && ! ($request->routeIs('panel.index') && ! $request->user())
-                && (! $request->user() || $request->routeIs('panel.password.first.*'))
                 ? ContenidoSitio::para($request->user())
                 : null,
         ];

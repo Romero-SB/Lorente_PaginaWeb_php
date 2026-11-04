@@ -7,7 +7,7 @@ import SectionHeader from '../../Components/Sitio/SectionHeader';
 
 export default function Noticia({ noticia, relacionadas = [] }) {
     const descripcion = (noticia.res || noticia.con || '').substring(0, 160);
-    const imagen = (noticia.imagenes || [])[0] || '/referencial.jpg';
+    const imagen = (noticia.imagenes || [])[0] || '/referencial.webp';
     const imagenAbsoluta = new URL(imagen, window.location.origin).href;
 
     return (

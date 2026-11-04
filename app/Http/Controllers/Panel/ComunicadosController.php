@@ -32,14 +32,12 @@ class ComunicadosController extends Controller
     {
         $datos = $request->validate([
             'imagen' => ['required', 'file', 'image', 'max:4096'],
-            'enlace' => ['nullable', 'url', 'max:500'],
             'inicio_at' => ['nullable', 'date'],
             'fin_at' => ['nullable', 'date', 'after_or_equal:inicio_at'],
         ], [
             'imagen.required' => 'Sube una imagen para el comunicado.',
             'imagen.image' => 'El archivo debe ser una imagen.',
             'imagen.max' => 'La imagen no debe superar los 4 MB.',
-            'enlace.url' => 'El enlace debe comenzar con http:// o https://.',
             'fin_at.after_or_equal' => 'La fecha de fin debe ser igual o posterior al inicio.',
         ]);
 
@@ -51,9 +49,8 @@ class ComunicadosController extends Controller
 
         Comunicado::create([
             'imagen' => $ruta,
-            'enlace' => $datos['enlace'] ?? null,
             'activo' => true,
-            'inicio_at' => $datos['inicio_at'] ?? null,
+            'inicio_at' => $datos['inicio_at'] ?? now(),
             'fin_at' => $datos['fin_at'] ?? null,
         ]);
 
@@ -81,7 +78,6 @@ class ComunicadosController extends Controller
         return [
             'id' => $c->id,
             'imagen_url' => $c->imagen_url,
-            'enlace' => $c->enlace,
             'activo' => (bool) $c->activo,
             'inicio_at' => $c->inicio_at?->format('Y-m-d\TH:i'),
             'fin_at' => $c->fin_at?->format('Y-m-d\TH:i'),

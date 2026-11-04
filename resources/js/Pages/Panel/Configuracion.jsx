@@ -537,7 +537,7 @@ export default function Configuracion({ config = {}, historia = [], nosotros_ima
                         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
                             <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                                 <img
-                                    src={heroPreview || '/lorentefrontis.jpg'}
+                                    src={heroPreview || '/lorentefrontis.webp'}
                                     alt="Vista previa de la imagen principal"
                                     className="aspect-video w-full object-cover"
                                 />
@@ -613,7 +613,7 @@ export default function Configuracion({ config = {}, historia = [], nosotros_ima
                             <div className="overflow-hidden rounded-xl border border-slate-200">
                                 <div className="relative">
                                     <img
-                                        src="/referencial.jpg"
+                                        src="/referencial.webp"
                                         alt="Instalaciones de la IE Sebastián Lorente"
                                         className="aspect-[3/2] w-full object-cover"
                                     />

@@ -121,6 +121,9 @@ Route::middleware('auth')->prefix('lorente-panel')->group(function () {
         Route::post('/mensajes/{mensaje}/leido', [MensajesController::class, 'marcarLeido'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.mensajes.leido');
+        Route::post('/mensajes/{mensaje}/leer', [MensajesController::class, 'leer'])
+            ->middleware('rol:super-usuario,administrador')
+            ->name('panel.mensajes.leer');
         Route::post('/mensajes/{mensaje}/respondido', [MensajesController::class, 'marcarRespondido'])
             ->middleware('rol:super-usuario,administrador')
             ->name('panel.mensajes.respondido');

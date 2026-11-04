@@ -29,7 +29,7 @@ export default function Recorrido() {
                     property="og:description"
                     content="Conoce aulas, pasillos y ambientes del colegio Sebastián Lorente en una experiencia 360° inmersiva."
                 />
-                <meta property="og:image" content="/referencial.jpg" />
+                <meta property="og:image" content="/referencial.webp" />
             </Head>
 
             {/* Barra Superior Institucional */}

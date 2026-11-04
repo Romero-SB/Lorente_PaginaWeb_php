@@ -41,21 +41,78 @@ class Almacenamiento
      */
     public static function guardarImagen(UploadedFile $archivo, string $carpeta = 'noticias/img'): ?string
     {
-        $extension = match ($archivo->getMimeType()) {
+        $mime = $archivo->getMimeType();
+
+        if (! in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
+            return null;
+        }
+
+        // GIF se conserva (puede ser animado). El resto se convierte a WebP en el servidor,
+        // para no depender de que el navegador haya comprimido la imagen.
+        if ($mime !== 'image/gif') {
+            $webp = self::convertirAWebp($archivo->getRealPath());
+
+            if ($webp !== null) {
+                $nombre = $carpeta.'/'.date('Ymd_His').'_'.uniqid().'.webp';
+                Storage::disk(self::disco())->put($nombre, $webp);
+
+                return $nombre;
+            }
+        }
+
+        $extension = match ($mime) {
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
             'image/webp' => 'webp',
-            'image/gif' => 'gif',
-            default => null,
+            default => 'gif',
         };
-
-        if ($extension === null) {
-            return null;
-        }
 
         $nombre = $carpeta.'/'.date('Ymd_His').'_'.uniqid().'.'.$extension;
 
         return $archivo->storeAs(dirname($nombre), basename($nombre), self::disco());
+    }
+
+    /**
+     * Convierte una imagen a WebP con GD, limitando el ancho máximo.
+     * Devuelve los bytes WebP, o null si GD no pudo procesarla.
+     */
+    public static function convertirAWebp(string $rutaOrigen, int $anchoMaximo = 1600, int $calidad = 82): ?string
+    {
+        if (! function_exists('imagewebp')) {
+            return null;
+        }
+
+        $origen = @file_get_contents($rutaOrigen);
+        $imagen = $origen !== false ? @imagecreatefromstring($origen) : false;
+
+        if ($imagen === false) {
+            return null;
+        }
+
+        $ancho = imagesx($imagen);
+        $alto = imagesy($imagen);
+
+        if ($ancho > $anchoMaximo) {
+            $nuevoAlto = (int) round($alto * ($anchoMaximo / $ancho));
+            $redimensionada = imagecreatetruecolor($anchoMaximo, $nuevoAlto);
+            imagealphablending($redimensionada, false);
+            imagesavealpha($redimensionada, true);
+            imagecopyresampled($redimensionada, $imagen, 0, 0, 0, 0, $anchoMaximo, $nuevoAlto, $ancho, $alto);
+            imagedestroy($imagen);
+            $imagen = $redimensionada;
+        } elseif (! imageistruecolor($imagen)) {
+            imagepalettetotruecolor($imagen);
+        }
+
+        imagealphablending($imagen, false);
+        imagesavealpha($imagen, true);
+
+        ob_start();
+        $ok = imagewebp($imagen, null, $calidad);
+        $bytes = ob_get_clean();
+        imagedestroy($imagen);
+
+        return $ok && $bytes !== false && $bytes !== '' ? $bytes : null;
     }
 
     /**

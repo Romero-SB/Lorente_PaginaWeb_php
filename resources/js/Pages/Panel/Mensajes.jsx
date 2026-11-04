@@ -42,7 +42,8 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
     const meta = mensajes?.meta ?? {};
     const [filtro, setFiltro] = useState(filtros.filtro ?? 'todos');
     const [q, setQ] = useState(filtros.q ?? '');
-    const [seleccion, setSeleccion] = useState(items[0]?.id ?? null);
+    // Ningún mensaje abierto al entrar: solo se marca como leído cuando el usuario lo abre.
+    const [seleccion, setSeleccion] = useState(null);
 
     const actual = items.find((m) => m.id === seleccion) ?? null;
 
@@ -63,6 +64,31 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
             preserveScroll: true,
             replace: true,
             onSuccess: () => setSeleccion(null),
+        });
+    }
+
+    // Al abrir un mensaje se marca como leído (sin marcarlo como respondido).
+    function seleccionar(m) {
+        setSeleccion(m.id);
+        if (!m.leido) {
+            router.post(`/lorente-panel/mensajes/${m.id}/leer`, {}, {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => router.reload({ only: ['mensajes', 'stats'], preserveScroll: true, preserveState: true }),
+            });
+        }
+    }
+
+    const [actualizando, setActualizando] = useState(false);
+
+    // Trae los mensajes nuevos conservando filtro, búsqueda y la página actual.
+    function actualizar() {
+        setActualizando(true);
+        router.reload({
+            only: ['mensajes', 'stats', 'filtros'],
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => setActualizando(false),
         });
     }
 
@@ -100,6 +126,15 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                 <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">
                     {stats.no_leidos ?? 0} sin leer
                 </span>
+                <button
+                    type="button"
+                    onClick={actualizar}
+                    disabled={actualizando}
+                    className="panel-boton--secundario inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
+                >
+                    <Icono nombre="actualizar" className={`h-4 w-4 ${actualizando ? 'animate-spin' : ''}`} />
+                    {actualizando ? 'Actualizando…' : 'Actualizar'}
+                </button>
             </PageHeader>
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -148,21 +183,27 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                 {items.map((m) => (
                                     <li key={m.id}>
                                         <button
-                                            onClick={() => setSeleccion(m.id)}
-                                            className={`w-full px-4 py-3 text-left transition ${
-                                                seleccion === m.id ? 'bg-blue-50' : 'hover:bg-slate-50'
+                                            onClick={() => seleccionar(m)}
+                                            aria-current={seleccion === m.id ? 'true' : undefined}
+                                            className={`relative w-full py-3 pr-4 pl-5 text-left transition ${
+                                                seleccion === m.id ? 'bg-blue-50' : m.leido ? 'hover:bg-slate-50' : 'bg-amber-50/60 hover:bg-amber-50'
                                             }`}
                                         >
+                                            {!m.leido && <span className="absolute top-0 bottom-0 left-0 w-1 bg-amber-500" aria-hidden="true" />}
                                             <div className="flex items-center justify-between gap-2">
-                                                <span className={`truncate text-sm ${m.leido ? 'font-medium text-slate-700' : 'font-bold text-slate-900'}`}>
+                                                <span className={`truncate text-sm ${m.leido ? 'text-slate-600' : 'font-bold text-slate-900'}`}>
                                                     {m.nombre}
                                                 </span>
-                                                {!m.leido && <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>}
-                                                {m.respondido && (
-                                                    <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                                                        respondido
-                                                    </span>
-                                                )}
+                                                <span className="flex shrink-0 items-center gap-1">
+                                                    {!m.leido && (
+                                                        <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">Nuevo</span>
+                                                    )}
+                                                    {m.respondido && (
+                                                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                                                            Respondido
+                                                        </span>
+                                                    )}
+                                                </span>
                                             </div>
                                             <div className="mt-0.5 truncate text-xs font-medium text-slate-500">{m.asunto}</div>
                                             <div className="mt-0.5 max-h-8 overflow-hidden text-xs text-slate-400">{m.mensaje}</div>
@@ -205,24 +246,16 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                     </p>
                                     <p className="mt-0.5 text-xs text-slate-400">
                                         {formatearFecha(actual.fecha)}
-                                        {actual.ip && <> · IP {actual.ip}</>}
                                         {actual.respondido && <> · Respondido el {formatearFecha(actual.respondido_at)}</>}
                                     </p>
                                 </div>
                                 <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                                     <Boton
-                                        onClick={() => accion(`/lorente-panel/mensajes/${actual.id}/leido`)}
-                                        className="px-3 py-1.5 text-xs border-slate-300 hover:bg-slate-50"
-                                    >
-                                        <Icono nombre="check" className="h-4 w-4" />
-                                        {actual.leido ? 'Marcar no leído' : 'Marcar leído'}
-                                    </Boton>
-                                    <Boton
                                         onClick={() => accion(`/lorente-panel/mensajes/${actual.id}/respondido`)}
                                         className="px-3 py-1.5 text-xs border-slate-300 hover:bg-slate-50"
                                     >
                                         <Icono nombre="publicar" className="h-4 w-4" />
-                                        {actual.respondido ? 'Quitar respondido' : 'Marcar respondido'}
+                                        {actual.respondido ? 'Quitar "respondido"' : 'Marcar como respondido'}
                                     </Boton>
                                     <Boton
                                         onClick={() => eliminar(actual.id)}
@@ -238,8 +271,9 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                 {actual.mensaje}
                             </div>
 
-                            <div className="mt-5 flex flex-wrap gap-2">
-                                {numeroWhatsapp(actual.telefono) && (
+                            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-5">
+                                <span className="mr-1 text-xs font-semibold text-slate-500">Responder:</span>
+                                {numeroWhatsapp(actual.telefono) ? (
                                     <a
                                         href={urlWhatsapp(actual)}
                                         target="_blank"
@@ -247,10 +281,12 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                         className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
                                     >
                                         <Icono nombre="publicar" className="h-4 w-4" />
-                                        Responder por WhatsApp
+                                        WhatsApp
                                     </a>
+                                ) : (
+                                    <span className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-400">Sin teléfono</span>
                                 )}
-                                {actual.email && (
+                                {actual.email ? (
                                     <a
                                         href={urlGmail(actual)}
                                         target="_blank"
@@ -258,8 +294,18 @@ export default function Mensajes({ mensajes = { data: [], links: [], meta: {} },
                                         className="panel-boton--primario inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-900"
                                     >
                                         <Icono nombre="publicar" className="h-4 w-4" />
-                                        Responder por Gmail
+                                        Correo (Gmail)
                                     </a>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        disabled
+                                        title="Este mensaje no incluyó correo electrónico"
+                                        className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-400"
+                                    >
+                                        <Icono nombre="publicar" className="h-4 w-4" />
+                                        Correo (no indicado)
+                                    </button>
                                 )}
                             </div>
                         </div>

@@ -3,18 +3,21 @@ import { useEffect, useState } from 'react';
 
 const MAX_VISTAS = 5;
 const CLAVE_VISTAS = (id) => `lorente-comunicado-vistas-${id}`;
-const CLAVE_SESION = (id) => `lorente-comunicado-sesion-${id}`;
+
+// Guarda por carga completa de la página: evita contar dos veces en StrictMode
+// y evita contar de nuevo cuando solo cambia la sección con Inertia.
+const cargasContadas = new Set();
 
 /**
  * Comunicado emergente de la página principal.
- * - Solo se muestra en el inicio ("/") y a visitantes sin sesión (el servidor no envía el dato a logueados).
- * - Se muestra como máximo 5 veces por navegador, contando una vez por sesión de pestaña.
+ * - Solo en el inicio y para visitantes sin sesión (el servidor no envía el dato a usuarios logueados).
+ * - Máximo 5 veces por navegador: cada carga completa del inicio (incluido refrescar) cuenta una vez.
  */
 export default function ComunicadoEmergente({ comunicado }) {
     const { url } = usePage();
     const esInicio = url === '/' || url.startsWith('/?');
-    const [visible, setVisible] = useState(false);
     const id = comunicado?.id;
+    const [visible, setVisible] = useState(false);
 
     useEffect(() => {
         if (!id || !esInicio) {
@@ -22,18 +25,16 @@ export default function ComunicadoEmergente({ comunicado }) {
             return;
         }
 
+        const clave = CLAVE_VISTAS(id);
         try {
-            if (sessionStorage.getItem(CLAVE_SESION(id))) {
-                setVisible(true);
-                return;
+            if (!cargasContadas.has(clave)) {
+                cargasContadas.add(clave);
+                const vistas = Number(localStorage.getItem(clave) || 0);
+                if (vistas < MAX_VISTAS) {
+                    localStorage.setItem(clave, String(vistas + 1));
+                    setVisible(true);
+                }
             }
-
-            const vistas = Number(localStorage.getItem(CLAVE_VISTAS(id)) || 0);
-            if (vistas >= MAX_VISTAS) return;
-
-            localStorage.setItem(CLAVE_VISTAS(id), String(vistas + 1));
-            sessionStorage.setItem(CLAVE_SESION(id), '1');
-            setVisible(true);
         } catch {
             // Si el navegador bloquea el almacenamiento, no se muestra el comunicado.
         }
@@ -49,14 +50,6 @@ export default function ComunicadoEmergente({ comunicado }) {
     }, [visible]);
 
     if (!visible || !comunicado || !esInicio) return null;
-
-    const imagen = (
-        <img
-            src={comunicado.imagen_url}
-            alt="Comunicado de la I.E. N.º 31501 Sebastián Lorente"
-            className="block max-h-[85vh] w-auto max-w-full rounded-xl object-contain shadow-2xl"
-        />
-    );
 
     return (
         <div
@@ -75,13 +68,11 @@ export default function ComunicadoEmergente({ comunicado }) {
                 >
                     ✕
                 </button>
-                {comunicado.enlace ? (
-                    <a href={comunicado.enlace} target="_blank" rel="noopener noreferrer" aria-label="Abrir comunicado">
-                        {imagen}
-                    </a>
-                ) : (
-                    imagen
-                )}
+                <img
+                    src={comunicado.imagen_url}
+                    alt="Comunicado de la I.E. N.º 31501 Sebastián Lorente"
+                    className="block max-h-[85vh] w-auto max-w-full rounded-xl object-contain shadow-2xl"
+                />
             </div>
         </div>
     );

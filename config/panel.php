@@ -9,13 +9,13 @@ return [
     ],
 
     'categorias_noticias' => [
-        'Logros' => '🏆 Logros',
-        'Concurso' => '🥇 Concurso',
-        'Resultados' => '📋 Resultados',
-        'Cultura' => '🎭 Cultura',
-        'Educacion' => '📚 Educación',
-        'Evento' => '🥳 Evento',
-        'Comunicado' => '📢 Comunicado',
+        'Logros' => 'Logros',
+        'Concurso' => 'Concurso',
+        'Resultados' => 'Resultados',
+        'Cultura' => 'Cultura',
+        'Educacion' => 'Educación',
+        'Evento' => 'Evento',
+        'Comunicado' => 'Comunicado',
     ],
 
     'dias_purga_papelera' => 7,
@@ -24,7 +24,6 @@ return [
         'publico' => 'Público',
         'privado' => 'Privado',
     ],
-
     'secciones' => [
         'resumen' => [
             'etiqueta' => 'Resumen',

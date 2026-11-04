@@ -77,6 +77,17 @@ class MensajesController extends Controller
         return back()->with('ok', $mensaje->leido ? 'Mensaje marcado como leído.' : 'Mensaje marcado como no leído.');
     }
 
+    /** Al abrir un mensaje queda leído (no cambia si ya lo estaba). */
+    public function leer(ContactoMensaje $mensaje): RedirectResponse
+    {
+        if (! $mensaje->leido) {
+            $mensaje->leido = true;
+            $mensaje->save();
+        }
+
+        return back();
+    }
+
     public function marcarRespondido(Request $request, ContactoMensaje $mensaje): RedirectResponse
     {
         $mensaje->respondido_at = $mensaje->respondido_at === null ? now() : null;
@@ -108,7 +119,6 @@ class MensajesController extends Controller
             'respondido_at' => $m->respondido_at?->toIso8601String(),
             'fecha' => $m->created_at?->toIso8601String(),
             'fecha_texto' => $m->created_at?->translatedFormat('d M Y · H:i'),
-            'ip' => $m->ip,
         ];
     }
 }

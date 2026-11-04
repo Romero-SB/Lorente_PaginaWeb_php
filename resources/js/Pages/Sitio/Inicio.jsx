@@ -6,7 +6,7 @@ export default function Inicio(props) {
     const descripcion =
         'I.E. N° 31501 Sebastián Lorente — institución educativa pública de Huancayo, Junín. Formamos ciudadanos íntegros con valores y excelencia educativa.';
     const imagenSocial =
-        props.config?.hero_imagen || new URL('/lorentefrontis.jpg', window.location.origin).href;
+        props.config?.hero_imagen || new URL('/lorentefrontis.webp', window.location.origin).href;
 
     return (
         <>

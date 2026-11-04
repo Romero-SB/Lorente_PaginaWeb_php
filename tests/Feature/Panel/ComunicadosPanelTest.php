@@ -55,11 +55,10 @@ class ComunicadosPanelTest extends TestCase
         $this->actingAs($admin)
             ->post('/lorente-panel/comunicados', [
                 'imagen' => UploadedFile::fake()->image('aviso.jpg', 1200, 1600),
-                'enlace' => 'https://lorente.edu.pe',
             ])
             ->assertSessionHas('ok');
 
-        $this->assertDatabaseHas('comunicados', ['enlace' => 'https://lorente.edu.pe', 'activo' => true]);
+        $this->assertDatabaseHas('comunicados', ['activo' => true]);
     }
 
     public function test_rechaza_publicar_sin_imagen_o_con_fechas_invertidas(): void
@@ -75,6 +74,21 @@ class ComunicadosPanelTest extends TestCase
             'inicio_at' => '2026-12-10 10:00',
             'fin_at' => '2026-12-01 10:00',
         ])->assertSessionHasErrors('fin_at');
+    }
+
+    public function test_sin_fecha_de_inicio_el_comunicado_empieza_hoy(): void
+    {
+        Storage::fake('public');
+        $admin = $this->usuario(User::ROLE_ADMIN);
+
+        $this->actingAs($admin)->post('/lorente-panel/comunicados', [
+            'imagen' => UploadedFile::fake()->image('aviso.jpg'),
+        ])->assertSessionHas('ok');
+
+        $c = Comunicado::first();
+        $this->assertNotNull($c->inicio_at);
+        $this->assertTrue($c->inicio_at->isToday());
+        $this->assertNotNull(Comunicado::vigente());
     }
 
     public function test_docente_no_gestiona_comunicados(): void

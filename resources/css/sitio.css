@@ -136,7 +136,7 @@
     align-items: center;
     min-height: 100vh;
     overflow: hidden;
-    background-image: url('/lorentefrontis.jpg');
+    background-image: url('/lorentefrontis.webp');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -2345,4 +2345,12 @@
     .sitio-root .hst::before {
         transform: scaleX(1);
     }
+}
+
+/* Fondo del sitio detrás del panel administrativo abierto (sin contenido ni tinte) */
+.panel-fondo-sitio {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: url('/lorentefrontis.webp') center / cover no-repeat;
 }

@@ -10,11 +10,17 @@ import { formatoPeso } from '../../lib/image';
 
 const PESO_MAXIMO = 4 * 1024 * 1024;
 
+// Fecha y hora actual en formato datetime-local (zona horaria del navegador).
+function ahoraLocal() {
+    const d = new Date();
+    d.setSeconds(0, 0);
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
 export default function Comunicados({ comunicados = [], vigente_id = null }) {
     const form = useForm({
         imagen: null,
-        enlace: '',
-        inicio_at: '',
+        inicio_at: ahoraLocal(),
         fin_at: '',
     });
     const [previa, setPrevia] = useState(null);
@@ -100,21 +106,6 @@ export default function Comunicados({ comunicados = [], vigente_id = null }) {
                         </div>
                     )}
 
-                    <div>
-                        <label htmlFor="com-enlace" className="mb-1 block text-xs font-semibold text-slate-600">
-                            Enlace al tocar la imagen (opcional)
-                        </label>
-                        <input
-                            id="com-enlace"
-                            type="url"
-                            placeholder="https://..."
-                            value={form.data.enlace}
-                            onChange={(e) => form.setData('enlace', e.target.value)}
-                            className="panel-campo w-full"
-                        />
-                        {form.errors.enlace && <p className="mt-1 text-xs text-red-600">{form.errors.enlace}</p>}
-                    </div>
-
                     <div className="grid gap-3 sm:grid-cols-2">
                         <div>
                             <label htmlFor="com-inicio" className="mb-1 block text-xs font-semibold text-slate-600">Mostrar desde (opcional)</label>
@@ -175,8 +166,7 @@ export default function Comunicados({ comunicados = [], vigente_id = null }) {
                                                 {c.fin_at ? `Hasta ${c.fin_at.replace('T', ' ')}` : ''}
                                             </p>
                                         )}
-                                        {c.enlace && <p className="truncate text-[11px] text-blue-600">{c.enlace}</p>}
-                                        <div className="mt-2 flex flex-wrap gap-2">
+                                                                <div className="mt-2 flex flex-wrap gap-2">
                                             <Boton onClick={() => alternar(c)} className="px-3 py-1.5 text-xs border-slate-200 hover:bg-slate-50">
                                                 {c.activo ? 'Desactivar' : 'Activar'}
                                             </Boton>

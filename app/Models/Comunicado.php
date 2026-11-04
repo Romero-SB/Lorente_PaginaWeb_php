@@ -9,7 +9,7 @@ class Comunicado extends Model
 {
     protected $table = 'comunicados';
 
-    protected $fillable = ['imagen', 'enlace', 'activo', 'inicio_at', 'fin_at'];
+    protected $fillable = ['imagen', 'activo', 'inicio_at', 'fin_at'];
 
     protected $casts = [
         'activo' => 'boolean',

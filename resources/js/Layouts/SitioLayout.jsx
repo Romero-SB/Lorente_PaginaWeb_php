@@ -23,25 +23,6 @@ const COMPONENTES_AUTH = new Set([
     'Auth/FirstPasswordChange',
 ]);
 
-// Fondo estático que reemplaza al sitio público detrás del panel.
-// Evita renderizar todo el sitio (Hero, Nosotros, Noticias, Documentos, Contacto)
-// en cada cambio de sección.
-function FondoPanel() {
-    return (
-        <div
-            aria-hidden="true"
-            style={{
-                position: 'fixed',
-                inset: 0,
-                zIndex: 0,
-                backgroundImage: "linear-gradient(rgba(10, 25, 60, 0.55), rgba(10, 25, 60, 0.7)), url('/lorentefrontis.jpg')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            }}
-        />
-    );
-}
-
 export default function SitioLayout({ children }) {
     const { component, props } = usePage();
     const sitio = props.sitio;
@@ -50,6 +31,7 @@ export default function SitioLayout({ children }) {
     const esAuth = COMPONENTES_AUTH.has(component);
     const esOverlay = esPanel || esAuth;
     const [loginAbierto, setLoginAbierto] = useState(() => props.abrir_panel === true && !usuario);
+    const [panelMinimizado, setPanelMinimizado] = useState(false);
 
     const limpiarHash = useCallback(() => {
         if (window.location.hash === HASH_LOGIN) {
@@ -105,6 +87,14 @@ export default function SitioLayout({ children }) {
         }
     }, [esOverlay]);
 
+    // El panel avisa cuando cambia su estado (normal, maximizado o minimizado).
+    // El contenido público solo se renderiza mientras el panel está minimizado.
+    useEffect(() => {
+        const alCambiarVista = (e) => setPanelMinimizado(e.detail === 'minimizado');
+        window.addEventListener('lorente-panel-vista', alCambiarVista);
+        return () => window.removeEventListener('lorente-panel-vista', alCambiarVista);
+    }, []);
+
     useEffect(() => {
         if (props.abrir_panel === true && !usuario) {
             setLoginAbierto(true);
@@ -120,8 +110,9 @@ export default function SitioLayout({ children }) {
             <Sidebar />
 
             <main id="contenido-principal" className="main-content" tabIndex={-1}>
-                {esPanel && <FondoPanel />}
-                {esOverlay ? sitio && <SitioHome {...sitio} /> : children}
+                {esAuth || (esPanel && panelMinimizado) ? sitio && <SitioHome {...sitio} /> : null}
+                {esPanel && !panelMinimizado && <div className="panel-fondo-sitio" aria-hidden="true" />}
+                {!esOverlay && children}
                 <Footer />
             </main>
 

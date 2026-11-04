@@ -26,6 +26,10 @@ export default function PanelLayout({ children }) {
     const ventana = usePanelWindow();
     const [menuAbierto, setMenuAbierto] = useState(false);
 
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('lorente-panel-vista', { detail: ventana.view }));
+    }, [ventana.view]);
+
     const secciones = panel?.secciones ?? [];
     const rutaActual = window.location.pathname;
     const activa = secciones.find((s) => (s.exacta ? rutaActual === s.ruta : rutaActual.startsWith(s.ruta)));
@@ -99,17 +103,13 @@ export default function PanelLayout({ children }) {
                 return;
             }
 
-            if (menuAbierto) {
-                setMenuAbierto(false);
-                return;
-            }
-
-            if (ventana.view !== 'minimizado') ventana.setView('minimizado');
+            // Escape solo cierra el menú móvil; el panel ya no se minimiza con esta tecla.
+            if (menuAbierto) setMenuAbierto(false);
         };
 
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [ventana.view, menuAbierto]);
+    }, [menuAbierto]);
 
     function cerrarSesion() {
         router.post('/lorente-panel/logout');

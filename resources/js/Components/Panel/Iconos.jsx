@@ -153,6 +153,12 @@ const PATH = {
         </>
     ),
     check: <path d="M20 6 9 17l-5-5" />,
+    actualizar: (
+        <>
+            <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+            <path d="M21 4v5h-5" />
+        </>
+    ),
     paleta: (
         <>
             <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
