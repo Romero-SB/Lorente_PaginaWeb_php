@@ -20,7 +20,7 @@ class ConfiguracionRequest extends FormRequest
             'direccion' => ['nullable', 'string', 'max:255'],
             'estudiantes' => ['nullable', 'integer', 'min:0', 'max:100000'],
             'docentes_count' => ['nullable', 'integer', 'min:0', 'max:10000'],
-            'anio_fundacion' => ['nullable', 'integer', 'min:1900', 'max:2100'],
+            'anio_fundacion' => ['nullable', 'integer', 'min:1800', 'max:2100'],
             'niveles' => ['nullable', 'string', 'max:255'],
             'mision' => ['nullable', 'string', 'max:2000'],
             'vision' => ['nullable', 'string', 'max:2000'],

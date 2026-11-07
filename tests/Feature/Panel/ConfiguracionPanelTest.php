@@ -48,7 +48,7 @@ class ConfiguracionPanelTest extends TestCase
             'direccion' => 'Av. Los Próceres 123',
             'estudiantes' => 850,
             'docentes_count' => 42,
-            'anio_fundacion' => 1965,
+            'anio_fundacion' => 1846,
             'historia_cierre' => 'Un legado que continúa creciendo.',
             'niveles' => 'Inicial, Primaria, Secundaria',
             'mision' => 'Formar estudiantes íntegros.',
@@ -64,7 +64,7 @@ class ConfiguracionPanelTest extends TestCase
         $this->assertSame('informes@lorente.edu.pe', $config->email);
         $this->assertSame(850, $config->estudiantes);
         $this->assertSame(42, $config->docentes_count);
-        $this->assertSame(1965, $config->anio_fundacion);
+        $this->assertSame(1846, $config->anio_fundacion);
         $this->assertSame('Inicial, Primaria, Secundaria', $config->niveles);
         $this->assertSame('Presentación editada desde el panel.', $config->nosotros_intro);
         $this->assertSame("Respeto\nResponsabilidad\nSolidaridad", $config->nosotros_valores);

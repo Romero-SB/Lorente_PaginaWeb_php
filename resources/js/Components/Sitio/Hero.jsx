@@ -9,7 +9,7 @@ export default function Hero({ config = {} }) {
         config.docentes_count !== null && config.docentes_count !== undefined && config.docentes_count !== ''
             ? `${config.docentes_count}+`
             : '25+';
-    const fundacion = config.anio_fundacion || '1950';
+    const fundacion = config.anio_fundacion || '1846';
     const niveles = config.niveles || '3';
 
     return (

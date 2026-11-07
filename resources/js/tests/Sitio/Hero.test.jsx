@@ -10,4 +10,10 @@ describe('Hero', () => {
         expect(screen.getByText(/Nivel$/)).toBeInTheDocument();
         expect(screen.queryByText(/Niveles$/)).not.toBeInTheDocument();
     });
+
+    test('usa 1846 como año de fundación por defecto', () => {
+        render(<Hero config={{}} />);
+
+        expect(screen.getByText('1846')).toBeInTheDocument();
+    });
 });

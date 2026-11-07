@@ -990,11 +990,10 @@
     gap: clamp(16px, 2vw, 24px);
 }
 
-.sitio-root .pdg-dynamic .pdc,
-.sitio-root .pdg-dynamic .rev {
-    flex: 0 1 calc(25% - clamp(16px, 2vw, 24px));
+.sitio-root .pdg-dynamic > .rev {
+    flex: 0 0 180px;
     min-width: 180px;
-    max-width: calc(25% - clamp(16px, 2vw, 24px));
+    max-width: 180px;
 }
 
 .sitio-root .pdg-dynamic .rev > .pdc {
@@ -1002,29 +1001,24 @@
     height: 100%;
 }
 
-@media (max-width: 1024px) {
-    .sitio-root .pdg-dynamic .pdc,
-    .sitio-root .pdg-dynamic .rev {
-        flex: 0 1 calc(33.33% - clamp(16px, 2vw, 24px));
-        max-width: calc(33.33% - clamp(16px, 2vw, 24px));
-    }
-}
-
 @media (max-width: 768px) {
-    .sitio-root .pdg-dynamic .pdc,
-    .sitio-root .pdg-dynamic .rev {
+    .sitio-root .pdg-dynamic > .rev {
         flex: 0 1 calc(50% - clamp(16px, 2vw, 24px));
         max-width: calc(50% - clamp(16px, 2vw, 24px));
+        min-width: 0;
     }
 }
 
 @media (max-width: 480px) {
-    /* Docentes de 2 en 2 en celulares */
-    .sitio-root .pdg-dynamic .pdc,
-    .sitio-root .pdg-dynamic .rev {
-        flex: 0 1 calc(50% - 8px);
-        max-width: calc(50% - 8px);
+    /* Docentes de 2 en 2 en celulares, centrados */
+    .sitio-root .pdg-dynamic > .rev {
+        flex: 0 1 calc(50% - 6px);
+        max-width: calc(50% - 6px);
         min-width: 0;
+    }
+
+    .sitio-root .pdg-dynamic {
+        gap: 12px;
     }
 }
 

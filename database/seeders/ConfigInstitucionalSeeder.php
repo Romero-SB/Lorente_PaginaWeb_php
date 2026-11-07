@@ -24,7 +24,7 @@ class ConfigInstitucionalSeeder extends Seeder
                 'direccion' => '',
                 'estudiantes' => null,
                 'docentes_count' => null,
-                'anio_fundacion' => null,
+                'anio_fundacion' => 1846,
                 'niveles' => '',
                 'mision' => '',
                 'vision' => '',
