@@ -7,7 +7,11 @@ vi.mock('@inertiajs/react', () => ({
     usePage: () => ({ url: '/' }),
 }));
 
-vi.mock('@google/model-viewer', () => ({}));
+vi.mock('@google/model-viewer/dist/model-viewer-module.min.js', () => ({
+    ModelViewerElement: class {
+        static meshoptDecoderLocation = '';
+    },
+}));
 
 describe('Sidebar logo 3D', () => {
     beforeEach(() => {
@@ -28,6 +32,7 @@ describe('Sidebar logo 3D', () => {
         expect(logo).toHaveAttribute('aria-busy', 'true');
         expect(container.querySelector('.ne-loader')).toBeInTheDocument();
         expect(container.querySelector('model-viewer')).not.toHaveAttribute('poster');
+        expect(container.querySelector('model-viewer')).toHaveAttribute('src', '/LOGASO.v3.glb');
         expect(screen.getByRole('status')).toHaveAccessibleName('Cargando logo 3D');
     });
 
@@ -38,6 +43,11 @@ describe('Sidebar logo 3D', () => {
         await act(async () => {
             await new Promise((resolve) => setTimeout(resolve, 0));
         });
+
+        const { ModelViewerElement } = await import('@google/model-viewer/dist/model-viewer-module.min.js');
+
+        expect(self.ModelViewerElement).toBe(ModelViewerElement);
+        expect(ModelViewerElement.meshoptDecoderLocation).toBe('/vendor/meshopt_decoder.js');
 
         fireEvent(model, new Event('load'));
 

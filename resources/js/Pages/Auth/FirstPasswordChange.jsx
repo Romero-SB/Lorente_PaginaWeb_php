@@ -2,7 +2,11 @@ import { router, useForm } from '@inertiajs/react';
 
 import '../../../css/login.css';
 
+import { useBloqueoFondo } from '../../hooks/useBloqueoFondo';
+
 export default function FirstPasswordChange() {
+    useBloqueoFondo(true, ['.sitio-root']);
+
     const { data, setData, post, processing, errors } = useForm({
         password: '',
         password_confirmation: '',

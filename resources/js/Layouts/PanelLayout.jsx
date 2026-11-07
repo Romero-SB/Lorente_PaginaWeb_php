@@ -32,6 +32,11 @@ export default function PanelLayout({ children }) {
     }, [ventana.view]);
 
     useEffect(() => {
+        document.body.classList.toggle('panel-abierto', ventana.view !== 'minimizado');
+        return () => document.body.classList.remove('panel-abierto');
+    }, [ventana.view]);
+
+    useEffect(() => {
         const minimizar = () => {
             setMenuAbierto(false);
             ventana.setView('minimizado');

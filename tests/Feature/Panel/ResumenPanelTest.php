@@ -21,6 +21,30 @@ class ResumenPanelTest extends TestCase
         ]);
     }
 
+    public function test_el_panel_expone_el_sitio_y_refleja_los_cambios(): void
+    {
+        $super = User::factory()->create(['role' => User::ROLE_SUPER]);
+
+        $this->actingAs($super)
+            ->get('/lorente-panel')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Panel/Resumen')
+                ->has('sitio.config')
+                ->has('sitio.noticias'));
+
+        $noticia = $this->noticia();
+
+        $this->actingAs($super)
+            ->get('/lorente-panel')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where(
+                    'sitio.noticias',
+                    fn ($noticias) => collect($noticias)->pluck('id')->contains($noticia->id),
+                ));
+    }
+
     public function test_las_estadisticas_se_invalidan_al_crear_contenido(): void
     {
         $super = User::factory()->create(['role' => User::ROLE_SUPER]);

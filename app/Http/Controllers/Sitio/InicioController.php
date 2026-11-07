@@ -12,9 +12,12 @@ class InicioController extends Controller
 {
     public function index(Request $request, bool $abrirPanel = false): Response
     {
+        $contenido = ContenidoSitio::para($request->user());
+
         return Inertia::render('Sitio/Inicio', [
-            ...ContenidoSitio::para($request->user()),
+            ...$contenido,
             'abrir_panel' => $abrirPanel,
+            'hero_preload' => $contenido['config']['hero_imagen'] ?? '/lorentefrontis.webp',
         ]);
     }
 }

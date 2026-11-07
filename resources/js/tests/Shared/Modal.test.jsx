@@ -27,4 +27,39 @@ describe('Modal', () => {
         await userEvent.click(screen.getByRole('dialog', { name: 'Ventana' }).parentElement);
         expect(onCerrar).toHaveBeenCalledTimes(1);
     });
+
+    test('bloquea el sitio y la ventana del panel cuando se abre dentro del panel', () => {
+        document.body.innerHTML = `
+            <div class="sitio-root"></div>
+            <div class="panel-capa"><div class="panel-ventana"></div></div>
+        `;
+        document.body.style.overflow = 'scroll';
+        document.body.style.paddingRight = '7px';
+
+        const sitio = document.querySelector('.sitio-root');
+        const panel = document.querySelector('.panel-ventana');
+
+        const { unmount } = render(
+            <Modal onCerrar={vi.fn()} ariaLabel="Formulario">
+                Contenido
+            </Modal>,
+        );
+
+        expect(sitio).toHaveAttribute('inert');
+        expect(panel).toHaveAttribute('inert');
+        expect(document.body).toHaveClass('fondo-bloqueado');
+        expect(document.body.style.overflow).toBe('hidden');
+
+        unmount();
+
+        expect(sitio).not.toHaveAttribute('inert');
+        expect(panel).not.toHaveAttribute('inert');
+        expect(document.body).not.toHaveClass('fondo-bloqueado');
+        expect(document.body.style.overflow).toBe('scroll');
+        expect(document.body.style.paddingRight).toBe('7px');
+
+        document.body.innerHTML = '';
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
 });

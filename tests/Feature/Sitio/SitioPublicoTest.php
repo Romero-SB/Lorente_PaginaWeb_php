@@ -56,7 +56,17 @@ class SitioPublicoTest extends TestCase
                 ->has('noticias')
                 ->has('documentos')
                 ->has('historia')
-                ->has('nosotros_imagenes'));
+                ->has('nosotros_imagenes')
+                ->where('hero_preload', '/lorentefrontis.webp'));
+    }
+
+    public function test_el_html_inicial_precarga_la_imagen_hero(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('rel="preload"', false)
+            ->assertSee('as="image"', false)
+            ->assertSee('/lorentefrontis.webp', false);
     }
 
     public function test_el_panel_para_invitados_se_muestra_sobre_el_inicio(): void

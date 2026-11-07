@@ -32,7 +32,7 @@ export default function SitioLayout({ children }) {
     const esOverlay = esPanel || esAuth;
     const [loginAbierto, setLoginAbierto] = useState(() => props.abrir_panel === true && !usuario);
     const [panelMinimizado, setPanelMinimizado] = useState(false);
-    const sitioVisible = !esPanel || panelMinimizado;
+    const sitioVisible = !esPanel || panelMinimizado || Boolean(sitio);
 
     const limpiarHash = useCallback(() => {
         if (window.location.hash === HASH_LOGIN) {
@@ -89,7 +89,8 @@ export default function SitioLayout({ children }) {
     }, [esOverlay]);
 
     // El panel avisa cuando cambia su estado (normal, maximizado o minimizado).
-    // El contenido público solo se renderiza mientras el panel está minimizado.
+    // El sitio de fondo se mantiene visible e interactivo; solo se usa la imagen
+    // de respaldo cuando no hay datos públicos disponibles.
     useEffect(() => {
         const alCambiarVista = (e) => setPanelMinimizado(e.detail === 'minimizado');
         window.addEventListener('lorente-panel-vista', alCambiarVista);
@@ -111,8 +112,8 @@ export default function SitioLayout({ children }) {
             <Sidebar sitioVisible={sitioVisible} />
 
             <main id="contenido-principal" className="main-content" tabIndex={-1}>
-                {esAuth || (esPanel && panelMinimizado) ? sitio && <SitioHome {...sitio} /> : null}
-                {esPanel && !panelMinimizado && <div className="panel-fondo-sitio" aria-hidden="true" />}
+                {(esAuth || esPanel) && sitio && <SitioHome {...sitio} />}
+                {esPanel && !sitio && <div className="panel-fondo-sitio" aria-hidden="true" />}
                 {!esOverlay && children}
                 <Footer />
             </main>

@@ -72,8 +72,11 @@ export default function Sidebar({ sitioVisible = true }) {
 
         const cargar = () => {
             const importar = () =>
-                import('@google/model-viewer')
-                    .then(() => {
+                import('@google/model-viewer/dist/model-viewer-module.min.js')
+                    .then(({ ModelViewerElement }) => {
+                        self.ModelViewerElement = ModelViewerElement;
+                        ModelViewerElement.meshoptDecoderLocation = '/vendor/meshopt_decoder.js';
+
                         if (!cancelado) setMvListo(true);
                     })
                     .catch(() => {
@@ -159,7 +162,7 @@ export default function Sidebar({ sitioVisible = true }) {
                 clearTimeout(resetTimeoutRef.current);
                 resetTimeoutRef.current = setTimeout(() => {
                     model.cameraOrbit = DEFAULT_ORBIT;
-                }, 3000);
+                }, 2000);
                 return;
             }
 
@@ -301,7 +304,7 @@ export default function Sidebar({ sitioVisible = true }) {
                         )}
                         <model-viewer
                             ref={modelRef}
-                            src="/LOGASO.v2.glb"
+                            src="/LOGASO.v3.glb"
                             alt="Logo 3D de la IE Sebastián Lorente"
                             loading="lazy"
                             camera-orbit="0deg 90deg 2.5m"

@@ -1438,3 +1438,8 @@ html.panel-arrastrando * {
     -webkit-user-select: none !important;
     user-select: none !important;
 }
+
+body.fondo-bloqueado .panel-ventana {
+    -webkit-user-select: none;
+    user-select: none;
+}

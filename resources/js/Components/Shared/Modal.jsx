@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useBloqueoFondo } from '../../hooks/useBloqueoFondo';
+
 /**
  * Diálogo modal accesible: cierra con Escape o al pulsar el fondo, y atrapa el
  * foco (Tab) mientras el foco está dentro del panel.
@@ -14,6 +16,9 @@ import { createPortal } from 'react-dom';
  */
 export default function Modal({ onCerrar, ariaLabel = 'Ventana', ancho = 'max-w-md', z = 'z-50', children }) {
     const ref = useRef(null);
+    const contenedor = typeof document !== 'undefined' ? document.querySelector('.panel-capa') : null;
+
+    useBloqueoFondo(Boolean(contenedor), contenedor ? ['.sitio-root', '.panel-ventana'] : []);
 
     useEffect(() => {
         function onKey(e) {
@@ -69,6 +74,5 @@ export default function Modal({ onCerrar, ariaLabel = 'Ventana', ancho = 'max-w-
 
     if (typeof document === 'undefined') return contenido;
 
-    const contenedor = document.querySelector('.panel-capa');
     return contenedor ? createPortal(contenido, contenedor) : contenido;
 }

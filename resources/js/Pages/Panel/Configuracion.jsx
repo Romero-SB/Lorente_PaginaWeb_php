@@ -332,7 +332,6 @@ export default function Configuracion({ config = {}, historia = [], nosotros_ima
                             <Campo
                                 etiqueta="Niveles"
                                 error={error('niveles')}
-                                ayuda="Separa los niveles con comas. Ej.: Inicial, Primaria, Secundaria."
                                 id="config-niveles"
                                 className="panel-celda-3"
                             >

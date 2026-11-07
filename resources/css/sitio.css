@@ -2431,3 +2431,19 @@
     z-index: 0;
     background: url('/lorentefrontis.webp') center / cover no-repeat;
 }
+
+/* Evita que la selección iniciada en formularios/modales escape al sitio de fondo. */
+body.fondo-bloqueado .sitio-root,
+body.panel-abierto .sitio-root {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body.panel-abierto .sitio-root input,
+body.panel-abierto .sitio-root textarea,
+body.panel-abierto .sitio-root select,
+body.panel-abierto .sitio-root [contenteditable='true'],
+body.panel-abierto .sitio-root [role='dialog'] {
+    -webkit-user-select: text;
+    user-select: text;
+}

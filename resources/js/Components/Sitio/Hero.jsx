@@ -60,7 +60,7 @@ export default function Hero({ config = {} }) {
                 <div className="hs">
                     <span className="hs-n">{niveles}</span>
                     <span className="hs-l">
-                        <i className="fas fa-layer-group"></i> Niveles
+                        <i className="fas fa-layer-group"></i> Nivel
                     </span>
                 </div>
             </div>

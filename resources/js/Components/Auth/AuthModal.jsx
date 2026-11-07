@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import '../../../css/login.css';
 
+import { useBloqueoFondo } from '../../hooks/useBloqueoFondo';
 import Turnstile from './Turnstile';
 
 const TEXTOS = {
@@ -31,6 +32,8 @@ export default function AuthModal({
     const { status } = usePage().props;
     const [vista, setVista] = useState(vistaInicial);
     const [verClave, setVerClave] = useState(false);
+
+    useBloqueoFondo(true, ['.sitio-root']);
 
     const login = useForm({
         email: email || '',

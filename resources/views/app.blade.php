@@ -8,6 +8,11 @@
         <link rel="apple-touch-icon" href="/logo_lorente.webp">
         <title inertia>{{ config('app.name', 'IE 31501 Sebastián Lorente') }}</title>
 
+        @php($heroPreload = isset($page) ? ($page['props']['hero_preload'] ?? null) : null)
+        @if ($heroPreload)
+            <link rel="preload" as="image" href="{{ $heroPreload }}" fetchpriority="high">
+        @endif
+
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
