@@ -358,6 +358,12 @@
     background: #eaf7ee;
 }
 
+.login-aviso--alerta {
+    border-color: #e6d3a0;
+    color: #6d5314;
+    background: #fbf6e8;
+}
+
 @media (max-width: 480px) {
     .login-capa {
         padding: 12px;

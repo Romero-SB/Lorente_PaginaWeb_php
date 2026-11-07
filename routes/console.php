@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
@@ -11,6 +12,12 @@ Artisan::command('inspire', function () {
 Schedule::command('noticias:purgar-papelera')->dailyAt('03:00');
 Schedule::command('docentes:purgar-papelera')->dailyAt('03:15');
 Schedule::command('documentos:purgar-papelera')->dailyAt('03:30');
+
+Schedule::call(function (): void {
+    DB::table('password_reset_used_tokens')
+        ->where('used_at', '<', now()->subDays(30))
+        ->delete();
+})->dailyAt('03:45')->name('purgar-tokens-recuperacion');
 
 Schedule::command('queue:work', ['--stop-when-empty', '--tries=3', '--max-time=60'])
     ->everyMinute()

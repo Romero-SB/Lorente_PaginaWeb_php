@@ -50,10 +50,11 @@ const ICONOS = {
     ),
 };
 
-export default function Sidebar() {
+export default function Sidebar({ sitioVisible = true }) {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [activa, setActiva] = useState('inicio');
     const [mvListo, setMvListo] = useState(false);
+    const [estadoLogo, setEstadoLogo] = useState('cargando');
     const modelRef = useRef(null);
     const logoRef = useRef(null);
     const velocityRef = useRef({ x: 0, y: 0 });
@@ -75,10 +76,12 @@ export default function Sidebar() {
                     .then(() => {
                         if (!cancelado) setMvListo(true);
                     })
-                    .catch(() => {});
+                    .catch(() => {
+                        if (!cancelado) setEstadoLogo('fallback');
+                    });
 
             if (typeof requestIdleCallback === 'function') {
-                requestIdleCallback(importar, { timeout: 1200 });
+                requestIdleCallback(importar, { timeout: 600 });
             } else {
                 importar();
             }
@@ -100,13 +103,43 @@ export default function Sidebar() {
                 { rootMargin: '240px' },
             );
             observador.observe(logoRef.current);
-            temporizador = setTimeout(alVer, 2500);
+            temporizador = setTimeout(alVer, 1200);
         }
 
         return () => {
             cancelado = true;
             observador?.disconnect();
             if (temporizador) clearTimeout(temporizador);
+        };
+    }, [mvListo]);
+
+    useEffect(() => {
+        const temporizador = setTimeout(() => {
+            setEstadoLogo((actual) => (actual === 'listo' ? actual : 'fallback'));
+        }, 8000);
+
+        return () => clearTimeout(temporizador);
+    }, []);
+
+    useEffect(() => {
+        if (!mvListo) return;
+
+        const model = modelRef.current;
+        if (!model) return;
+
+        const alCargar = () => setEstadoLogo('listo');
+        const alFallar = () => setEstadoLogo((actual) => (actual === 'listo' ? actual : 'fallback'));
+
+        if (model.loaded) {
+            alCargar();
+            return;
+        }
+
+        model.addEventListener('load', alCargar);
+        model.addEventListener('error', alFallar);
+        return () => {
+            model.removeEventListener('load', alCargar);
+            model.removeEventListener('error', alFallar);
         };
     }, [mvListo]);
 
@@ -196,9 +229,12 @@ export default function Sidebar() {
     const { url } = usePage();
 
     useEffect(() => {
-        const esInicio = window.location.pathname === '/';
+        if (!sitioVisible) return;
 
-        if (!esInicio) {
+        const esInicio = window.location.pathname === '/';
+        const haySitio = document.getElementById('inicio') !== null;
+
+        if (!esInicio && !haySitio) {
             if (window.location.pathname.startsWith('/noticias')) setActiva('noticias');
             return;
         }
@@ -218,7 +254,7 @@ export default function Sidebar() {
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
-    }, [url]);
+    }, [url, sitioVisible]);
 
     const navegar = (item) => {
         setShowMobileMenu(false);
@@ -245,11 +281,27 @@ export default function Sidebar() {
                 </button>
                 <div className="sidebar-logo-container">
                     <div className="nt-glorioso">Glorioso Lorente</div>
-                    <div className="ne" ref={logoRef}>
+                    <div
+                        className={`ne${estadoLogo === 'listo' ? ' ne-listo' : ''}${estadoLogo === 'fallback' ? ' ne-fallback' : ''}`}
+                        ref={logoRef}
+                        data-estado={estadoLogo}
+                        aria-busy={estadoLogo === 'cargando'}
+                    >
+                        <img
+                            className="ne-poster"
+                            src="/logo_lorente.webp"
+                            alt=""
+                            aria-hidden="true"
+                            decoding="async"
+                        />
+                        {estadoLogo === 'cargando' && (
+                            <span className="ne-loader" role="status" aria-label="Cargando logo 3D">
+                                <span className="ne-loader-anillo" aria-hidden="true" />
+                            </span>
+                        )}
                         <model-viewer
                             ref={modelRef}
                             src="/LOGASO.v2.glb"
-                            poster="/logo_lorente.webp"
                             alt="Logo 3D de la IE Sebastián Lorente"
                             loading="lazy"
                             camera-orbit="0deg 90deg 2.5m"

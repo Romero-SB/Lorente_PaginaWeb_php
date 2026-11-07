@@ -19,16 +19,19 @@ class ResetPasswordNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = $this->resetUrl($notifiable);
+        $datos = [
+            'nombre' => $notifiable->name ?: 'usuario',
+            'correo' => $this->email,
+            'url' => $this->resetUrl($notifiable),
+            'minutos' => (int) config('auth.passwords.users.expire', 60),
+            'institucion' => 'Institución Educativa N.º 31501 «Sebastián Lorente»',
+            'logo' => asset('favicon.png'),
+        ];
 
         return (new MailMessage)
-            ->subject('Restablece tu contraseña — IE N.º 31501 «Sebastián Lorente»')
-            ->greeting('Hola '.($notifiable->name ?? ''))
-            ->line('Recibiste este correo porque se solicitó restablecer la contraseña de tu cuenta.')
-            ->line('Haz clic en el botón para elegir una nueva contraseña.')
-            ->action('Restablecer contraseña', $url)
-            ->line('Este enlace caducará en '.config('auth.passwords.users.expire', 60).' minutos.')
-            ->line('Si no solicitaste este cambio, ignora este mensaje. Tu contraseña seguirá siendo la misma.');
+            ->subject('Restablece tu contraseña | IE N.º 31501 Sebastián Lorente')
+            ->view('mail.reset-password', $datos)
+            ->text('mail.reset-password-text', $datos);
     }
 
     protected function resetUrl(object $notifiable): string

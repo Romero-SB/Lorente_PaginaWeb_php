@@ -10,6 +10,7 @@ use App\Support\Correo;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -49,16 +50,27 @@ class PasswordResetController extends Controller
 
     public function showReset(Request $request, string $token): Response
     {
+        $email = Correo::normalizar($request->string('email')->toString()) ?? '';
+
+        $estado = match (true) {
+            $this->tokenUsado($email, $token) => 'usado',
+            $this->tokenValido($email, $token) => 'valido',
+            default => 'invalido',
+        };
+
         return Inertia::render('Auth/ResetPassword', [
             'token' => $token,
-            'email' => $request->string('email')->toString(),
+            'email' => $email,
+            'estado' => $estado,
         ]);
     }
 
     public function update(ResetPasswordRequest $request): RedirectResponse
     {
         $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
-        $credentials['email'] = Correo::normalizar($credentials['email']);
+        $email = Correo::normalizar($credentials['email']) ?? '';
+        $token = (string) $credentials['token'];
+        $credentials['email'] = $email;
 
         $status = Password::reset(
             $credentials,
@@ -74,15 +86,54 @@ class PasswordResetController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
+            $this->registrarTokenUsado($email, $token);
+
             return redirect()
                 ->route('panel.login.show')
-                ->with('status', 'Tu contraseña fue actualizada. Ya puedes iniciar sesión.');
+                ->with('status', 'Tu contraseña fue actualizada. Ya puedes iniciar sesión.')
+                ->with('email', $email);
+        }
+
+        if ($status === Password::INVALID_TOKEN) {
+            return redirect()->route('panel.password.reset', [
+                'token' => $token,
+                'email' => $email,
+            ]);
         }
 
         return back()->withErrors([
-            'email' => $status === Password::INVALID_TOKEN
-                ? 'El enlace expiró o ya fue utilizado. Solicita uno nuevo.'
-                : 'No fue posible restablecer la contraseña.',
+            'email' => 'No fue posible restablecer la contraseña.',
         ])->withInput($request->only('email'));
+    }
+
+    private function tokenValido(string $email, string $token): bool
+    {
+        if ($email === '' || $token === '') {
+            return false;
+        }
+
+        $usuario = User::where('email', $email)->first();
+
+        return $usuario !== null && Password::broker()->tokenExists($usuario, $token);
+    }
+
+    private function tokenUsado(string $email, string $token): bool
+    {
+        if ($email === '' || $token === '') {
+            return false;
+        }
+
+        return DB::table('password_reset_used_tokens')
+            ->where('email', $email)
+            ->where('token_hash', hash('sha256', $token))
+            ->exists();
+    }
+
+    private function registrarTokenUsado(string $email, string $token): void
+    {
+        DB::table('password_reset_used_tokens')->updateOrInsert(
+            ['token_hash' => hash('sha256', $token)],
+            ['email' => $email, 'used_at' => now()],
+        );
     }
 }

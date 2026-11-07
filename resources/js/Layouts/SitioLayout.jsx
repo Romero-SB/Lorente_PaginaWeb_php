@@ -32,6 +32,7 @@ export default function SitioLayout({ children }) {
     const esOverlay = esPanel || esAuth;
     const [loginAbierto, setLoginAbierto] = useState(() => props.abrir_panel === true && !usuario);
     const [panelMinimizado, setPanelMinimizado] = useState(false);
+    const sitioVisible = !esPanel || panelMinimizado;
 
     const limpiarHash = useCallback(() => {
         if (window.location.hash === HASH_LOGIN) {
@@ -107,7 +108,7 @@ export default function SitioLayout({ children }) {
                 Saltar al contenido
             </a>
 
-            <Sidebar />
+            <Sidebar sitioVisible={sitioVisible} />
 
             <main id="contenido-principal" className="main-content" tabIndex={-1}>
                 {esAuth || (esPanel && panelMinimizado) ? sitio && <SitioHome {...sitio} /> : null}

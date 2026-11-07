@@ -20,18 +20,25 @@ const TEXTOS = {
     },
 };
 
-export default function AuthModal({ vistaInicial = 'login', token = '', email = '', onClose, actualizarUrl = true }) {
+export default function AuthModal({
+    vistaInicial = 'login',
+    token = '',
+    email = '',
+    estado = 'valido',
+    onClose,
+    actualizarUrl = true,
+}) {
     const { status } = usePage().props;
     const [vista, setVista] = useState(vistaInicial);
     const [verClave, setVerClave] = useState(false);
 
     const login = useForm({
-        email: '',
+        email: email || '',
         password: '',
         remember: false,
     });
 
-    const recuperar = useForm({ email: '' });
+    const recuperar = useForm({ email: email || '' });
 
     const restablecer = useForm({
         token,
@@ -78,6 +85,14 @@ export default function AuthModal({ vistaInicial = 'login', token = '', email = 
         cambiarVista('login');
     }
 
+    function solicitarNuevoEnlace() {
+        if (!recuperar.data.email) {
+            recuperar.setData('email', email);
+        }
+        recuperar.clearErrors();
+        cambiarVista('recuperar');
+    }
+
     function enviarLogin(e) {
         e.preventDefault();
         login.post('/lorente-panel/login', { preserveScroll: true, preserveState: true });
@@ -93,14 +108,24 @@ export default function AuthModal({ vistaInicial = 'login', token = '', email = 
         restablecer.post('/lorente-panel/restablecer', { preserveScroll: true, preserveState: true });
     }
 
-    const texto = TEXTOS[vista] ?? TEXTOS.login;
+    const estadoReset = vista === 'restablecer' ? estado : 'valido';
+    const texto =
+        estadoReset === 'usado'
+            ? { titulo: 'Enlace ya utilizado', sub: 'La contraseña de esta cuenta ya fue actualizada' }
+            : estadoReset === 'invalido'
+              ? { titulo: 'Enlace no válido', sub: 'Solicita un nuevo enlace de recuperación' }
+              : (TEXTOS[vista] ?? TEXTOS.login);
     const mensaje = typeof status === 'string' && status.length > 0 ? status : null;
     const tituloDocumento =
-        vista === 'recuperar'
-            ? 'Recuperar contraseña'
-            : vista === 'restablecer'
-              ? 'Restablecer contraseña'
-              : 'Acceso al panel';
+        estadoReset === 'usado'
+            ? 'Enlace ya utilizado'
+            : estadoReset === 'invalido'
+              ? 'Enlace no válido'
+              : vista === 'recuperar'
+                ? 'Recuperar contraseña'
+                : vista === 'restablecer'
+                  ? 'Restablecer contraseña'
+                  : 'Acceso al panel';
 
     return (
         <div className="login-capa" onClick={(e) => e.target === e.currentTarget && cerrar()}>
@@ -269,7 +294,37 @@ export default function AuthModal({ vistaInicial = 'login', token = '', email = 
                         </form>
                     )}
 
-                    {vista === 'restablecer' && (
+                    {vista === 'restablecer' && estadoReset !== 'valido' && (
+                        <>
+                            <div className="login-aviso login-aviso--alerta" role="status">
+                                {estadoReset === 'usado'
+                                    ? 'Este enlace ya fue utilizado. La contraseña de esta cuenta ya fue actualizada.'
+                                    : 'Este enlace expiró o no es válido. Solicita uno nuevo para continuar.'}
+                            </div>
+
+                            <p className="login-descripcion">
+                                {estadoReset === 'usado'
+                                    ? 'Por seguridad, cada enlace solo puede usarse una vez. Si necesitas cambiar la contraseña de nuevo, solicita otro enlace.'
+                                    : 'Los enlaces de recuperación tienen una vigencia limitada y solo pueden usarse una vez.'}
+                            </p>
+
+                            <button type="button" className="login-btn" onClick={volverALogin}>
+                                Ir a iniciar sesión
+                            </button>
+
+                            <p className="login-pie">
+                                <button
+                                    type="button"
+                                    className="login-enlace login-enlace--boton"
+                                    onClick={solicitarNuevoEnlace}
+                                >
+                                    Solicitar un nuevo enlace
+                                </button>
+                            </p>
+                        </>
+                    )}
+
+                    {vista === 'restablecer' && estadoReset === 'valido' && (
                         <form onSubmit={enviarRestablecimiento} className="space-y-4" noValidate>
                             <p className="login-descripcion">Elige una contraseña nueva para tu cuenta.</p>
 
@@ -353,7 +408,7 @@ export default function AuthModal({ vistaInicial = 'login', token = '', email = 
                                 ← Volver a iniciar sesión
                             </button>
                         )}
-                        {vista === 'restablecer' && (
+                        {vista === 'restablecer' && estadoReset === 'valido' && (
                             <Link href="/lorente-panel/login" className="login-enlace">
                                 ← Volver a iniciar sesión
                             </Link>

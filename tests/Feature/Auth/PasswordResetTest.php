@@ -39,6 +39,27 @@ class PasswordResetTest extends TestCase
         Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
+    public function test_el_correo_de_recuperacion_usa_la_plantilla_institucional(): void
+    {
+        $user = User::factory()->make(['email' => 'docente@lorente.edu.pe']);
+
+        $mail = (new ResetPasswordNotification('token-de-prueba', $user->email))->toMail($user);
+
+        $this->assertSame(
+            'Restablece tu contraseña | IE N.º 31501 Sebastián Lorente',
+            $mail->subject,
+        );
+        $this->assertSame('mail.reset-password', $mail->view['html']);
+        $this->assertSame('mail.reset-password-text', $mail->view['text']);
+        $this->assertStringContainsString('31501', $mail->viewData['institucion']);
+        $this->assertStringContainsString('/restablecer/token-de-prueba', $mail->viewData['url']);
+
+        $html = view('mail.reset-password', $mail->viewData)->render();
+        $this->assertStringContainsString('un solo uso', $html);
+        $this->assertStringContainsString($mail->viewData['url'], $html);
+        $this->assertStringContainsString('No respondas a este correo', $html);
+    }
+
     public function test_no_revela_si_el_correo_no_existe(): void
     {
         $response = $this->post(route('panel.password.email'), [
@@ -105,10 +126,79 @@ class PasswordResetTest extends TestCase
 
         $response->assertRedirect(route('panel.login.show'));
         $response->assertSessionHas('status');
+        $response->assertSessionHas('email', $user->email);
 
         $user->refresh();
         $this->assertTrue(Hash::check('NuevaContrasena1234', $user->password));
         $this->assertFalse($user->must_change_password);
+        $this->assertDatabaseHas('password_reset_used_tokens', [
+            'email' => $user->email,
+            'token_hash' => hash('sha256', $token),
+        ]);
+    }
+
+    public function test_el_enlace_valido_muestra_el_formulario(): void
+    {
+        $user = User::factory()->create(['email' => 'docente@lorente.edu.pe']);
+        $token = Password::broker()->createToken($user);
+
+        $this->get(route('panel.password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]))->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Auth/ResetPassword')
+            ->where('estado', 'valido')
+            ->where('token', $token)
+            ->where('email', $user->email));
+    }
+
+    public function test_el_enlace_usado_muestra_el_estado_correspondiente(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'docente@lorente.edu.pe',
+            'password' => Hash::make('Anterior1234'),
+        ]);
+
+        $token = Password::broker()->createToken($user);
+
+        $this->post(route('panel.password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'NuevaContrasena1234',
+            'password_confirmation' => 'NuevaContrasena1234',
+        ])->assertRedirect(route('panel.login.show'));
+
+        $this->get(route('panel.password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]))->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Auth/ResetPassword')
+            ->where('estado', 'usado')
+            ->where('email', $user->email));
+
+        $this->post(route('panel.password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'OtraContrasena1234',
+            'password_confirmation' => 'OtraContrasena1234',
+        ])->assertRedirect(route('panel.password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]));
+
+        $this->assertTrue(Hash::check('NuevaContrasena1234', $user->fresh()->password));
+    }
+
+    public function test_enlace_invalido_muestra_el_estado_correspondiente(): void
+    {
+        $user = User::factory()->create(['email' => 'docente@lorente.edu.pe']);
+
+        $this->get(route('panel.password.reset', [
+            'token' => 'token-invalido',
+            'email' => $user->email,
+        ]))->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Auth/ResetPassword')
+            ->where('estado', 'invalido'));
     }
 
     public function test_token_invalido_es_rechazado(): void
@@ -122,7 +212,10 @@ class PasswordResetTest extends TestCase
             'password_confirmation' => 'NuevaContrasena1234',
         ]);
 
-        $response->assertSessionHasErrors('email');
+        $response->assertRedirect(route('panel.password.reset', [
+            'token' => 'token-invalido',
+            'email' => $user->email,
+        ]));
         $this->assertFalse(Hash::check('NuevaContrasena1234', $user->fresh()->password));
     }
 

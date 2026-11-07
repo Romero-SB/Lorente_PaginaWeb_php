@@ -14,9 +14,11 @@ use Inertia\Response;
 
 class LoginController extends Controller
 {
-    public function show(): Response
+    public function show(Request $request): Response
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Auth/Login', [
+            'email' => $request->session()->get('email', ''),
+        ]);
     }
 
     public function login(LoginRequest $request, RateLimiter $limiter): RedirectResponse

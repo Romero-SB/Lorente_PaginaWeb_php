@@ -8,6 +8,7 @@ import { Toasts } from '../Components/Panel/Toasts';
 import { usePanelWindow } from '../hooks/usePanelWindow';
 import { guardarBorrador, limpiarBorrador, restaurarBorrador } from '../lib/draft';
 import { precargarPanel } from '../lib/precargaPanel';
+import { EVENTO_MINIMIZAR_PANEL } from '../lib/sitio';
 import { fijarThemeColor, THEME_COLOR_PANEL, THEME_COLOR_SITIO } from '../lib/themeColor';
 import { toast } from '../lib/toast';
 
@@ -29,6 +30,16 @@ export default function PanelLayout({ children }) {
     useEffect(() => {
         window.dispatchEvent(new CustomEvent('lorente-panel-vista', { detail: ventana.view }));
     }, [ventana.view]);
+
+    useEffect(() => {
+        const minimizar = () => {
+            setMenuAbierto(false);
+            ventana.setView('minimizado');
+        };
+
+        window.addEventListener(EVENTO_MINIMIZAR_PANEL, minimizar);
+        return () => window.removeEventListener(EVENTO_MINIMIZAR_PANEL, minimizar);
+    }, [ventana.setView]);
 
     const secciones = panel?.secciones ?? [];
     const rutaActual = window.location.pathname;
